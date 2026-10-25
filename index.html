@@ -6,8 +6,9 @@
   <meta name="theme-color" content="#101426">
   <title>Smart AI Gallery</title>
   
+  <!-- TensorFlow.js और 1000+ चीज़ें पहचानने वाला MobileNet AI मॉडल -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
   <style>
     *{box-sizing:border-box}
@@ -24,7 +25,7 @@
     #photos{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:15px;margin-top:20px;}
     .photo{background:#202743;border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;}
     .photo img{width:100%;height:140px;object-fit:cover}
-    .photo .tags{padding:8px;font-size:12px;color:#8be9fd;word-wrap:break-word;font-weight:bold;}
+    .photo .tags{padding:8px;font-size:12px;color:#50fa7b;word-wrap:break-word;font-weight:bold;}
     .photo button{background:#ff4a4a;padding:6px 12px;font-size:12px;margin:8px 0;width:80%;}
     .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:16px;}
     .status-alert{background:#202743;color:#8be9fd;padding:10px;border-radius:8px;font-size:12px;margin-bottom:15px;display:inline-block;}
@@ -35,11 +36,11 @@
   <header>
     <h1>✦ Smart AI Gallery</h1>
     <p>आपकी यादें, एक खूबसूरत और समझदार जगह पर ❤️</p>
-    <div id="ai-status" class="status-alert">ब्रेन लोडिंग... AI तैयार हो रहा है 🧠</div>
+    <div id="ai-status" class="status-alert">AI इंजन लोड हो रहा है... 🧠</div>
   </header>
 
   <main>
-    <input class="search" id="search" type="search" placeholder="यहाँ ढूँढें... (जैसे: person, कार, phone, बोतल)">
+    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: man, flower, car, phone)">
     
     <div class="actions">
       <label class="upload">+ फोटो चुनें
@@ -56,54 +57,19 @@
     let model = null;
     let images = [];
 
-    const hindiDictionary = {
-      'person': 'इंसान व्यक्ति आदमी औरत',
-      'car': 'कार गाड़ी वाहन ऑटो',
-      'motorcycle': 'मोटरसाइकिल बाइक गाड़ी',
-      'airplane': 'हवाई जहाज विमान',
-      'bus': 'बस गाड़ी',
-      'train': 'ट्रेन रेलगाड़ी',
-      'truck': 'ट्रक गाड़ी',
-      'boat': 'नाव',
-      'bottle': 'बोतल पानी',
-      'cup': 'कप चाय प्याला',
-      'fork': 'कांटा',
-      'knife': 'चाकू',
-      'spoon': 'चम्मच',
-      'bowl': 'कटोरी बर्तन',
-      'banana': 'केला फल',
-      'apple': 'सेब फल',
-      'sandwich': 'सैंडविच',
-      'orange': 'संतरा',
-      'chair': 'कुर्सी',
-      'couch': 'सोफा',
-      'potted plant': 'पौधा गमला फूल गुलाब',
-      'bed': 'बिस्तर पलंग चादर',
-      'dining table': 'मेज टेबल',
-      'tv': 'टीवी टेलीविजन स्क्रीन',
-      'laptop': 'लैपटॉप कंप्यूटर',
-      'mouse': 'माउस',
-      'remote': 'रिमोट',
-      'keyboard': 'कीबोर्ड',
-      'cell phone': 'मोबाइल फोन',
-      'book': 'किताब पुस्तक पेपर पेज',
-      'clock': 'घड़ी',
-      'cat': 'बिल्ली',
-      'dog': 'कुत्ता'
-    };
-
-    cocoSsd.load().then(loadedModel => {
+    // MobileNet मॉडल लोड करना
+    mobilenet.load().then(loadedModel => {
       model = loadedModel;
-      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
+      document.getElementById('ai-status').innerText = "AI तैयार है! अब फोटो अपलोड करें 🎉";
       document.getElementById('ai-status').style.color = "#50fa7b";
     }).catch(err => {
-      document.getElementById('ai-status').innerText = "AI लोड एरर, कृपया पेज रीलोड करें";
+      document.getElementById('ai-status').innerText = "AI लोड नहीं हो सका। कृपया इंटरनेट चेक करें।";
       document.getElementById('ai-status').style.color = "#ff5555";
     });
 
     document.getElementById('files').addEventListener('change', async (e) => {
       if (!model) {
-        alert("कृपया AI तैयार होने तक रुकें!");
+        alert("कृपया AI मॉडल लोड होने का इंतज़ार करें!");
         return;
       }
       
@@ -111,41 +77,31 @@
       
       for (let file of files) {
         const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = url;
         
         await new Promise(resolve => {
-          img.onload = async () => {
-            document.getElementById('ai-status').innerText = "AI स्कैन कर रहा है... 🔍";
-            
-            // मोबाइल फोटो को स्कैन के लिए कैनवास पर छोटा करना (ताकि AI खाली न छोड़े)
-            const canvas = document.createElement('canvas');
-            canvas.width = 416;
-            canvas.height = 416;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 416, 416);
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = url;
 
+          img.onload = async () => {
+            document.getElementById('ai-status').innerText = "AI फोटो को स्कैन कर रहा है... 🔍";
+            
             let detectedTags = [];
             try {
-              // दोनों (कैनवास और असली इमेज) पर डिटेक्शन चलाएं
-              let predictions = await model.detect(canvas);
-              if (!predictions || predictions.length === 0) {
-                predictions = await model.detect(img);
-              }
-
+              // MobileNet से वर्गीकरण (Classification)
+              const predictions = await model.classify(img);
               if (predictions && predictions.length > 0) {
-                predictions.forEach(p => {
-                  const en = p.class.toLowerCase();
-                  if (!detectedTags.includes(en)) detectedTags.push(en);
-                  if (hindiDictionary[en]) {
-                    hindiDictionary[en].split(' ').forEach(h => {
-                      if (!detectedTags.includes(h)) detectedTags.push(h);
-                    });
-                  }
+                // टॉप 3 रिजल्ट के टैग निकालना
+                predictions.slice(0, 3).forEach(p => {
+                  const words = p.className.toLowerCase().split(',');
+                  words.forEach(w => {
+                    const tag = w.trim();
+                    if (!detectedTags.includes(tag)) detectedTags.push(tag);
+                  });
                 });
               }
             } catch (err) {
-              console.log(err);
+              console.error(err);
             }
 
             images.push({
@@ -188,7 +144,7 @@
 
         const tagsDiv = document.createElement('div');
         tagsDiv.className = 'tags';
-        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 3).join(', ') : 'पहचान नहीं हो सकी';
+        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 2).join(', ') : 'पहचान नहीं हो सकी';
         tagsDiv.textContent = `पहचाना: ${displayTags}`;
 
         const del = document.createElement('button');
