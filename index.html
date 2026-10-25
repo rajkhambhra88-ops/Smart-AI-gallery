@@ -25,7 +25,7 @@
     #photos{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:15px;margin-top:20px;}
     .photo{background:#202743;border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;}
     .photo img{width:100%;height:140px;object-fit:cover}
-    .photo .tags{padding:8px;font-size:11px;color:#a0aed0;word-wrap:break-word;}
+    .photo .tags{padding:8px;font-size:12px;color:#a0aed0;word-wrap:break-word;}
     .photo button{background:#ff4a4a;padding:6px 12px;font-size:12px;margin:8px 0;width:80%;}
     .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:16px;}
     .status-alert{background:#202743;color:#8be9fd;padding:10px;border-radius:8px;font-size:12px;margin-bottom:15px;display:inline-block;}
@@ -40,7 +40,7 @@
   </header>
 
   <main>
-    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: dog, person, bottle)">
+    <input class="search" id="search" type="search" placeholder="हिंदी या English में ढूँढें... (जैसे: कार, bottle, कुत्ता)">
     
     <div class="actions">
       <label class="upload">+ फोटो चुनें
@@ -57,6 +57,50 @@
     let model = null;
     let images = [];
 
+    // अंग्रेजी से हिंदी अनुवाद शब्दकोश
+    const hindiDictionary = {
+      'person': 'इंसान व्यक्ति आदमी',
+      'car': 'कार गाड़ी वाहन',
+      'motorcycle': 'मोटरसाइकिल बाइक गाड़ी',
+      'airplane': 'हवाई जहाज विमान',
+      'bus': 'बस गाड़ी',
+      'train': 'ट्रेन रेलगाड़ी',
+      'truck': 'ट्रक गाड़ी',
+      'boat': 'नाव',
+      'bottle': 'बोतल पानी',
+      'cup': 'कप चाय प्याला',
+      'fork': 'कांटा चम्मच',
+      'knife': 'चाकू',
+      'spoon': 'चम्मच',
+      'bowl': 'कटोरी',
+      'banana': 'केला फल',
+      'apple': 'सेब फल',
+      'sandwich': 'सैंडविच',
+      'orange': 'संतरा',
+      'chair': 'कुर्सी',
+      'couch': 'सोफा',
+      'potted plant': 'पौधा गमला फूल',
+      'bed': 'बिस्तर पलंग',
+      'dining table': 'मेज टेबल',
+      'tv': 'टीवी टेलीविजन',
+      'laptop': 'लैपटॉप कंप्यूटर',
+      'mouse': 'माउस',
+      'remote': 'रिमोट',
+      'keyboard': 'कीबोर्ड',
+      'cell phone': 'मोबाइल फोन फोन',
+      'book': 'किताब पुस्तक',
+      'clock': 'घड़ी',
+      'cat': 'बिल्ली',
+      'dog': 'कुत्ता',
+      'horse': 'घोड़ा',
+      'sheep': 'भेड़',
+      'cow': 'गाय',
+      'elephant': 'हाथी',
+      'bear': 'भालू',
+      'zebra': 'ज़ेबरा',
+      'giraffe': 'जिराफ'
+    };
+
     // AI Object Detection Model लोड करना
     cocoSsd.load().then(loadedModel => {
       model = loadedModel;
@@ -67,10 +111,10 @@
       document.getElementById('ai-status').style.color = "#ff5555";
     });
 
-    // फोटो अपलोड और AI से पहचान (Object Detection)
+    // फोटो अपलोड और AI पहचान
     document.getElementById('files').addEventListener('change', async (e) => {
       if (!model) {
-        alert("कृपया AI मॉडल पूरी तरह लोड होने का इंतज़ार करें!");
+        alert("कृपया AI मॉडल पूरी तरह लोड होने का इंतज़ार करें!");
         return;
       }
       
@@ -78,8 +122,6 @@
       
       for (let file of files) {
         const url = URL.createObjectURL(file);
-        
-        // एक टेम्पररी इमेज बनाकर AI से स्कैन करवाना
         const tempImg = new Image();
         tempImg.src = url;
         
@@ -88,18 +130,30 @@
           
           try {
             const predictions = await model.detect(tempImg);
-            // मिली हुई चीज़ों के नाम निकालना और उन्हें छोटा (lowercase) करना
-            const detectedTags = predictions.map(p => p.class.toLowerCase());
-            
+            let detectedTags = [];
+
+            if (predictions && predictions.length > 0) {
+              predictions.forEach(p => {
+                const enTag = p.class.toLowerCase();
+                detectedTags.push(enTag);
+                if (hindiDictionary[enTag]) {
+                  detectedTags.push(hindiDictionary[enTag]);
+                }
+              });
+            }
+
             images.push({
               name: file.name,
               url: url,
               tags: detectedTags
             });
-            
-            document.getElementById('ai-status').innerText = "फोटो सफलतापूर्वक पहचानी और जोड़ी गई! ✅";
+
+            document.getElementById('ai-status').innerText = detectedTags.length > 0 
+              ? "पहचान पूरी हुई: " + predictions.map(p=>p.class).join(', ') + " ✅" 
+              : "चीज साफ नहीं पहचानी जा सकी ℹ️";
+
             setTimeout(() => {
-              if(model) document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
+              if (model) document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
             }, 3000);
 
             render();
@@ -112,16 +166,15 @@
       }
     });
 
-    // रेंडर और स्मार्ट सर्च फ़ंक्शन (नाम और AI टैग दोनों से ढूँढना)
+    // रेंडर और स्मार्ट सर्च फ़ंक्शन (हिंदी और अंग्रेजी दोनों सपोर्ट)
     function render() {
       const q = document.getElementById('search').value.toLowerCase().trim();
       const area = document.getElementById('photos');
       area.innerHTML = '';
 
-      // नाम या फिर AI द्वारा पहचाने गए किसी भी टैग से मैच करना
       const list = images.filter(x => {
         const matchName = x.name.toLowerCase().includes(q);
-        const matchTag = x.tags && x.tags.some(tag => tag.includes(q));
+        const matchTag = x.tags && x.tags.some(tag => tag.toLowerCase().includes(q));
         return matchName || matchTag;
       });
 
@@ -140,7 +193,8 @@
 
         const tagsDiv = document.createElement('div');
         tagsDiv.className = 'tags';
-        tagsDiv.textContent = x.tags && x.tags.length ? `पहचाना: ${x.tags.join(', ')}` : 'पहचान नहीं हो सकी';
+        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 2).join(' / ') : 'पहचान नहीं हो सकी';
+        tagsDiv.textContent = `पहचाना: ${displayTags}`;
 
         const del = document.createElement('button');
         del.textContent = 'हटाएँ';
@@ -155,7 +209,6 @@
       });
     }
 
-    // सर्च बॉक्स में टाइप करते ही तुरंत ढूँढना
     document.getElementById('search').addEventListener('input', render);
   </script>
 </body>
