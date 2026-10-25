@@ -1,81 +1,162 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101426">
-<title>Smart AI Gallery</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#101426;color:white;font-family:Arial,sans-serif}
-header{padding:24px 18px;background:linear-gradient(135deg,#4836b8,#087fba);border-radius:0 0 26px 26px}
-h1{margin:0 0 8px;font-size:27px}
-p{color:#dce8ff}
-main{padding:18px}
-.search{width:100%;padding:15px;border:1px solid #424b70;border-radius:14px;background:#1c2340;color:white;font-size:16px}
-.actions{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
-button,.upload{background:#5545d5;color:white;border:0;border-radius:12px;padding:12px 15px;font-size:15px;cursor:pointer}
-.upload{display:inline-block}
-#photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.photo{background:#202743;border-radius:15px;overflow:hidden}
-.photo img{width:100%;height:170px;object-fit:cover;display:block}
-.photo button{margin:8px}
-.empty{color:#bdc7e8;text-align:center;padding:30px 5px;grid-column:1/-1}
-footer{text-align:center;color:#9ca9cf;padding:25px;font-size:13px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101426">
+  <title>Smart AI Gallery</title>
+  
+  <!-- AI लाइब्रेरी: TensorFlow.js और Object Detection Model -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#101426;color:white;font-family:sans-serif;text-align:center;}
+    header{padding:24px 18px;background:linear-gradient(to bottom, #1a1f3c, #101426);}
+    h1{margin:0 0 8px;font-size:27px}
+    p{color:#dce8ff;margin-bottom:15px;}
+    main{padding:18px}
+    .search{width:100%;padding:15px;border:1px solid #202743;border-radius:12px;background:#181c35;color:white;font-size:16px;outline:none;margin-bottom:15px;}
+    .actions{display:flex;gap:10px;margin:16px 0;justify-content:center;}
+    button, .upload{background:#5545d5;color:white;border:none;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;}
+    .upload{display:inline-block}
+    #files{display:none}
+    #photos{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:15px;margin-top:20px;}
+    .photo{background:#202743;border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;}
+    .photo img{width:100%;height:140px;object-fit:cover}
+    .photo .tags{padding:8px;font-size:11px;color:#a0aed0;word-wrap:break-word;}
+    .photo button{background:#ff4a4a;padding:6px 12px;font-size:12px;margin:8px 0;width:80%;}
+    .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:16px;}
+    .status-alert{background:#202743;color:#8be9fd;padding:10px;border-radius:8px;font-size:12px;margin-bottom:15px;display:inline-block;}
+    footer{text-align:center;color:#9ca9cf;padding:25px;font-size:12px;}
+  </style>
 </head>
 <body>
-<header>
-<h1>✦ Smart AI Gallery</h1>
-<p>आपकी यादें, एक खूबसूरत जगह पर ❤️</p>
-</header>
-<main>
-<input class="search" id="search" placeholder="🔍 अपनी फोटो खोजें..." oninput="render()">
-<div class="actions">
-<label class="upload">＋ फोटो चुनें
-<input id="files" type="file" accept="image/*" multiple hidden>
-</label>
-<button onclick="document.getElementById('search').value='';render()">सभी फोटो</button>
-</div>
-<div id="photos"><div class="empty">अपनी पहली फोटो चुनें 📸</div></div>
-</main>
-<footer>Smart AI Gallery · आपका निजी फोटो संग्रह</footer>
-<script>
-let images=[];
-document.getElementById('files').addEventListener('change',e=>{
-for(const file of e.target.files){
-if(file.type.startsWith('image/')){
-images.push({name:file.name,url:URL.createObjectURL(file)});
-}}
-render();
-});
-function render(){
-const q=document.getElementById('search').value.toLowerCase();
-const list=images.filter(x=>x.name.toLowerCase().includes(q));
-const area=document.getElementById('photos');
-area.innerHTML='';
-if(!list.length){
-area.innerHTML='<div class="empty">कोई फोटो नहीं मिली। फोटो चुनकर शुरुआत करें 📷</div>';
-return;
-}
-list.forEach(x=>{
-const card=document.createElement('div');
-card.className='photo';
-const img=document.createElement('img');
-img.src=x.url;img.alt=x.name;
-const label=document.createElement('div');
-label.style.cssText='padding:10px;font-size:13px;overflow-wrap:anywhere';
-label.textContent=x.name;
-const del=document.createElement('button');
-del.textContent='हटाएँ';
-del.onclick=()=>{
-images=images.filter(y=>y!==x);
-URL.revokeObjectURL(x.url);render();
-};
-card.append(img,label,del);area.append(card);
-});
-}
-</script>
+  <header>
+    <h1>✦ Smart AI Gallery</h1>
+    <p>आपकी यादें, एक खूबसूरत और समझदार जगह पर ❤️</p>
+    <div id="ai-status" class="status-alert">ब्रेन लोडिंग... AI मॉडल तैयार हो रहा है, कृपया रुकें 🧠</div>
+  </header>
+
+  <main>
+    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: dog, person, bottle)">
+    
+    <div class="actions">
+      <label class="upload">+ फोटो चुनें
+        <input id="files" type="file" accept="image/*" multiple>
+      </label>
+    </div>
+
+    <div id="photos"></div>
+  </main>
+
+  <footer>Smart AI Gallery © 2026</footer>
+
+  <script>
+    let model = null;
+    let images = [];
+
+    // AI Object Detection Model लोड करना
+    cocoSsd.load().then(loadedModel => {
+      model = loadedModel;
+      document.getElementById('ai-status').innerText = "AI तैयार है! अब आप फोटो अपलोड करके स्मार्ट सर्च कर सकते हैं 🎉";
+      document.getElementById('ai-status').style.color = "#50fa7b";
+    }).catch(err => {
+      document.getElementById('ai-status').innerText = "AI लोड करने में कुछ दिक्कत आई। कृपया पेज रिफ्रेश करें।";
+      document.getElementById('ai-status').style.color = "#ff5555";
+    });
+
+    // फोटो अपलोड और AI से पहचान (Object Detection)
+    document.getElementById('files').addEventListener('change', async (e) => {
+      if (!model) {
+        alert("कृपया AI मॉडल पूरी तरह लोड होने का इंतज़ार करें!");
+        return;
+      }
+      
+      const files = Array.from(e.target.files);
+      
+      for (let file of files) {
+        const url = URL.createObjectURL(file);
+        
+        // एक टेम्पररी इमेज बनाकर AI से स्कैन करवाना
+        const tempImg = new Image();
+        tempImg.src = url;
+        
+        tempImg.onload = async () => {
+          document.getElementById('ai-status').innerText = "AI आपकी फोटो को पहचान रहा है... 🔍";
+          
+          try {
+            const predictions = await model.detect(tempImg);
+            // मिली हुई चीज़ों के नाम निकालना और उन्हें छोटा (lowercase) करना
+            const detectedTags = predictions.map(p => p.class.toLowerCase());
+            
+            images.push({
+              name: file.name,
+              url: url,
+              tags: detectedTags
+            });
+            
+            document.getElementById('ai-status').innerText = "फोटो सफलतापूर्वक पहचानी और जोड़ी गई! ✅";
+            setTimeout(() => {
+              if(model) document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
+            }, 3000);
+
+            render();
+          } catch (error) {
+            console.error(error);
+            images.push({ name: file.name, url: url, tags: [] });
+            render();
+          }
+        };
+      }
+    });
+
+    // रेंडर और स्मार्ट सर्च फ़ंक्शन (नाम और AI टैग दोनों से ढूँढना)
+    function render() {
+      const q = document.getElementById('search').value.toLowerCase().trim();
+      const area = document.getElementById('photos');
+      area.innerHTML = '';
+
+      // नाम या फिर AI द्वारा पहचाने गए किसी भी टैग से मैच करना
+      const list = images.filter(x => {
+        const matchName = x.name.toLowerCase().includes(q);
+        const matchTag = x.tags && x.tags.some(tag => tag.includes(q));
+        return matchName || matchTag;
+      });
+
+      if (!list.length) {
+        area.innerHTML = '<div class="empty">कोई फोटो नहीं मिली 🔍</div>';
+        return;
+      }
+
+      list.forEach(x => {
+        const card = document.createElement('div');
+        card.className = 'photo';
+
+        const img = document.createElement('img');
+        img.src = x.url;
+        img.alt = x.name;
+
+        const tagsDiv = document.createElement('div');
+        tagsDiv.className = 'tags';
+        tagsDiv.textContent = x.tags && x.tags.length ? `पहचाना: ${x.tags.join(', ')}` : 'पहचान नहीं हो सकी';
+
+        const del = document.createElement('button');
+        del.textContent = 'हटाएँ';
+        del.onclick = () => {
+          images = images.filter(y => y !== x);
+          URL.revokeObjectURL(x.url);
+          render();
+        };
+
+        card.append(img, tagsDiv, del);
+        area.append(card);
+      });
+    }
+
+    // सर्च बॉक्स में टाइप करते ही तुरंत ढूँढना
+    document.getElementById('search').addEventListener('input', render);
+  </script>
 </body>
 </html>
