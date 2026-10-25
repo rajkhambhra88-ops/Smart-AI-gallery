@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101426">
   <title>Smart AI Gallery</title>
-  
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
   <style>
     *{box-sizing:border-box}
@@ -32,7 +29,7 @@
     
     .fav-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     
-    .tags{padding:8px;font-size:11px;color:#50fa7b;word-wrap:break-word;font-weight:bold;flex-grow:1;}
+    .tags{padding:8px;font-size:12px;color:#50fa7b;word-wrap:break-word;font-weight:bold;flex-grow:1;}
     .del-btn{background:#ff4a4a;color:white;border:none;padding:6px;font-size:12px;margin:6px 10px 10px;border-radius:8px;cursor:pointer;}
     
     .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:15px;}
@@ -44,17 +41,17 @@
   <header>
     <h1>✦ Smart AI Gallery</h1>
     <p>आपकी यादें, एक खूबसूरत और समझदार जगह पर ❤️</p>
-    <div id="ai-status" class="status-alert">AI इंजन लोड हो रहा है... 🧠</div>
+    <div id="ai-status" class="status-alert">गैलरी तैयार है! अपनी फोटो/वीडियो जोड़ें 🎉</div>
   </header>
 
   <main>
-    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: man, flower, car, video)">
+    <input class="search" id="search" type="search" placeholder="यहाँ नाम या टैग से ढूँढें... (जैसे: Netaji, Army, कार)">
     
     <div class="tabs">
-      <button class="tab-btn active" onclick="setTab('all')">सभी (All)</button>
-      <button class="tab-btn" onclick="setTab('photos')">फोटो</button>
-      <button class="tab-btn" onclick="setTab('videos')">वीडियो</button>
-      <button class="tab-btn" onclick="setTab('yaadein')">❤️ यादें (Albums)</button>
+      <button class="tab-btn active" onclick="setTab('all', this)">सभी (All)</button>
+      <button class="tab-btn" onclick="setTab('photos', this)">फोटो</button>
+      <button class="tab-btn" onclick="setTab('videos', this)">वीडियो</button>
+      <button class="tab-btn" onclick="setTab('yaadein', this)">❤️ यादें (Albums)</button>
     </div>
 
     <div class="actions">
@@ -69,87 +66,42 @@
   <footer>Smart AI Gallery © 2026</footer>
 
   <script>
-    let model = null;
     let mediaList = [];
     let currentTab = 'all';
 
-    mobilenet.load({ version: 2, alpha: 1.0 }).then(loadedModel => {
-      model = loadedModel;
-      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो/वीडियो जोड़ सकते हैं 🎉";
-      document.getElementById('ai-status').style.color = "#50fa7b";
-    }).catch(err => {
-      document.getElementById('ai-status').innerText = "AI लोड एरर, इंटरनेट चेक करें";
-      document.getElementById('ai-status').style.color = "#ff5555";
-    });
-
-    function setTab(tab) {
+    function setTab(tab, btn) {
       currentTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       render();
     }
 
     document.getElementById('files').addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
-      
+      if (!files.length) return;
+
       for (let file of files) {
         const url = URL.createObjectURL(file);
         const isVideo = file.type.startsWith('video');
 
-        if (isVideo) {
-          mediaList.push({
-            id: Date.now() + Math.random(),
-            name: file.name,
-            url: url,
-            type: 'video',
-            isFav: false,
-            tags: ['video', 'वीडियो']
-          });
-          render();
-        } else {
-          await new Promise(resolve => {
-            const img = new Image();
-            img.src = url;
-            img.onload = async () => {
-              let detectedTags = ['photo', 'फोटो'];
-              
-              if (model) {
-                try {
-                  const canvas = document.createElement('canvas');
-                  canvas.width = 224;
-                  canvas.height = 224;
-                  const ctx = canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, 224, 224);
-
-                  const predictions = await model.classify(canvas);
-                  if (predictions && predictions.length > 0) {
-                    predictions.slice(0, 3).forEach(p => {
-                      p.className.toLowerCase().split(',').forEach(w => {
-                        const tag = w.trim();
-                        if (!detectedTags.includes(tag)) detectedTags.push(tag);
-                      });
-                    });
-                  }
-                } catch (err) {
-                  console.error(err);
-                }
-              }
-
-              mediaList.push({
-                id: Date.now() + Math.random(),
-                name: file.name,
-                url: url,
-                type: 'photo',
-                isFav: false,
-                tags: detectedTags
-              });
-
-              render();
-              resolve();
-            };
-          });
+        // यूज़र से मनपसंद नाम या टैग पूछना
+        let customTag = prompt(`"${file.name}" के लिए कोई नाम या टैग लिखें (उदा: Netaji, Guru Ji, Army, कार):`, "");
+        if (customTag === null || customTag.trim() === "") {
+          customTag = isVideo ? "वीडियो" : "फोटो";
         }
+
+        mediaList.push({
+          id: Date.now() + Math.random(),
+          name: file.name,
+          url: url,
+          type: isVideo ? 'video' : 'photo',
+          isFav: false,
+          tag: customTag.trim()
+        });
       }
+
+      render();
+      e.target.value = ''; // रीसेट ताकि दोबारा अपलोड हो सके
     });
 
     function toggleFav(id) {
@@ -184,7 +136,7 @@
       if (q) {
         list = list.filter(x => {
           const matchName = x.name.toLowerCase().includes(q);
-          const matchTag = x.tags && x.tags.some(tag => tag.toLowerCase().includes(q));
+          const matchTag = x.tag.toLowerCase().includes(q);
           return matchName || matchTag;
         });
       }
@@ -215,8 +167,7 @@
 
         const tagsDiv = document.createElement('div');
         tagsDiv.className = 'tags';
-        const displayTags = x.tags.filter(t => t !== 'photo' && t !== 'फोटो').slice(0, 2).join(', ');
-        tagsDiv.textContent = displayTags ? `पहचाना: ${displayTags}` : (x.type === 'video' ? 'वीडियो' : 'पहचान नहीं हो सकी');
+        tagsDiv.textContent = `टैग: ${x.tag}`;
 
         const delBtn = document.createElement('button');
         delBtn.className = 'del-btn';
