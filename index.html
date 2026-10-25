@@ -6,30 +6,38 @@
   <meta name="theme-color" content="#101426">
   <title>Smart AI Gallery</title>
   
-  <!-- TensorFlow.js और 1000+ चीज़ें पहचानने वाला MobileNet AI मॉडल -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#101426;color:white;font-family:sans-serif;text-align:center;}
-    header{padding:24px 18px;background:linear-gradient(to bottom, #1a1f3c, #101426);}
-    h1{margin:0 0 8px;font-size:27px}
-    p{color:#dce8ff;margin-bottom:15px;}
-    main{padding:18px}
-    .search{width:100%;padding:15px;border:1px solid #202743;border-radius:12px;background:#181c35;color:white;font-size:16px;outline:none;margin-bottom:15px;}
-    .actions{display:flex;gap:10px;margin:16px 0;justify-content:center;}
-    button, .upload{background:#5545d5;color:white;border:none;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;}
-    .upload{display:inline-block}
+    header{padding:20px 16px;background:linear-gradient(to bottom, #1a1f3c, #101426);}
+    h1{margin:0 0 6px;font-size:26px}
+    p{color:#dce8ff;margin-bottom:12px;font-size:14px;}
+    main{padding:14px}
+    .search{width:100%;padding:14px;border:1px solid #202743;border-radius:12px;background:#181c35;color:white;font-size:15px;outline:none;margin-bottom:12px;}
+    
+    .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+    .tab-btn{background:#181c35;border:1px solid #202743;color:#dce8ff;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;}
+    .tab-btn.active{background:#5545d5;color:white;border-color:#5545d5;font-weight:bold;}
+
+    .actions{display:flex;gap:10px;margin:12px 0;justify-content:center;}
+    .upload{background:#5545d5;color:white;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;display:inline-block;}
     #files{display:none}
-    #photos{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:15px;margin-top:20px;}
-    .photo{background:#202743;border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;}
-    .photo img{width:100%;height:140px;object-fit:cover}
-    .photo .tags{padding:8px;font-size:12px;color:#50fa7b;word-wrap:break-word;font-weight:bold;}
-    .photo button{background:#ff4a4a;padding:6px 12px;font-size:12px;margin:8px 0;width:80%;}
-    .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:16px;}
-    .status-alert{background:#202743;color:#8be9fd;padding:10px;border-radius:8px;font-size:12px;margin-bottom:15px;display:inline-block;}
-    footer{text-align:center;color:#9ca9cf;padding:25px;font-size:12px;}
+    
+    #gallery{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:14px;margin-top:16px;}
+    .item-card{background:#202743;border-radius:14px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.3);position:relative;display:flex;flex-direction:column;}
+    .item-card img, .item-card video{width:100%;height:140px;object-fit:cover;background:#0b0d19;}
+    
+    .fav-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    
+    .tags{padding:8px;font-size:11px;color:#50fa7b;word-wrap:break-word;font-weight:bold;flex-grow:1;}
+    .del-btn{background:#ff4a4a;color:white;border:none;padding:6px;font-size:12px;margin:6px 10px 10px;border-radius:8px;cursor:pointer;}
+    
+    .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:15px;}
+    .status-alert{background:#202743;color:#8be9fd;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:10px;display:inline-block;}
+    footer{text-align:center;color:#9ca9cf;padding:20px;font-size:12px;}
   </style>
 </head>
 <body>
@@ -40,122 +48,182 @@
   </header>
 
   <main>
-    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: man, flower, car, phone)">
+    <input class="search" id="search" type="search" placeholder="यहाँ कुछ भी ढूँढें... (जैसे: man, flower, car, video)">
     
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setTab('all')">सभी (All)</button>
+      <button class="tab-btn" onclick="setTab('photos')">फोटो</button>
+      <button class="tab-btn" onclick="setTab('videos')">वीडियो</button>
+      <button class="tab-btn" onclick="setTab('yaadein')">❤️ यादें (Albums)</button>
+    </div>
+
     <div class="actions">
-      <label class="upload">+ फोटो चुनें
-        <input id="files" type="file" accept="image/*" multiple>
+      <label class="upload">+ फोटो / वीडियो जोड़ें
+        <input id="files" type="file" accept="image/*,video/*" multiple>
       </label>
     </div>
 
-    <div id="photos"></div>
+    <div id="gallery"></div>
   </main>
 
   <footer>Smart AI Gallery © 2026</footer>
 
   <script>
     let model = null;
-    let images = [];
+    let mediaList = [];
+    let currentTab = 'all';
 
-    // MobileNet मॉडल लोड करना
-    mobilenet.load().then(loadedModel => {
+    mobilenet.load({ version: 2, alpha: 1.0 }).then(loadedModel => {
       model = loadedModel;
-      document.getElementById('ai-status').innerText = "AI तैयार है! अब फोटो अपलोड करें 🎉";
+      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो/वीडियो जोड़ सकते हैं 🎉";
       document.getElementById('ai-status').style.color = "#50fa7b";
     }).catch(err => {
-      document.getElementById('ai-status').innerText = "AI लोड नहीं हो सका। कृपया इंटरनेट चेक करें।";
+      document.getElementById('ai-status').innerText = "AI लोड एरर, इंटरनेट चेक करें";
       document.getElementById('ai-status').style.color = "#ff5555";
     });
 
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      render();
+    }
+
     document.getElementById('files').addEventListener('change', async (e) => {
-      if (!model) {
-        alert("कृपया AI मॉडल लोड होने का इंतज़ार करें!");
-        return;
-      }
-      
       const files = Array.from(e.target.files);
       
       for (let file of files) {
         const url = URL.createObjectURL(file);
-        
-        await new Promise(resolve => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = url;
+        const isVideo = file.type.startsWith('video');
 
-          img.onload = async () => {
-            document.getElementById('ai-status').innerText = "AI फोटो को स्कैन कर रहा है... 🔍";
-            
-            let detectedTags = [];
-            try {
-              // MobileNet से वर्गीकरण (Classification)
-              const predictions = await model.classify(img);
-              if (predictions && predictions.length > 0) {
-                // टॉप 3 रिजल्ट के टैग निकालना
-                predictions.slice(0, 3).forEach(p => {
-                  const words = p.className.toLowerCase().split(',');
-                  words.forEach(w => {
-                    const tag = w.trim();
-                    if (!detectedTags.includes(tag)) detectedTags.push(tag);
-                  });
-                });
+        if (isVideo) {
+          mediaList.push({
+            id: Date.now() + Math.random(),
+            name: file.name,
+            url: url,
+            type: 'video',
+            isFav: false,
+            tags: ['video', 'वीडियो']
+          });
+          render();
+        } else {
+          await new Promise(resolve => {
+            const img = new Image();
+            img.src = url;
+            img.onload = async () => {
+              let detectedTags = ['photo', 'फोटो'];
+              
+              if (model) {
+                try {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 224;
+                  canvas.height = 224;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, 224, 224);
+
+                  const predictions = await model.classify(canvas);
+                  if (predictions && predictions.length > 0) {
+                    predictions.slice(0, 3).forEach(p => {
+                      p.className.toLowerCase().split(',').forEach(w => {
+                        const tag = w.trim();
+                        if (!detectedTags.includes(tag)) detectedTags.push(tag);
+                      });
+                    });
+                  }
+                } catch (err) {
+                  console.error(err);
+                }
               }
-            } catch (err) {
-              console.error(err);
-            }
 
-            images.push({
-              name: file.name,
-              url: url,
-              tags: detectedTags
-            });
+              mediaList.push({
+                id: Date.now() + Math.random(),
+                name: file.name,
+                url: url,
+                type: 'photo',
+                isFav: false,
+                tags: detectedTags
+              });
 
-            render();
-            resolve();
-          };
-        });
+              render();
+              resolve();
+            };
+          });
+        }
       }
-      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
     });
+
+    function toggleFav(id) {
+      const item = mediaList.find(x => x.id === id);
+      if (item) {
+        item.isFav = !item.isFav;
+        render();
+      }
+    }
+
+    function deleteItem(id) {
+      const item = mediaList.find(x => x.id === id);
+      if (item) {
+        URL.revokeObjectURL(item.url);
+        mediaList = mediaList.filter(x => x.id !== id);
+        render();
+      }
+    }
 
     function render() {
       const q = document.getElementById('search').value.toLowerCase().trim();
-      const area = document.getElementById('photos');
+      const area = document.getElementById('gallery');
       area.innerHTML = '';
 
-      const list = images.filter(x => {
-        const matchName = x.name.toLowerCase().includes(q);
-        const matchTag = x.tags && x.tags.some(tag => tag.toLowerCase().includes(q));
-        return matchName || matchTag;
+      let list = mediaList.filter(x => {
+        if (currentTab === 'photos') return x.type === 'photo';
+        if (currentTab === 'videos') return x.type === 'video';
+        if (currentTab === 'yaadein') return x.isFav === true;
+        return true;
       });
 
+      if (q) {
+        list = list.filter(x => {
+          const matchName = x.name.toLowerCase().includes(q);
+          const matchTag = x.tags && x.tags.some(tag => tag.toLowerCase().includes(q));
+          return matchName || matchTag;
+        });
+      }
+
       if (!list.length) {
-        area.innerHTML = '<div class="empty">कोई फोटो नहीं मिली 🔍</div>';
+        area.innerHTML = '<div class="empty">इस सेक्शन में कुछ नहीं मिला 🔍</div>';
         return;
       }
 
       list.forEach(x => {
         const card = document.createElement('div');
-        card.className = 'photo';
+        card.className = 'item-card';
 
-        const img = document.createElement('img');
-        img.src = x.url;
-        img.alt = x.name;
+        let mediaEl;
+        if (x.type === 'video') {
+          mediaEl = document.createElement('video');
+          mediaEl.src = x.url;
+          mediaEl.controls = true;
+        } else {
+          mediaEl = document.createElement('img');
+          mediaEl.src = x.url;
+        }
+
+        const favBtn = document.createElement('button');
+        favBtn.className = 'fav-btn';
+        favBtn.innerHTML = x.isFav ? '❤️' : '🤍';
+        favBtn.onclick = () => toggleFav(x.id);
 
         const tagsDiv = document.createElement('div');
         tagsDiv.className = 'tags';
-        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 2).join(', ') : 'पहचान नहीं हो सकी';
-        tagsDiv.textContent = `पहचाना: ${displayTags}`;
+        const displayTags = x.tags.filter(t => t !== 'photo' && t !== 'फोटो').slice(0, 2).join(', ');
+        tagsDiv.textContent = displayTags ? `पहचाना: ${displayTags}` : (x.type === 'video' ? 'वीडियो' : 'पहचान नहीं हो सकी');
 
-        const del = document.createElement('button');
-        del.textContent = 'हटाएँ';
-        del.onclick = () => {
-          images = images.filter(y => y !== x);
-          URL.revokeObjectURL(x.url);
-          render();
-        };
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del-btn';
+        delBtn.textContent = 'हटाएँ';
+        delBtn.onclick = () => deleteItem(x.id);
 
-        card.append(img, tagsDiv, del);
+        card.append(mediaEl, favBtn, tagsDiv, delBtn);
         area.append(card);
       });
     }
