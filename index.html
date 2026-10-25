@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#101426">
   <title>Smart AI Gallery</title>
   
-  <!-- AI लाइब्रेरी: TensorFlow.js और Object Detection Model -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 
@@ -25,7 +24,7 @@
     #photos{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:15px;margin-top:20px;}
     .photo{background:#202743;border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;}
     .photo img{width:100%;height:140px;object-fit:cover}
-    .photo .tags{padding:8px;font-size:12px;color:#a0aed0;word-wrap:break-word;}
+    .photo .tags{padding:8px;font-size:12px;color:#8be9fd;word-wrap:break-word;font-weight:bold;}
     .photo button{background:#ff4a4a;padding:6px 12px;font-size:12px;margin:8px 0;width:80%;}
     .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:16px;}
     .status-alert{background:#202743;color:#8be9fd;padding:10px;border-radius:8px;font-size:12px;margin-bottom:15px;display:inline-block;}
@@ -36,11 +35,11 @@
   <header>
     <h1>✦ Smart AI Gallery</h1>
     <p>आपकी यादें, एक खूबसूरत और समझदार जगह पर ❤️</p>
-    <div id="ai-status" class="status-alert">ब्रेन लोडिंग... AI मॉडल तैयार हो रहा है, कृपया रुकें 🧠</div>
+    <div id="ai-status" class="status-alert">ब्रेन लोडिंग... AI तैयार हो रहा है 🧠</div>
   </header>
 
   <main>
-    <input class="search" id="search" type="search" placeholder="हिंदी या English में ढूँढें... (जैसे: कार, bottle, कुत्ता)">
+    <input class="search" id="search" type="search" placeholder="यहाँ ढूँढें... (जैसे: person, कार, phone, बोतल)">
     
     <div class="actions">
       <label class="upload">+ फोटो चुनें
@@ -57,10 +56,9 @@
     let model = null;
     let images = [];
 
-    // अंग्रेजी से हिंदी अनुवाद शब्दकोश
     const hindiDictionary = {
-      'person': 'इंसान व्यक्ति आदमी',
-      'car': 'कार गाड़ी वाहन',
+      'person': 'इंसान व्यक्ति आदमी औरत',
+      'car': 'कार गाड़ी वाहन ऑटो',
       'motorcycle': 'मोटरसाइकिल बाइक गाड़ी',
       'airplane': 'हवाई जहाज विमान',
       'bus': 'बस गाड़ी',
@@ -69,52 +67,43 @@
       'boat': 'नाव',
       'bottle': 'बोतल पानी',
       'cup': 'कप चाय प्याला',
-      'fork': 'कांटा चम्मच',
+      'fork': 'कांटा',
       'knife': 'चाकू',
       'spoon': 'चम्मच',
-      'bowl': 'कटोरी',
+      'bowl': 'कटोरी बर्तन',
       'banana': 'केला फल',
       'apple': 'सेब फल',
       'sandwich': 'सैंडविच',
       'orange': 'संतरा',
       'chair': 'कुर्सी',
       'couch': 'सोफा',
-      'potted plant': 'पौधा गमला फूल',
-      'bed': 'बिस्तर पलंग',
+      'potted plant': 'पौधा गमला फूल गुलाब',
+      'bed': 'बिस्तर पलंग चादर',
       'dining table': 'मेज टेबल',
-      'tv': 'टीवी टेलीविजन',
+      'tv': 'टीवी टेलीविजन स्क्रीन',
       'laptop': 'लैपटॉप कंप्यूटर',
       'mouse': 'माउस',
       'remote': 'रिमोट',
       'keyboard': 'कीबोर्ड',
-      'cell phone': 'मोबाइल फोन फोन',
-      'book': 'किताब पुस्तक',
+      'cell phone': 'मोबाइल फोन',
+      'book': 'किताब पुस्तक पेपर पेज',
       'clock': 'घड़ी',
       'cat': 'बिल्ली',
-      'dog': 'कुत्ता',
-      'horse': 'घोड़ा',
-      'sheep': 'भेड़',
-      'cow': 'गाय',
-      'elephant': 'हाथी',
-      'bear': 'भालू',
-      'zebra': 'ज़ेबरा',
-      'giraffe': 'जिराफ'
+      'dog': 'कुत्ता'
     };
 
-    // AI Object Detection Model लोड करना
     cocoSsd.load().then(loadedModel => {
       model = loadedModel;
-      document.getElementById('ai-status').innerText = "AI तैयार है! अब आप फोटो अपलोड करके स्मार्ट सर्च कर सकते हैं 🎉";
+      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
       document.getElementById('ai-status').style.color = "#50fa7b";
     }).catch(err => {
-      document.getElementById('ai-status').innerText = "AI लोड करने में कुछ दिक्कत आई। कृपया पेज रिफ्रेश करें।";
+      document.getElementById('ai-status').innerText = "AI लोड एरर, कृपया पेज रीलोड करें";
       document.getElementById('ai-status').style.color = "#ff5555";
     });
 
-    // फोटो अपलोड और AI पहचान
     document.getElementById('files').addEventListener('change', async (e) => {
       if (!model) {
-        alert("कृपया AI मॉडल पूरी तरह लोड होने का इंतज़ार करें!");
+        alert("कृपया AI तैयार होने तक रुकें!");
         return;
       }
       
@@ -122,24 +111,41 @@
       
       for (let file of files) {
         const url = URL.createObjectURL(file);
-        const tempImg = new Image();
-        tempImg.src = url;
+        const img = new Image();
+        img.src = url;
         
-        tempImg.onload = async () => {
-          document.getElementById('ai-status').innerText = "AI आपकी फोटो को पहचान रहा है... 🔍";
-          
-          try {
-            const predictions = await model.detect(tempImg);
-            let detectedTags = [];
+        await new Promise(resolve => {
+          img.onload = async () => {
+            document.getElementById('ai-status').innerText = "AI स्कैन कर रहा है... 🔍";
+            
+            // मोबाइल फोटो को स्कैन के लिए कैनवास पर छोटा करना (ताकि AI खाली न छोड़े)
+            const canvas = document.createElement('canvas');
+            canvas.width = 416;
+            canvas.height = 416;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 416, 416);
 
-            if (predictions && predictions.length > 0) {
-              predictions.forEach(p => {
-                const enTag = p.class.toLowerCase();
-                detectedTags.push(enTag);
-                if (hindiDictionary[enTag]) {
-                  detectedTags.push(hindiDictionary[enTag]);
-                }
-              });
+            let detectedTags = [];
+            try {
+              // दोनों (कैनवास और असली इमेज) पर डिटेक्शन चलाएं
+              let predictions = await model.detect(canvas);
+              if (!predictions || predictions.length === 0) {
+                predictions = await model.detect(img);
+              }
+
+              if (predictions && predictions.length > 0) {
+                predictions.forEach(p => {
+                  const en = p.class.toLowerCase();
+                  if (!detectedTags.includes(en)) detectedTags.push(en);
+                  if (hindiDictionary[en]) {
+                    hindiDictionary[en].split(' ').forEach(h => {
+                      if (!detectedTags.includes(h)) detectedTags.push(h);
+                    });
+                  }
+                });
+              }
+            } catch (err) {
+              console.log(err);
             }
 
             images.push({
@@ -148,25 +154,14 @@
               tags: detectedTags
             });
 
-            document.getElementById('ai-status').innerText = detectedTags.length > 0 
-              ? "पहचान पूरी हुई: " + predictions.map(p=>p.class).join(', ') + " ✅" 
-              : "चीज साफ नहीं पहचानी जा सकी ℹ️";
-
-            setTimeout(() => {
-              if (model) document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
-            }, 3000);
-
             render();
-          } catch (error) {
-            console.error(error);
-            images.push({ name: file.name, url: url, tags: [] });
-            render();
-          }
-        };
+            resolve();
+          };
+        });
       }
+      document.getElementById('ai-status').innerText = "AI तैयार है! नई फोटो जोड़ सकते हैं 🎉";
     });
 
-    // रेंडर और स्मार्ट सर्च फ़ंक्शन (हिंदी और अंग्रेजी दोनों सपोर्ट)
     function render() {
       const q = document.getElementById('search').value.toLowerCase().trim();
       const area = document.getElementById('photos');
@@ -193,7 +188,7 @@
 
         const tagsDiv = document.createElement('div');
         tagsDiv.className = 'tags';
-        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 2).join(' / ') : 'पहचान नहीं हो सकी';
+        const displayTags = x.tags && x.tags.length ? x.tags.slice(0, 3).join(', ') : 'पहचान नहीं हो सकी';
         tagsDiv.textContent = `पहचाना: ${displayTags}`;
 
         const del = document.createElement('button');
