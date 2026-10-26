@@ -251,6 +251,15 @@ largeImage.addEventListener('dblclick', function() {
   }
 
   updateZoom();
+});', function() {
+  scale = scale > 1 ? 1 : 2;
+
+  if (scale === 1) {
+    panX = 0;
+    panY = 0;
+  }
+
+  updateZoom();
 });
 
 ', function() {
