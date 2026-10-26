@@ -1,185 +1,47 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101426">
-  <title>Smart AI Gallery</title>
-
-  <style>
-    *{box-sizing:border-box}
-    body{margin:0;background:#101426;color:white;font-family:sans-serif;text-align:center;}
-    header{padding:20px 16px;background:linear-gradient(to bottom, #1a1f3c, #101426);}
-    h1{margin:0 0 6px;font-size:26px}
-    p{color:#dce8ff;margin-bottom:12px;font-size:14px;}
-    main{padding:14px}
-    .search{width:100%;padding:14px;border:1px solid #202743;border-radius:12px;background:#181c35;color:white;font-size:15px;outline:none;margin-bottom:12px;}
-    
-    .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-    .tab-btn{background:#181c35;border:1px solid #202743;color:#dce8ff;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;}
-    .tab-btn.active{background:#5545d5;color:white;border-color:#5545d5;font-weight:bold;}
-
-    .actions{display:flex;gap:10px;margin:12px 0;justify-content:center;}
-    .upload{background:#5545d5;color:white;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;display:inline-block;}
-    #files{display:none}
-    
-    #gallery{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:14px;margin-top:16px;}
-    .item-card{background:#202743;border-radius:14px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,0.3);position:relative;display:flex;flex-direction:column;}
-    .item-card img, .item-card video{width:100%;height:140px;object-fit:cover;background:#0b0d19;}
-    
-    .fav-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-    
-    .tags{padding:8px;font-size:12px;color:#50fa7b;word-wrap:break-word;font-weight:bold;flex-grow:1;}
-    .del-btn{background:#ff4a4a;color:white;border:none;padding:6px;font-size:12px;margin:6px 10px 10px;border-radius:8px;cursor:pointer;}
-    
-    .empty{color:#bdc7e8;grid-column:1/-1;padding:40px 10px;font-size:15px;}
-    .status-alert{background:#202743;color:#8be9fd;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:10px;display:inline-block;}
-    footer{text-align:center;color:#9ca9cf;padding:20px;font-size:12px;}
-  </style>
-</head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101426"><title>Smart AI Gallery</title>
+<style>
+:root{--bg:#0d1224;--panel:#171e36;--panel2:#202945;--line:#2c3658;--text:#f5f7ff;--muted:#aeb9dc;--accent:#7567ff;--cyan:#69e4f7;--green:#6ff0a8;--danger:#ff6b83}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#202653 0,#0d1224 52%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;text-align:left;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}header{padding:25px 18px 20px;text-align:center;background:linear-gradient(135deg,#26245caa,#11172cbb);border-bottom:1px solid #ffffff12}header .logo{font-size:34px}h1{margin:4px 0;font-size:clamp(23px,5vw,31px);letter-spacing:.2px}header p{margin:8px auto;color:#cbd5f6;max-width:540px;font-size:13px}.pill{display:inline-flex;align-items:center;gap:6px;background:#202a47;border:1px solid #3a4770;color:var(--cyan);border-radius:30px;padding:7px 12px;font-size:12px;margin-top:8px}main{max-width:1000px;margin:auto;padding:15px}.notice{background:#172a3c;border:1px solid #28546b;color:#c8f4ff;padding:12px;border-radius:12px;font-size:12px;line-height:1.55;margin-bottom:13px}.searchrow{display:flex;gap:8px;align-items:center}.search{min-width:0;flex:1;background:#151c32;border:1px solid var(--line);border-radius:13px;padding:13px 14px;color:white;outline:none}.search:focus{border-color:var(--accent)}.btn{border:0;border-radius:12px;padding:11px 14px;color:white;background:var(--accent);font-weight:650}.btn.secondary{background:#222c49;border:1px solid #39476b}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}.btn.danger{background:#692b43}.uploadgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.uploadgrid label{display:flex;justify-content:center;align-items:center;gap:7px;padding:12px 8px;background:linear-gradient(135deg,#554be4,#7d4bc9);border-radius:12px;font-size:13px;font-weight:700;cursor:pointer}.uploadgrid label.alt{background:#202a47;border:1px solid #3a4770}.uploadgrid input{display:none}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}.stat{background:#171e36;border:1px solid #2a3454;border-radius:13px;padding:12px 8px;text-align:center}.stat strong{display:block;font-size:21px}.stat span{font-size:11px;color:var(--muted)}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:19px 0 10px}.sectionhead h2{font-size:16px;margin:0}.small{font-size:11px;color:var(--muted)}.chips{display:flex;gap:7px;overflow:auto;padding:2px 0 8px;scrollbar-width:thin}.chip{white-space:nowrap;background:#171e36;border:1px solid #303b5d;color:#dce4ff;border-radius:25px;padding:8px 12px;font-size:12px}.chip.active{background:#5147c6;border-color:#8176ff;color:#fff}.toolbar{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}.toolbar select{background:#171e36;color:white;border:1px solid var(--line);border-radius:10px;padding:9px;max-width:100%}#gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 25px}.card{min-width:0;background:#171e36;border:1px solid #2b3554;border-radius:15px;overflow:hidden;position:relative}.preview{height:150px;background:#0a0e1a;display:flex;align-items:center;justify-content:center;overflow:hidden}.preview img,.preview video{width:100%;height:100%;object-fit:cover}.fileicon{font-size:42px}.cardbody{padding:9px}.filename{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f2f4ff;font-weight:650}.tagline{font-size:11px;color:var(--green);margin:5px 0;overflow-wrap:anywhere}.subline{font-size:10px;color:var(--muted);margin-bottom:7px}.cardactions{display:flex;gap:6px}.iconbtn{flex:1;border:1px solid #344061;background:#202945;color:white;border-radius:8px;padding:7px 4px;font-size:12px}.iconbtn.fav{color:#ff90b2}.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:35px 14px;background:#151c32;border:1px dashed #384568;border-radius:14px;line-height:1.7}.empty strong{display:block;color:white;font-size:15px;margin-bottom:4px}.footer{text-align:center;padding:18px;color:#7886b0;font-size:11px}.modalback{position:fixed;inset:0;background:#050814d9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal{width:min(100%,460px);background:#171e36;border:1px solid #3a4569;border-radius:18px;padding:17px}.modal h3{margin:0 0 12px}.modal label{display:block;color:var(--muted);font-size:12px;margin:12px 0 5px}.modal input,.modal select{width:100%;padding:11px;background:#0e1428;color:white;border:1px solid #344061;border-radius:10px}.modalbuttons{display:flex;gap:8px;margin-top:15px}.modalbuttons button{flex:1}.hidden{display:none!important}@media(min-width:600px){#gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.preview{height:190px}.uploadgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(min-width:850px){#gallery{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style></head>
 <body>
-  <header>
-    <h1>✦ Smart AI Gallery</h1>
-    <p>आपकी यादें, एक खूबसूरत और समझदार जगह पर ❤️</p>
-    <div id="ai-status" class="status-alert">गैलरी तैयार है! अपनी फोटो/वीडियो जोड़ें 🎉</div>
-  </header>
-
-  <main>
-    <input class="search" id="search" type="search" placeholder="यहाँ नाम या टैग से ढूँढें... (जैसे: Netaji, Army, कार)">
-    
-    <div class="tabs">
-      <button class="tab-btn active" onclick="setTab('all', this)">सभी (All)</button>
-      <button class="tab-btn" onclick="setTab('photos', this)">फोटो</button>
-      <button class="tab-btn" onclick="setTab('videos', this)">वीडियो</button>
-      <button class="tab-btn" onclick="setTab('yaadein', this)">❤️ यादें (Albums)</button>
-    </div>
-
-    <div class="actions">
-      <label class="upload">+ फोटो / वीडियो जोड़ें
-        <input id="files" type="file" accept="image/*,video/*" multiple>
-      </label>
-    </div>
-
-    <div id="gallery"></div>
-  </main>
-
-  <footer>Smart AI Gallery © 2026</footer>
-
-  <script>
-    let mediaList = [];
-    let currentTab = 'all';
-
-    function setTab(tab, btn) {
-      currentTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      render();
-    }
-
-    document.getElementById('files').addEventListener('change', async (e) => {
-      const files = Array.from(e.target.files);
-      if (!files.length) return;
-
-      for (let file of files) {
-        const url = URL.createObjectURL(file);
-        const isVideo = file.type.startsWith('video');
-
-        // यूज़र से मनपसंद नाम या टैग पूछना
-        let customTag = prompt(`"${file.name}" के लिए कोई नाम या टैग लिखें (उदा: Netaji, Guru Ji, Army, कार):`, "");
-        if (customTag === null || customTag.trim() === "") {
-          customTag = isVideo ? "वीडियो" : "फोटो";
-        }
-
-        mediaList.push({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          url: url,
-          type: isVideo ? 'video' : 'photo',
-          isFav: false,
-          tag: customTag.trim()
-        });
-      }
-
-      render();
-      e.target.value = ''; // रीसेट ताकि दोबारा अपलोड हो सके
-    });
-
-    function toggleFav(id) {
-      const item = mediaList.find(x => x.id === id);
-      if (item) {
-        item.isFav = !item.isFav;
-        render();
-      }
-    }
-
-    function deleteItem(id) {
-      const item = mediaList.find(x => x.id === id);
-      if (item) {
-        URL.revokeObjectURL(item.url);
-        mediaList = mediaList.filter(x => x.id !== id);
-        render();
-      }
-    }
-
-    function render() {
-      const q = document.getElementById('search').value.toLowerCase().trim();
-      const area = document.getElementById('gallery');
-      area.innerHTML = '';
-
-      let list = mediaList.filter(x => {
-        if (currentTab === 'photos') return x.type === 'photo';
-        if (currentTab === 'videos') return x.type === 'video';
-        if (currentTab === 'yaadein') return x.isFav === true;
-        return true;
-      });
-
-      if (q) {
-        list = list.filter(x => {
-          const matchName = x.name.toLowerCase().includes(q);
-          const matchTag = x.tag.toLowerCase().includes(q);
-          return matchName || matchTag;
-        });
-      }
-
-      if (!list.length) {
-        area.innerHTML = '<div class="empty">इस सेक्शन में कुछ नहीं मिला 🔍</div>';
-        return;
-      }
-
-      list.forEach(x => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-
-        let mediaEl;
-        if (x.type === 'video') {
-          mediaEl = document.createElement('video');
-          mediaEl.src = x.url;
-          mediaEl.controls = true;
-        } else {
-          mediaEl = document.createElement('img');
-          mediaEl.src = x.url;
-        }
-
-        const favBtn = document.createElement('button');
-        favBtn.className = 'fav-btn';
-        favBtn.innerHTML = x.isFav ? '❤️' : '🤍';
-        favBtn.onclick = () => toggleFav(x.id);
-
-        const tagsDiv = document.createElement('div');
-        tagsDiv.className = 'tags';
-        tagsDiv.textContent = `टैग: ${x.tag}`;
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'del-btn';
-        delBtn.textContent = 'हटाएँ';
-        delBtn.onclick = () => deleteItem(x.id);
-
-        card.append(mediaEl, favBtn, tagsDiv, delBtn);
-        area.append(card);
-      });
-    }
-
-    document.getElementById('search').addEventListener('input', render);
-  </script>
-</body>
-</html>
+<header><div class="logo">✦📸</div><h1>Smart AI Gallery</h1><p>आपकी तस्वीरें, वीडियो और यादें — एक सुंदर जगह पर ❤️</p><div class="pill">✧ स्मार्ट श्रेणियाँ · निजी गैलरी</div></header>
+<main>
+<div class="notice"><b>ज़रूरी जानकारी:</b> यह संस्करण फ़ाइल के नाम, फ़ोल्डर-पथ (यदि ब्राउज़र बताए) और आपके चुने टैग से स्मार्ट श्रेणियाँ सुझाता है। यह अभी तस्वीर को देखकर असली AI पहचान नहीं करता। मोबाइल के Camera/WhatsApp फ़ोल्डर चुनने के लिए नीचे फ़ाइल/फ़ोल्डर चुनें; Android अनुमति और native APK integration अलग चरण है। आपकी चुनी हुई मीडिया इसी ब्राउज़र की स्थानीय IndexedDB में सेव होती है।</div>
+<div class="searchrow"><input id="search" class="search" type="search" placeholder="🔎 नाम, टैग या श्रेणी खोजें…"><button id="clearSearch" class="btn secondary" aria-label="खोज साफ करें">✕</button></div>
+<div class="uploadgrid">
+<label>＋ फोटो / वीडियो<input id="files" type="file" accept="image/*,video/*" multiple></label>
+<label class="alt">▤ फ़ोल्डर चुनें<input id="folderFiles" type="file" accept="image/*,video/*" multiple webkitdirectory directory></label>
+<label class="alt" id="scanBtn">✧ श्रेणियाँ फिर जाँचें</label>
+<label class="alt" id="exportBtn">⇩ सूची बैकअप</label>
+</div>
+<div class="stats"><div class="stat"><strong id="totalCount">0</strong><span>कुल मीडिया</span></div><div class="stat"><strong id="photoCount">0</strong><span>फोटो</span></div><div class="stat"><strong id="favCount">0</strong><span>पसंदीदा ❤️</span></div></div>
+<div class="sectionhead"><h2>एल्बम / श्रेणियाँ</h2><span class="small" id="categoryHint">अपने मीडिया से बनेंगी</span></div>
+<div id="chips" class="chips"></div>
+<div class="toolbar"><select id="sort"><option value="new">नए पहले</option><option value="old">पुराने पहले</option><option value="name">नाम A–Z</option></select><select id="kind"><option value="all">सभी प्रकार</option><option value="photo">केवल फोटो</option><option value="video">केवल वीडियो</option></select><button class="btn ghost" id="manageTags">＋ टैग / श्रेणी</button></div>
+<div class="sectionhead"><h2 id="listTitle">आपकी गैलरी</h2><span id="shownCount" class="small">0 आइटम</span></div><div id="gallery"></div>
+</main><div class="footer">Smart AI Gallery · आपकी मीडिया आपके डिवाइस के ब्राउज़र में रहती है</div>
+<div id="modalBack" class="modalback"><div class="modal"><h3 id="modalTitle">मीडिया संपादित करें</h3><label for="editName">दिखाने का नाम</label><input id="editName" maxlength="120"><label for="editTag">टैग (कॉमा लगाकर कई लिखें)</label><input id="editTag" maxlength="300" placeholder="जैसे: परिवार, घर, शादी"><label for="editCategory">श्रेणी</label><select id="editCategory"><option>परिवार</option><option>घर</option><option>डिजाइन / कपड़े</option><option>Camera</option><option>WhatsApp</option><option>Screenshots</option><option>दस्तावेज़</option><option>प्रकृति / यात्रा</option><option>खाना</option><option>अन्य</option></select><div class="modalbuttons"><button class="btn secondary" id="cancelEdit">रद्द करें</button><button class="btn" id="saveEdit">सेव करें</button></div></div></div>
+<script>
+'use strict';
+const DB_NAME='SmartAIGalleryDB', DB_VERSION=1, STORE='media';let db=null, mediaList=[], activeCategory='सभी', editId=null, objectUrls=new Map();
+const $=id=>document.getElementById(id);
+const CATEGORIES=['सभी','पसंदीदा','Camera','WhatsApp','Screenshots','परिवार','घर','डिजाइन / कपड़े','दस्तावेज़','प्रकृति / यात्रा','खाना','वीडियो','अन्य'];
+function openDB(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(new Error('इस ब्राउज़र में स्थानीय सेव सुविधा उपलब्ध नहीं है।'));return}const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE)){const s=d.createObjectStore(STORE,{keyPath:'id'});s.createIndex('createdAt','createdAt')}};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+function tx(mode='readonly'){return db.transaction(STORE,mode).objectStore(STORE)}
+function allRecords(){return new Promise((resolve,reject)=>{const r=tx().getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)})}
+function saveRecord(item){return new Promise((resolve,reject)=>{const r=tx('readwrite').put(item);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function deleteRecord(id){return new Promise((resolve,reject)=>{const r=tx('readwrite').delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function inferCategory(file,relPath,isVideo){if(isVideo)return 'वीडियो';const s=(file.name+' '+(relPath||'')).toLowerCase();if(/whatsapp|wa images|whatsapp images|whatsapp video/.test(s))return 'WhatsApp';if(/screenshot|screen.?shot|screenshots/.test(s))return 'Screenshots';if(/camera|dcim/.test(s))return 'Camera';if(/family|family|parivar|परिवार|wedding|shaadi|शादी|birthday|बर्थडे|mummy|papa|माता|पिता/.test(s))return 'परिवार';if(/design|designer|embroidery|fashion|dress|suit|kurti|कढ़ाई|डिजाइन|ड्रेस|कपड़े|कपडा/.test(s))return 'डिजाइन / कपड़े';if(/document|scan|pdf|invoice|bill|aadhar|आधार|दस्तावेज़/.test(s))return 'दस्तावेज़';if(/home|house|ghar|घर|room|kitchen|मकान/.test(s))return 'घर';if(/food|dish|recipe|fruit|vegetable|खाना|भोजन/.test(s))return 'खाना';if(/travel|trip|mountain|beach|nature|forest|यात्रा|प्रकृति/.test(s))return 'प्रकृति / यात्रा';return 'अन्य'}
+function getUrl(item){if(objectUrls.has(item.id))return objectUrls.get(item.id);const u=URL.createObjectURL(item.blob);objectUrls.set(item.id,u);return u}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function categoryCounts(){const counts={};for(const m of mediaList){counts[m.category]=(counts[m.category]||0)+1;if(m.isFav)counts['पसंदीदा']=(counts['पसंदीदा']||0)+1}return counts}
+function renderChips(){const counts=categoryCounts();$('chips').innerHTML='';CATEGORIES.forEach(c=>{if(c!=='सभी'&&!counts[c])return;const b=document.createElement('button');b.className='chip'+(activeCategory===c?' active':'');b.textContent=c+(c==='सभी'?' ('+mediaList.length+')':' ('+(counts[c]||0)+')');b.onclick=()=>{activeCategory=c;render()};$('chips').append(b)})}
+function render(){renderChips();$('totalCount').textContent=mediaList.length;$('photoCount').textContent=mediaList.filter(x=>x.type==='photo').length;$('favCount').textContent=mediaList.filter(x=>x.isFav).length;const q=$('search').value.toLocaleLowerCase().trim(),kind=$('kind').value;let list=mediaList.filter(x=>{if(activeCategory==='पसंदीदा'&&!x.isFav)return false;if(activeCategory!=='सभी'&&activeCategory!=='पसंदीदा'&&x.category!==activeCategory)return false;if(kind!=='all'&&x.type!==kind)return false;if(q&&!([x.name,x.tag,x.category,x.relativePath].join(' ').toLocaleLowerCase().includes(q)))return false;return true});const sort=$('sort').value;list.sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='old'?a.createdAt-b.createdAt:b.createdAt-a.createdAt);$('listTitle').textContent=activeCategory==='सभी'?'आपकी गैलरी':activeCategory;$('shownCount').textContent=list.length+' आइटम';const area=$('gallery');area.innerHTML='';if(!list.length){area.innerHTML='<div class="empty"><strong>यहाँ अभी कुछ नहीं है 🔎</strong>ऊपर “फोटो / वीडियो” या “फ़ोल्डर चुनें” दबाकर मीडिया जोड़ें।<br>अपने फ़ोल्डर से श्रेणी सुझाव मिल सकते हैं; तस्वीर की वास्तविक AI पहचान अभी इस संस्करण में शामिल नहीं है।</div>';return}for(const x of list){const card=document.createElement('article');card.className='card';const preview=document.createElement('div');preview.className='preview';if(x.type==='video'){const v=document.createElement('video');v.src=getUrl(x);v.preload='metadata';v.muted=true;preview.append(v)}else{const im=document.createElement('img');im.src=getUrl(x);im.alt=x.name;im.loading='lazy';preview.append(im)}const body=document.createElement('div');body.className='cardbody';body.innerHTML='<div class="filename" title="'+escapeHtml(x.name)+'">'+escapeHtml(x.displayName||x.name)+'</div><div class="tagline">'+escapeHtml(x.category)+' · '+escapeHtml(x.tag||'कोई टैग नहीं')+'</div><div class="subline">'+escapeHtml(x.relativePath||x.type.toUpperCase())+'</div>';const actions=document.createElement('div');actions.className='cardactions';const fav=document.createElement('button');fav.className='iconbtn fav';fav.textContent=x.isFav?'❤️ पसंदीदा':'🤍 पसंद';fav.onclick=async()=>{x.isFav=!x.isFav;await saveRecord(x);render()};const edit=document.createElement('button');edit.className='iconbtn';edit.textContent='✎ संपादित';edit.onclick=()=>openEdit(x.id);const del=document.createElement('button');del.className='iconbtn';del.textContent='हटाएँ';del.onclick=async()=>{if(!confirm('इस मीडिया को गैलरी की स्थानीय सूची से हटाएँ?'))return;await deleteRecord(x.id);if(objectUrls.has(x.id)){URL.revokeObjectURL(objectUrls.get(x.id));objectUrls.delete(x.id)}mediaList=mediaList.filter(m=>m.id!==x.id);render()};actions.append(fav,edit,del);body.append(actions);card.append(preview,body);area.append(card)}}
+async function addFiles(fileList){const files=Array.from(fileList||[]);if(!files.length)return;let added=0;for(const file of files){if(!file.type.startsWith('image/')&&!file.type.startsWith('video/'))continue;const rel=file.webkitRelativePath||'';const isVideo=file.type.startsWith('video/');const item={id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),name:file.name,displayName:file.name,blob:file,type:isVideo?'video':'photo',isFav:false,tag:'',category:inferCategory(file,rel,isVideo),relativePath:rel?rel.split('/').slice(0,-1).join('/'):'चुनी हुई फ़ाइल',createdAt:Date.now(),mime:file.type,size:file.size};try{await saveRecord(item);mediaList.push(item);added++}catch(err){console.error(err)}}render();$('ai-status')?.remove();alert(added+' फ़ाइलें गैलरी में जोड़ी गईं।\nश्रेणी फ़ाइल/फ़ोल्डर के नाम से सुझाई गई है, AI दृश्य पहचान से नहीं।');}
+function openEdit(id){const x=mediaList.find(m=>m.id===id);if(!x)return;editId=id;$('editName').value=x.displayName||x.name;$('editTag').value=x.tag||'';$('editCategory').value=x.category;$('modalBack').style.display='flex'}
+function closeEdit(){$('modalBack').style.display='none';editId=null}
+$('files').addEventListener('change',async e=>{await addFiles(e.target.files);e.target.value=''});$('folderFiles').addEventListener('change',async e=>{await addFiles(e.target.files);e.target.value=''});$('search').addEventListener('input',render);$('clearSearch').onclick=()=>{$('search').value='';render()};$('sort').onchange=render;$('kind').onchange=render;$('cancelEdit').onclick=closeEdit;$('modalBack').addEventListener('click',e=>{if(e.target===$('modalBack'))closeEdit()});$('saveEdit').onclick=async()=>{const x=mediaList.find(m=>m.id===editId);if(!x)return;x.displayName=$('editName').value.trim()||x.name;x.tag=$('editTag').value.trim();x.category=$('editCategory').value;await saveRecord(x);closeEdit();render()};$('manageTags').onclick=()=>{const first=mediaList[0];if(!first){alert('पहले कुछ फोटो या वीडियो जोड़ें।');return}openEdit(first.id);alert('अभी टैग/श्रेणी बदलने के लिए किसी आइटम के “संपादित” बटन का उपयोग करें।')};$('scanBtn').onclick=()=>{mediaList.forEach(x=>{if(!x.tag)x.category=inferCategory({name:x.name},x.relativePath,x.type==='video')});Promise.all(mediaList.map(saveRecord)).then(()=>{render();alert('फ़ाइल नाम और उपलब्ध फ़ोल्डर-पथ से श्रेणियाँ फिर जाँची गईं। यह वास्तविक AI दृश्य पहचान नहीं है।')})};$('exportBtn').onclick=()=>{const data=mediaList.map(({id,name,displayName,type,tag,category,relativePath,createdAt,size,isFav})=>({id,name,displayName,type,tag,category,relativePath,createdAt,size,isFav}));const blob=new Blob([JSON.stringify({app:'Smart AI Gallery',version:1,exportedAt:new Date().toISOString(),items:data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='smart-ai-gallery-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+(async function init(){try{db=await openDB();mediaList=await allRecords();render()}catch(e){console.error(e);$('gallery').innerHTML='<div class="empty"><strong>स्थानीय स्टोरेज शुरू नहीं हो सकी</strong>इस ऐप को Chrome में खोलकर देखें। यदि इसे APK में चलाना है, तो Android WebView की IndexedDB सेटिंग जाँचनी होगी।</div>'}})();
+</script></body></html>
