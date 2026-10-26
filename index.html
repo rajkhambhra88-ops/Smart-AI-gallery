@@ -120,7 +120,6 @@ $('files').addEventListener('change',async e=>{await addFiles(e.target.files);e.
     largeImage.src = media.currentSrc || media.src;
     largeImage.alt = media.alt || 'गैलरी फोटो';
     largeImage.style.cursor = 'zoom-in';
-
 let scale = 1;
 let startDistance = 0;
 let startScale = 1;
@@ -222,7 +221,6 @@ largeImage.addEventListener('pointermove', function(e) {
   lastX = e.clientX;
   lastY = e.clientY;
 });
-
 function endPointer(e) {
   activePointers.delete(e.pointerId);
 
