@@ -121,12 +121,81 @@ $('files').addEventListener('change',async e=>{await addFiles(e.target.files);e.
     largeImage.alt = media.alt || 'गैलरी फोटो';
     largeImage.style.cursor = 'zoom-in';
 
-    largeImage.addEventListener('click', function () {
-      largeImage.classList.toggle('zoomed');
-      largeImage.style.cursor =
-        largeImage.classList.contains('zoomed')
-          ? 'zoom-out' : 'zoom-in';
-    });
+    
+let scale = 1;
+let startDistance = 0;
+let startScale = 1;
+const activePointers = new Map();
+
+largeImage.style.touchAction = 'none';
+largeImage.style.transformOrigin = 'center center';
+largeImage.style.transition = 'transform 0.05s linear';
+largeImage.style.maxWidth = '100%';
+largeImage.style.maxHeight = '100%';
+
+function distanceBetween(a, b) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function updateZoom() {
+  largeImage.style.transform = `scale(${scale})`;
+}
+
+largeImage.addEventListener('pointerdown', function (e) {
+  e.preventDefault();
+  activePointers.set(e.pointerId, {
+    x: e.clientX,
+    y: e.clientY
+  });
+
+  if (activePointers.size === 2) {
+    const points = [...activePointers.values()];
+    startDistance = distanceBetween(points[0], points[1]);
+    startScale = scale;
+  }
+});
+
+largeImage.addEventListener('pointermove', function (e) {
+  if (!activePointers.has(e.pointerId)) return;
+
+  activePointers.set(e.pointerId, {
+    x: e.clientX,
+    y: e.clientY
+  });
+
+  if (activePointers.size === 2) {
+    const points = [...activePointers.values()];
+    const distance = distanceBetween(points[0], points[1]);
+
+    if (startDistance > 0) {
+      scale = Math.min(
+        5,
+        Math.max(1, startScale * distance / startDistance)
+      );
+      updateZoom();
+    }
+  }
+});
+
+function endPointer(e) {
+  activePointers.delete(e.pointerId);
+
+  if (activePointers.size < 2) {
+    startDistance = 0;
+  }
+}
+
+largeImage.addEventListener('pointerup', endPointer);
+largeImage.addEventListener('pointercancel', endPointer);
+largeImage.addEventListener('lostpointercapture', endPointer);
+
+largeImage.addEventListener('dblclick', function () {
+  scale = scale > 1 ? 1 : 2;
+  updateZoom();
+});
+    
 
     content.replaceChildren(largeImage);
     viewer.style.display = 'flex';
@@ -147,4 +216,5 @@ $('files').addEventListener('change',async e=>{await addFiles(e.target.files);e.
     if (event.key === 'Escape') closeViewer();
   });
 })();
-</script></body></html>
+</script>
+</body></html>
