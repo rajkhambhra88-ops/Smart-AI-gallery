@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0b0f19">
-  <title>Smart AI Gallery Pro</title>
+  <title>Smart AI Gallery Pro Ultimate</title>
   <style>
     :root {
       --bg: #070a12;
@@ -17,6 +17,7 @@
       --accent-glow: rgba(45, 212, 191, 0.25);
       --danger: #f43f5e;
       --star: #fbbf24;
+      --lock: #ec4899;
       --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +28,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-bottom: 80px;
+      padding-bottom: 85px;
       -webkit-tap-highlight-color: transparent;
     }
     .container {
@@ -37,6 +38,8 @@
       width: 100%;
       flex: 1;
     }
+
+    /* Header */
     header.hero {
       background: linear-gradient(135deg, #131d33 0%, #0d2331 100%);
       border: 1px solid var(--border);
@@ -45,11 +48,16 @@
       margin-bottom: 14px;
       box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.5);
     }
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 14px;
     }
     .logo-badge {
       background: linear-gradient(135deg, #a855f7, #3b82f6, #2dd4bf);
@@ -58,21 +66,42 @@
       font-size: 22px;
       padding: 10px 14px;
       border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .hero-titles h1 { font-size: clamp(19px, 4vw, 25px); font-weight: 800; }
-    .hero-titles p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .hero-titles h1 { font-size: clamp(18px, 4vw, 24px); font-weight: 800; }
+    .hero-titles p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    
+    .lang-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     .stats-bar { display: flex; flex-wrap: wrap; gap: 6px; }
     .stat-pill {
       background: rgba(7, 10, 18, 0.7);
       border: 1px solid var(--border);
       padding: 5px 11px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       color: #cbd5e1;
       display: inline-flex;
       align-items: center;
       gap: 5px;
     }
+    .stat-storage { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* Toolbar Buttons */
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
     button {
       background: var(--card);
@@ -96,27 +125,57 @@
     .btn-ai { background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; border-color: #9333ea; }
     .btn-danger { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: #fda4af; }
     .btn-share { background: #15803d; color: #fff; border-color: #22c55e; font-weight: 700; }
+    .btn-lock { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); color: #f472b6; }
+    
     .icon {
-      width: 17px; height: 17px; fill: none; stroke: currentColor;
+      width: 16px; height: 16px; fill: none; stroke: currentColor;
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
     }
-    .search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+
+    /* Controls: Search & Sort Bar */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
     .field {
       width: 100%; background: #0b1120; border: 1px solid var(--border);
-      color: var(--text); padding: 10px 14px; border-radius: 12px; font: inherit; font-size: 14px; outline: none;
+      color: var(--text); padding: 9px 12px; border-radius: 12px; font: inherit; font-size: 13px; outline: none;
     }
     .field:focus { border-color: var(--accent); }
+    .sort-select {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+
     .filter-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; }
-    .filter-btn { white-space: nowrap; padding: 6px 13px; border-radius: 20px; font-size: 12px; }
+    .filter-btn { white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 12px; }
     .filter-btn.active { background: var(--accent); color: #042f2e; border-color: var(--accent); font-weight: 700; }
+    .filter-btn.tab-lock.active { background: var(--lock); color: #fff; border-color: var(--lock); }
+    .filter-btn.tab-trash.active { background: var(--danger); color: #fff; border-color: var(--danger); }
+
     .section-title { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 10px; }
-    .section-title h2 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .section-title h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
     .section-title span { font-size: 12px; color: var(--muted); }
 
     /* Gallery Grid */
     .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
     @media (min-width: 600px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
     @media (min-width: 900px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+    
     .media-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 16px;
       overflow: hidden; display: flex; flex-direction: column; position: relative;
@@ -133,17 +192,16 @@
     .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .video-badge {
       position: absolute; background: rgba(0, 0, 0, 0.75); color: #fff;
-      padding: 3px 6px; border-radius: 6px; font-size: 11px; bottom: 6px; left: 6px;
+      padding: 3px 6px; border-radius: 6px; font-size: 10px; bottom: 6px; left: 6px;
     }
-    .ai-tag-badge {
-      position: absolute; bottom: 6px; right: 6px; background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(168, 85, 247, 0.5); color: #d8b4fe; font-size: 10px;
-      font-weight: 600; padding: 2px 6px; border-radius: 6px;
+    .private-badge {
+      position: absolute; top: 6px; left: 38px; background: rgba(236, 72, 153, 0.85); color: #fff;
+      padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700;
     }
     .select-check {
-      position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%;
+      position: absolute; top: 6px; left: 6px; width: 26px; height: 26px; border-radius: 50%;
       background: rgba(11, 15, 25, 0.8); border: 2px solid #94a3b8; color: #fff;
-      display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
       cursor: pointer; z-index: 5;
     }
     .media-card.selected .select-check {
@@ -160,7 +218,7 @@
     .media-actions { display: flex; gap: 4px; margin-top: 5px; }
     .media-actions button { flex: 1; padding: 5px; font-size: 11px; justify-content: center; }
 
-    /* Floating Multi-select Bar */
+    /* Selection Floating Bar */
     .selection-bar {
       position: fixed; bottom: 0; left: 0; right: 0; background: #101728;
       border-top: 1px solid var(--border); padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
@@ -170,7 +228,7 @@
     .selection-bar.active { display: flex; }
     .selection-count { font-size: 13px; font-weight: 700; color: var(--accent); }
 
-    /* Viewer */
+    /* Fullscreen Viewer */
     .viewer {
       display: none; position: fixed; inset: 0; background: #000;
       z-index: 99999; flex-direction: column; touch-action: none; overflow: hidden;
@@ -187,7 +245,7 @@
     }
     .viewer-stage img {
       max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center center;
-      pointer-events: none; transition: none;
+      pointer-events: none; transition: filter 0.2s ease;
     }
     .viewer-stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
     .viewer-bottom {
@@ -195,10 +253,12 @@
       border-top: 1px solid var(--border); display: flex; justify-content: space-between;
       align-items: center; font-size: 11px; color: var(--muted); z-index: 100;
     }
+    .edit-tools { display: flex; gap: 6px; align-items: center; }
 
+    /* Dialogs */
     dialog {
       background: var(--card); color: var(--text); border: 1px solid var(--border);
-      border-radius: 16px; width: min(92vw, 420px); margin: auto; padding: 18px;
+      border-radius: 16px; width: min(92vw, 400px); margin: auto; padding: 18px;
     }
     dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
     dialog h3 { font-size: 15px; margin-bottom: 12px; }
@@ -208,14 +268,6 @@
       background: var(--surface); border: 1px dashed var(--border); border-radius: 16px;
       padding: 32px 18px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6;
     }
-    .panel {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-      padding: 16px; margin-bottom: 18px;
-    }
-    .ai-box {
-      background: #090e1a; border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px; font-size: 12px; line-height: 1.6; color: #cbd5e1; white-space: pre-wrap;
-    }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -223,20 +275,26 @@
 
 <div class="container">
   <header class="hero">
-    <div class="brand">
-      <div class="logo-badge">
-        <svg class="icon" style="width:24px;height:24px;" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+    <div class="brand-bar">
+      <div class="brand">
+        <div class="logo-badge">
+          <svg class="icon" style="width:24px;height:24px;" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+        </div>
+        <div class="hero-titles">
+          <h1 id="txtAppTitle">Smart AI Gallery Pro</h1>
+          <p id="txtAppSubtitle">Offline, Private & AI-Powered Gallery</p>
+        </div>
       </div>
-      <div class="hero-titles">
-        <h1>Smart AI Gallery Pro</h1>
-        <p>फ़ोटो, वीडियो और WhatsApp शेयरिंग — एक ही जगह</p>
-      </div>
+      <button class="lang-btn" id="btnLangToggle">🌐 English / हिन्दी</button>
     </div>
+
+    <!-- Stats with Storage Counter -->
     <div class="stats-bar">
-      <span class="stat-pill" id="stTotal">0 कुल मीडिया</span>
-      <span class="stat-pill" id="stPhotos">0 फ़ोटो</span>
-      <span class="stat-pill" id="stVideos">0 वीडियो</span>
-      <span class="stat-pill" id="stFav">0 पसंदीदा</span>
+      <span class="stat-pill" id="stTotal">0 Media</span>
+      <span class="stat-pill" id="stPhotos">0 Photos</span>
+      <span class="stat-pill" id="stVideos">0 Videos</span>
+      <span class="stat-pill" id="stFav">0 Favorites</span>
+      <span class="stat-pill stat-storage" id="stStorage">📊 0 MB</span>
     </div>
   </header>
 
@@ -244,50 +302,60 @@
   <div class="toolbar">
     <button class="btn-primary" id="btnAdd">
       <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      फ़ोटो जोड़ें (Multiple)
+      <span id="txtAddPhoto">फ़ोटो जोड़ें</span>
     </button>
     <button id="btnAddVideo">
       <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-      वीडियो जोड़ें
+      <span id="txtAddVideo">वीडियो जोड़ें</span>
     </button>
     <button id="btnToggleSelect">
       <svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      चुनें (Select)
+      <span id="txtSelect">चुनें</span>
     </button>
     <button class="btn-ai" id="btnAIGroup">
       <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      🧠 AI ऑटो-ग्रुप
+      <span id="txtAutoGroup">AI ऑटो-ग्रुप</span>
+    </button>
+    <button class="btn-lock" id="btnLockFolder">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span id="txtPrivateFolder">🔒 प्राइवेट फ़ोल्डर</span>
     </button>
     <button id="btnBackup">
       <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      बैकअप
+      <span id="txtBackup">बैकअप</span>
     </button>
 
-    <!-- Specific Multiple File Pickers that Android Handles Smoothly -->
     <input hidden id="photoInput" type="file" accept="image/*" multiple>
     <input hidden id="videoInput" type="file" accept="video/*" multiple>
   </div>
 
-  <div class="search-bar">
-    <div style="position:relative; flex:1;">
-      <svg class="icon" style="position:absolute; left:12px; top:12px; color:var(--muted);" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" class="field" style="padding-left:36px;" id="searchInput" placeholder="नाम, श्रेणी या टैग खोजें...">
+  <!-- Search & Sorting Controls -->
+  <div class="controls-row">
+    <div class="search-box">
+      <input type="text" class="field" id="searchInput" placeholder="खोजें (Search)...">
     </div>
-    <button id="btnClearSearch">साफ़</button>
+    <select class="sort-select" id="sortSelect">
+      <option value="newest">🕒 नई से पुरानी (Newest)</option>
+      <option value="oldest">⌛ पुरानी से नई (Oldest)</option>
+      <option value="name_asc">🔤 नाम (A to Z)</option>
+      <option value="size_desc">💾 साइज़ (Largest First)</option>
+    </select>
   </div>
 
+  <!-- Filter Pills -->
   <div class="filter-pills" id="typeFilters">
-    <button class="filter-btn active" data-filter="all">🌐 सभी</button>
-    <button class="filter-btn" data-filter="photos">🖼️ फ़ोटो</button>
-    <button class="filter-btn" data-filter="videos">🎬 वीडियो</button>
-    <button class="filter-btn" data-filter="favorites">⭐ पसंदीदा</button>
-    <button class="filter-btn" data-filter="recent">🕒 हाल की</button>
+    <button class="filter-btn active" data-filter="all" id="tabAll">🌐 सभी</button>
+    <button class="filter-btn" data-filter="photos" id="tabPhotos">🖼️ फ़ोटो</button>
+    <button class="filter-btn" data-filter="videos" id="tabVideos">🎬 वीडियो</button>
+    <button class="filter-btn" data-filter="favorites" id="tabFavs">⭐ पसंदीदा</button>
+    <button class="filter-btn tab-lock" data-filter="private" id="tabPrivate">🔒 प्राइवेट</button>
+    <button class="filter-btn tab-trash" data-filter="trash" id="tabTrash">🗑️ रीसायकल बिन</button>
   </div>
 
   <div class="section-title">
     <h2>
       <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      श्रेणियाँ
+      <span id="txtCategories">श्रेणियाँ (Categories)</span>
     </h2>
     <button id="btnAddCat" style="padding: 5px 9px; font-size: 11px;">＋ नई श्रेणी</button>
   </div>
@@ -299,62 +367,65 @@
   </div>
 
   <div id="emptyView" class="empty-state">
-    <p>गैलरी अभी ख़ाली है।</p>
-    <p style="margin-top: 6px; font-size: 12px;">ऊपर <b>फ़ोटो जोड़ें</b> दबाकर अपनी तस्वीरें चुनें।</p>
+    <p id="txtEmpty">गैलरी अभी ख़ाली है।</p>
   </div>
 
   <div class="gallery-grid" id="galleryGrid"></div>
-
-  <!-- Smart AI Info -->
-  <section class="panel">
-    <h3 style="font-size:14px; margin-bottom:6px;">🧠 ऑन-डिवाइस AI विज़न</h3>
-    <div class="ai-box" id="aiOutput">फ़ोटो को लॉन्ग-प्रेस (दबाकर) रखें ताकि टिक (✓) लग सके, या ऊपर "चुनें" बटन दबाएँ।</div>
-  </section>
 </div>
 
 <!-- Floating Multi-Select & Share Bar -->
 <div class="selection-bar" id="selectionBar">
   <div class="selection-count" id="selectedCountText">0 चुनी गई</div>
-  <div style="display: flex; gap: 8px;">
-    <button class="btn-share" id="btnShareSelected">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      WhatsApp
-    </button>
-    <button class="btn-danger" id="btnDeleteSelected">
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-      हटाएँ
-    </button>
+  <div style="display: flex; gap: 6px;">
+    <button class="btn-share" id="btnShareSelected">📤 Share</button>
+    <button class="btn-lock" id="btnLockSelected" title="Move to Private">🔒 Private</button>
+    <button class="btn-danger" id="btnDeleteSelected">🗑️ Delete</button>
     <button id="btnCancelSelected">✕</button>
   </div>
 </div>
 
-<!-- Fullscreen Viewer Modal -->
+<!-- Fullscreen Viewer with Edit Tools (Rotate & Filters) -->
 <div class="viewer" id="viewerModal" role="dialog" aria-modal="true">
   <div class="viewer-top">
     <button id="vClose">✕</button>
     <div class="viewer-title" id="vTitle">फ़ाइल</div>
-    <button id="vZoomOut" style="padding: 7px 11px;">−</button>
-    <button id="vReset" style="padding: 7px 11px;">1:1</button>
-    <button id="vZoomIn" style="padding: 7px 11px;">＋</button>
-    <button class="btn-share" id="vShare" style="padding: 7px 11px;">📤 शेयर</button>
+    <div class="edit-tools" id="vEditTools">
+      <button id="vRotate" title="Rotate 90°">🔄 Rotate</button>
+      <button id="vFilter" title="Apply Filter">🎨 Filter</button>
+    </div>
+    <button class="btn-share" id="vShare" style="padding: 7px 11px;">📤</button>
     <button id="vFav">☆</button>
   </div>
   <div class="viewer-stage" id="vStage"></div>
   <div class="viewer-bottom">
-    <span id="vHint">दो उँगलियों से ज़ूम करें • एक उँगली से फोटो खिसकाएँ</span>
+    <span id="vHint">दो उँगलियों से ज़ूम करें • Rotate/Filter से संपादित करें</span>
     <button id="vDownload" style="padding: 4px 10px; font-size: 11px;">डाउनलोड</button>
   </div>
 </div>
 
-<!-- Edit Dialog -->
+<!-- PIN Security Dialog -->
+<dialog id="pinDialog">
+  <h3 id="txtPinHeading">🔒 प्राइवेट फ़ोल्डर सुरक्षा</h3>
+  <label id="txtPinLabel">4-अंकों का पिन (PIN) दर्ज करें:</label>
+  <input class="field" type="password" id="pinInput" maxlength="4" placeholder="उदा. 1234">
+  <div class="dialog-actions">
+    <button id="btnCancelPin">रद्द करें</button>
+    <button class="btn-primary" id="btnSubmitPin">अनलॉक करें</button>
+  </div>
+</dialog>
+
+<!-- Edit Metadata Dialog -->
 <dialog id="editDialog">
-  <h3>फ़ाइल विवरण संपादित करें</h3>
-  <label for="editName">नाम</label>
+  <h3>फ़ाइल विवरण</h3>
+  <label>नाम</label>
   <input class="field" id="editName" maxlength="100">
-  <label for="editCat">श्रेणी</label>
+  <label>श्रेणी</label>
   <select class="field" id="editCat"></select>
-  <label for="editTags">टैग</label>
-  <input class="field" id="editTags" placeholder="परिवार, काम, यात्रा">
+  <label>सुरक्षा स्थिति</label>
+  <select class="field" id="editPrivate">
+    <option value="false">सामान्य (Normal)</option>
+    <option value="true">🔒 प्राइवेट / छुपा हुआ (Private)</option>
+  </select>
   <div class="dialog-actions">
     <button id="btnCancelEdit">रद्द करें</button>
     <button class="btn-primary" id="btnSaveEdit">सहेजें</button>
@@ -364,7 +435,7 @@
 <!-- Add Category Dialog -->
 <dialog id="newCatDialog">
   <h3>नई श्रेणी जोड़ें</h3>
-  <label for="catInputName">श्रेणी का नाम</label>
+  <label>नाम</label>
   <input class="field" id="catInputName" maxlength="40">
   <div class="dialog-actions">
     <button id="btnCancelCat">रद्द करें</button>
@@ -396,6 +467,87 @@
 
   let isSelectMode = false;
   let selectedIds = new Set();
+  let currentSort = 'newest';
+  let isPrivateUnlocked = false;
+  let userPin = localStorage.getItem('gallery_pin') || '1234';
+  let currentLang = localStorage.getItem('gallery_lang') || 'hi';
+
+  // Rotation and Filters state for Viewer
+  let currentRotation = 0;
+  const filtersList = ['none', 'grayscale(100%)', 'sepia(80%)', 'contrast(140%) brightness(110%)'];
+  let currentFilterIndex = 0;
+
+  // Language Dictionary
+  const langDict = {
+    hi: {
+      appTitle: 'Smart AI Gallery Pro',
+      appSubtitle: 'ऑफ़लाइन, प्राइवेट व AI संचालित गैलरी',
+      addPhoto: 'फ़ोटो जोड़ें',
+      addVideo: 'वीडियो जोड़ें',
+      select: 'चुनें',
+      autoGroup: 'AI ऑटो-ग्रुप',
+      privateFolder: '🔒 प्राइवेट फ़ोल्डर',
+      backup: 'बैकअप',
+      categories: 'श्रेणियाँ (Categories)',
+      empty: 'गैलरी अभी ख़ाली है।',
+      all: '🌐 सभी',
+      photos: '🖼️ फ़ोटो',
+      videos: '🎬 वीडियो',
+      favs: '⭐ पसंदीदा',
+      private: '🔒 प्राइवेट',
+      trash: '🗑️ रीसायकल बिन',
+      searchHolder: 'खोजें (Search)...',
+      unlockSuccess: 'प्राइवेट फ़ोल्डर अनलॉक हो गया!',
+      wrongPin: 'गलत पिन! कृपया पुनः प्रयास करें।',
+      restore: 'पुनर्प्राप्त करें (Restore)',
+      permDelete: 'हमेशा के लिए हटाएँ'
+    },
+    en: {
+      appTitle: 'Smart AI Gallery Pro',
+      appSubtitle: 'Offline, Private & AI-Powered Gallery',
+      addPhoto: 'Add Photos',
+      addVideo: 'Add Videos',
+      select: 'Select',
+      autoGroup: 'AI Auto-Group',
+      privateFolder: '🔒 Private Vault',
+      backup: 'Backup',
+      categories: 'Categories',
+      empty: 'Gallery is currently empty.',
+      all: '🌐 All',
+      photos: '🖼️ Photos',
+      videos: '🎬 Videos',
+      favs: '⭐ Favorites',
+      private: '🔒 Private',
+      trash: '🗑️ Recycle Bin',
+      searchHolder: 'Search name, tag...',
+      unlockSuccess: 'Private Vault unlocked!',
+      wrongPin: 'Incorrect PIN! Try again.',
+      restore: 'Restore',
+      permDelete: 'Delete Permanently'
+    }
+  };
+
+  function applyLanguage() {
+    const t = langDict[currentLang];
+    document.getElementById('txtAppTitle').textContent = t.appTitle;
+    document.getElementById('txtAppSubtitle').textContent = t.appSubtitle;
+    document.getElementById('txtAddPhoto').textContent = t.addPhoto;
+    document.getElementById('txtAddVideo').textContent = t.addVideo;
+    document.getElementById('txtSelect').textContent = isSelectMode ? (currentLang === 'hi' ? 'चयन समाप्त' : 'Done') : t.select;
+    document.getElementById('txtAutoGroup').textContent = t.autoGroup;
+    document.getElementById('txtPrivateFolder').textContent = t.privateFolder;
+    document.getElementById('txtBackup').textContent = t.backup;
+    document.getElementById('txtCategories').textContent = t.categories;
+    document.getElementById('txtEmpty').textContent = t.empty;
+    document.getElementById('tabAll').textContent = t.all;
+    document.getElementById('tabPhotos').textContent = t.photos;
+    document.getElementById('tabVideos').textContent = t.videos;
+    document.getElementById('tabFavs').textContent = t.favs;
+    document.getElementById('tabPrivate').textContent = t.private;
+    document.getElementById('tabTrash').textContent = t.trash;
+    document.getElementById('searchInput').placeholder = t.searchHolder;
+    document.getElementById('btnLangToggle').textContent = currentLang === 'hi' ? '🌐 English' : '🌐 हिन्दी';
+  }
 
   const esc = str => String(str ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -450,6 +602,42 @@
     return item._cachedUrl || '';
   }
 
+  // Generate lightweight 200px thumbnail for fast loading
+  function createThumbnail(file) {
+    return new Promise(resolve => {
+      if (!file.type.startsWith('image/')) {
+        return resolve(null);
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const maxDim = 200;
+          let w = img.width, h = img.height;
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const thumbData = canvas.toDataURL('image/jpeg', 0.65);
+          URL.revokeObjectURL(url);
+          resolve(thumbData);
+        } catch (_) {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
   function loadCategories() {
     try {
       const saved = JSON.parse(localStorage.getItem('smart_ai_gallery_cats'));
@@ -469,22 +657,32 @@
     const pillsCont = document.getElementById('catPills');
     const selectEl = document.getElementById('editCat');
 
-    pillsCont.innerHTML = `<button class="filter-btn ${!activeCategory ? 'active' : ''}" data-cat="">सभी श्रेणियाँ</button>` +
+    pillsCont.innerHTML = `<button class="filter-btn ${!activeCategory ? 'active' : ''}" data-cat="">${currentLang==='hi'?'सभी श्रेणियाँ':'All Categories'}</button>` +
       categories.map(c => `<button class="filter-btn ${activeCategory === c ? 'active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
 
     selectEl.innerHTML = categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   }
 
   function updateStats() {
-    const total = mediaList.length;
-    const photos = mediaList.filter(i => i.kind === 'image').length;
-    const videos = mediaList.filter(i => i.kind === 'video').length;
-    const favs = mediaList.filter(i => i.isFavorite).length;
+    const activeItems = mediaList.filter(i => !i.isDeleted);
+    const total = activeItems.length;
+    const photos = activeItems.filter(i => i.kind === 'image').length;
+    const videos = activeItems.filter(i => i.kind === 'video').length;
+    const favs = activeItems.filter(i => i.isFavorite).length;
 
-    document.getElementById('stTotal').textContent = `${total} कुल मीडिया`;
-    document.getElementById('stPhotos').textContent = `${photos} फ़ोटो`;
-    document.getElementById('stVideos').textContent = `${videos} वीडियो`;
-    document.getElementById('stFav').textContent = `${favs} पसंदीदा`;
+    // Calculate Storage Space in Bytes
+    let totalBytes = 0;
+    mediaList.forEach(i => { totalBytes += (i.size || 0); });
+    let storageStr = (totalBytes / (1024 * 1024)).toFixed(1) + ' MB';
+    if (totalBytes > 1024 * 1024 * 1024) {
+      storageStr = (totalBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    }
+
+    document.getElementById('stTotal').textContent = `${total} ${currentLang==='hi'?'कुल':'Items'}`;
+    document.getElementById('stPhotos').textContent = `${photos} ${currentLang==='hi'?'फ़ोटो':'Photos'}`;
+    document.getElementById('stVideos').textContent = `${videos} ${currentLang==='hi'?'वीडियो':'Videos'}`;
+    document.getElementById('stFav').textContent = `${favs} ${currentLang==='hi'?'पसंदीदा':'Favs'}`;
+    document.getElementById('stStorage').textContent = `💾 ${storageStr}`;
   }
 
   function updateSelectionBar() {
@@ -494,12 +692,12 @@
 
     if (isSelectMode) {
       bar.classList.add('active');
-      text.textContent = `${selectedIds.size} फ़ाइलें चुनी गईं`;
-      btn.textContent = '✕ चयन समाप्त';
+      text.textContent = `${selectedIds.size} ${currentLang==='hi'?'चुनी गई':'Selected'}`;
+      btn.textContent = currentLang === 'hi' ? '✕ चयन समाप्त' : '✕ Done';
       btn.classList.add('btn-primary');
     } else {
       bar.classList.remove('active');
-      btn.textContent = 'चुनें (Select)';
+      btn.textContent = currentLang === 'hi' ? 'चुनें (Select)' : 'Select';
       btn.classList.remove('btn-primary');
       selectedIds.clear();
     }
@@ -510,11 +708,25 @@
     const empty = document.getElementById('emptyView');
     const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    const filtered = mediaList.filter(item => {
+    // Filtering
+    let list = mediaList.filter(item => {
+      // Trash handling
+      if (currentFilter === 'trash') {
+        return item.isDeleted === true;
+      }
+      if (item.isDeleted === true) return false;
+
+      // Private folder handling
+      if (currentFilter === 'private') {
+        return item.isPrivate === true;
+      }
+      // If not in private tab, hide private files unless unlocked
+      if (item.isPrivate && !isPrivateUnlocked) return false;
+
       if (currentFilter === 'photos' && item.kind !== 'image') return false;
       if (currentFilter === 'videos' && item.kind !== 'video') return false;
       if (currentFilter === 'favorites' && !item.isFavorite) return false;
-      if (currentFilter === 'recent' && (Date.now() - item.createdAt > 7 * 86400000)) return false;
+
       if (activeCategory && item.category !== activeCategory) return false;
 
       if (searchVal) {
@@ -522,11 +734,20 @@
         if (!fullTxt.includes(searchVal)) return false;
       }
       return true;
-    }).sort((a, b) => b.createdAt - a.createdAt);
+    });
 
-    document.getElementById('itemCount').textContent = `${filtered.length} फ़ाइलें`;
+    // Sorting
+    list.sort((a, b) => {
+      if (currentSort === 'newest') return b.createdAt - a.createdAt;
+      if (currentSort === 'oldest') return a.createdAt - b.createdAt;
+      if (currentSort === 'name_asc') return (a.name || '').localeCompare(b.name || '');
+      if (currentSort === 'size_desc') return (b.size || 0) - (a.size || 0);
+      return 0;
+    });
 
-    if (filtered.length === 0) {
+    document.getElementById('itemCount').textContent = `${list.length} ${currentLang==='hi'?'फ़ाइलें':'Files'}`;
+
+    if (list.length === 0) {
       grid.classList.add('hidden');
       empty.classList.remove('hidden');
       return;
@@ -535,37 +756,44 @@
     grid.classList.remove('hidden');
     empty.classList.add('hidden');
 
-    grid.innerHTML = filtered.map(item => {
+    grid.innerHTML = list.map(item => {
       const isVid = item.kind === 'video';
-      const url = getMediaUrl(item);
+      // Use thumbnail data if exists for ultra-fast rendering, otherwise cached URL
+      const displaySrc = item.thumbData || getMediaUrl(item);
       const isSelected = selectedIds.has(item.id);
-      const dateStr = new Date(item.createdAt).toLocaleDateString('hi-IN', {
+      const isTrashView = currentFilter === 'trash';
+      const dateStr = new Date(item.createdAt).toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-US', {
         day: 'numeric', month: 'short', year: 'numeric'
       });
 
       return `
         <article class="media-card ${isSelected ? 'selected' : ''}" data-id="${esc(item.id)}">
-          <div class="select-check" data-action="select-item">${isSelected ? '✓' : ''}</div>
-          <button class="fav-btn" data-action="toggle-fav">${item.isFavorite ? '★' : '☆'}</button>
-          <div class="media-thumb" data-action="view">
+          ${!isTrashView ? `<div class="select-check" data-action="select-item">${isSelected ? '✓' : ''}</div>` : ''}
+          ${!isTrashView ? `<button class="fav-btn" data-action="toggle-fav">${item.isFavorite ? '★' : '☆'}</button>` : ''}
+          ${item.isPrivate ? `<span class="private-badge">🔒</span>` : ''}
+          <div class="media-thumb" data-action="${isTrashView ? 'none' : 'view'}">
             ${isVid ? `
-              <video src="${url}" preload="metadata" muted></video>
-              <div class="video-badge">▶ वीडियो</div>
+              <video src="${displaySrc}" preload="metadata" muted></video>
+              <div class="video-badge">▶ Video</div>
             ` : `
-              <img src="${url}" alt="${esc(item.name)}" loading="lazy">
+              <img src="${displaySrc}" alt="${esc(item.name)}" loading="lazy">
             `}
-            ${item.aiTag ? `<div class="ai-tag-badge">AI: ${esc(item.aiTag)}</div>` : ''}
           </div>
           <div class="media-body">
             <div class="media-name" title="${esc(item.name)}">${esc(item.name)}</div>
             <div class="media-meta">
-              <span>${esc(item.category || 'अन्य')}</span>
+              <span>${esc(item.category || 'Other')}</span>
               <span>${dateStr}</span>
             </div>
             <div class="media-actions">
-              <button class="btn-share" data-action="share-single">📤</button>
-              <button data-action="edit">✎</button>
-              <button class="btn-danger" data-action="delete">🗑</button>
+              ${isTrashView ? `
+                <button class="btn-primary" data-action="restore" style="font-size:10px;">${currentLang==='hi'?'पुनर्प्राप्त':'Restore'}</button>
+                <button class="btn-danger" data-action="perm-delete" style="font-size:10px;">${currentLang==='hi'?'हटाएँ':'Delete'}</button>
+              ` : `
+                <button class="btn-share" data-action="share-single">📤</button>
+                <button data-action="edit">✎</button>
+                <button class="btn-danger" data-action="soft-delete" title="Move to Trash">🗑️</button>
+              `}
             </div>
           </div>
         </article>
@@ -576,62 +804,11 @@
     updateSelectionBar();
   }
 
-  /* Image Visual AI Classifier */
-  function analyzeVisualPixels(blob) {
-    return new Promise(resolve => {
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const w = 48, h = 48;
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          ctx.drawImage(img, 0, 0, w, h);
-          const data = ctx.getImageData(0, 0, w, h).data;
-
-          let whitePixels = 0, skinPixels = 0, greenPixels = 0, darkPixels = 0;
-          const total = (w * h);
-
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i], g = data[i+1], b = data[i+2];
-            if (r > 205 && g > 205 && b > 205) whitePixels++;
-            else if (g > r * 1.15 && g > b * 1.05 && g > 65) greenPixels++;
-            else if (r > 95 && g > 40 && b > 20 && (r - g > 15) && (r > b)) skinPixels++;
-            if (r < 50 && g < 50 && b < 50) darkPixels++;
-          }
-
-          let detectedGroup = 'अन्य';
-          let confidenceTag = 'सामान्य';
-
-          if (whitePixels / total > 0.45) {
-            detectedGroup = 'दस्तावेज़ / रसीदें'; confidenceTag = 'दस्तावेज़';
-          } else if (greenPixels / total > 0.22) {
-            detectedGroup = 'यात्रा / प्रकृति'; confidenceTag = 'प्रकृति/सफर';
-          } else if (skinPixels / total > 0.25) {
-            detectedGroup = 'परिवार'; confidenceTag = 'व्यक्ति/चेहरा';
-          } else if (darkPixels / total > 0.35) {
-            detectedGroup = 'मशीन / औज़ार'; confidenceTag = 'औज़ार/मशीन';
-          } else {
-            detectedGroup = 'कढ़ाई / डिज़ाइन'; confidenceTag = 'डिज़ाइन';
-          }
-
-          URL.revokeObjectURL(url);
-          resolve({ group: detectedGroup, tag: confidenceTag });
-        } catch (e) {
-          URL.revokeObjectURL(url);
-          resolve(null);
-        }
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
-      img.src = url;
-    });
-  }
-
+  // Process and Compress
   async function processNewFiles(fileArray) {
     const validFiles = [...fileArray].filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
     if (!validFiles.length) {
-      alert('कृपया वैध फ़ोटो या वीडियो फ़ाइलें चुनें।');
+      alert(currentLang === 'hi' ? 'कृपया वैध फ़ाइलें चुनें।' : 'Please select valid files.');
       return;
     }
 
@@ -639,23 +816,14 @@
     for (const file of validFiles) {
       const isVid = file.type.startsWith('video/');
       const cleanedName = file.name.replace(/\.[^.]+$/, '');
-      let cat = 'अन्य';
-      let aiTag = '';
-
-      if (!isVid) {
-        const visualResult = await analyzeVisualPixels(file);
-        if (visualResult) {
-          cat = visualResult.group;
-          aiTag = visualResult.tag;
-        }
-      }
+      const thumb = await createThumbnail(file);
 
       const item = {
         id: 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6),
         blob: file, fileName: file.name, name: cleanedName,
         type: file.type, kind: isVid ? 'video' : 'image',
-        category: cat, aiTag: aiTag, tags: [], isFavorite: false,
-        createdAt: Date.now(), size: file.size
+        category: 'अन्य', tags: [], isFavorite: false, isPrivate: false, isDeleted: false,
+        thumbData: thumb, createdAt: Date.now(), size: file.size
       };
 
       try {
@@ -668,15 +836,12 @@
     }
 
     renderGallery();
-    document.getElementById('aiOutput').textContent = `✅ ${addedCount} फ़ाइलें गैलरी में जोड़ी गईं।`;
+    alert(`${addedCount} ${currentLang==='hi'?'फ़ाइलें सफलतापूर्वक जोड़ी गईं!':'files added successfully!'}`);
   }
 
-  // Multi-Share
+  // Sharing
   async function shareFiles(itemsToShare) {
-    if (!itemsToShare || itemsToShare.length === 0) {
-      alert('शेयर करने के लिए कोई फ़ोटो नहीं चुनी गई।');
-      return;
-    }
+    if (!itemsToShare || itemsToShare.length === 0) return;
     const filesArray = [];
     for (const item of itemsToShare) {
       try {
@@ -684,26 +849,20 @@
           type: item.type || (item.kind === 'video' ? 'video/mp4' : 'image/jpeg')
         });
         filesArray.push(fileObj);
-      } catch (e) {
-        console.warn('File conversion error:', e);
-      }
+      } catch (e) {}
     }
 
     if (navigator.canShare && navigator.canShare({ files: filesArray })) {
       try {
-        await navigator.share({
-          files: filesArray,
-          title: 'Smart AI Gallery',
-          text: 'Smart AI Gallery से भेजी गई तस्वीरें'
-        });
+        await navigator.share({ files: filesArray, title: 'Smart AI Gallery' });
         return;
       } catch (err) {
-        if (err.name !== 'AbortError') console.error('Share failed:', err);
+        if (err.name !== 'AbortError') console.error(err);
         return;
       }
     }
 
-    // Fallback: download each file
+    // Direct download fallback
     for (const item of itemsToShare) {
       const a = document.createElement('a');
       a.href = getMediaUrl(item);
@@ -712,41 +871,53 @@
     }
   }
 
-  function openEditModal(item) {
-    activeEditItem = item;
-    document.getElementById('editName').value = item.name || '';
-    document.getElementById('editCat').value = item.category || 'अन्य';
-    document.getElementById('editTags').value = (item.tags || []).join(', ');
-    document.getElementById('editDialog').showModal();
-  }
-
-  async function saveEditedItem() {
-    if (!activeEditItem) return;
-    activeEditItem.name = document.getElementById('editName').value.trim() || activeEditItem.fileName;
-    activeEditItem.category = document.getElementById('editCat').value;
-    activeEditItem.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(Boolean);
-    await dbPut(activeEditItem);
-    document.getElementById('editDialog').close();
-    renderGallery();
-  }
-
-  /* Pinch-to-Zoom & Pan Viewer */
+  // Viewer controls
   let scale = 1, posX = 0, posY = 0, isPinching = false, isPanning = false;
   let pinchStartDistance = 0, pinchStartScale = 1, panStartX = 0, panStartY = 0, startPosX = 0, startPosY = 0;
-  let lastTapTime = 0;
 
   function renderTransform() {
     const img = document.querySelector('#vStage img');
     if (!img) return;
     if (scale <= 1) { scale = 1; posX = 0; posY = 0; }
-    img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`;
-    const hint = document.getElementById('vHint');
-    if (hint) {
-      hint.textContent = scale > 1 ? `ज़ूम: ${scale.toFixed(1)}x • एक उँगली से खिसकाएँ` : `दो उँगलियों से ज़ूम करें`;
-    }
+    img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale}) rotate(${currentRotation}deg)`;
+    img.style.filter = filtersList[currentFilterIndex];
   }
 
-  function resetZoom() { scale = 1; posX = 0; posY = 0; renderTransform(); }
+  function resetZoom() {
+    scale = 1; posX = 0; posY = 0; currentRotation = 0; currentFilterIndex = 0;
+    renderTransform();
+  }
+
+  function openViewer(item) {
+    activeViewerItem = item;
+    resetZoom();
+    const isVid = item.kind === 'video';
+    const stage = document.getElementById('vStage');
+    const url = getMediaUrl(item);
+
+    document.getElementById('vTitle').textContent = item.name;
+    document.getElementById('vFav').textContent = item.isFavorite ? '★' : '☆';
+    document.getElementById('vEditTools').style.display = isVid ? 'none' : 'flex';
+
+    if (isVid) {
+      stage.innerHTML = `<video src="${url}" controls autoplay playsinline style="max-width:100%;max-height:100%;"></video>`;
+    } else {
+      stage.innerHTML = `<img src="${url}" alt="${esc(item.name)}">`;
+      initGestureListeners(stage);
+    }
+    document.getElementById('viewerModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeViewer() {
+    const v = document.getElementById('vStage').querySelector('video');
+    if (v) v.pause();
+    document.getElementById('viewerModal').classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('vStage').innerHTML = '';
+    activeViewerItem = null;
+    resetZoom();
+  }
 
   function getTouchDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
@@ -788,13 +959,6 @@
     stage.addEventListener('touchend', e => {
       if (e.touches.length === 0) {
         isPinching = false; isPanning = false;
-        const now = Date.now();
-        if (now - lastTapTime < 300) {
-          e.preventDefault();
-          if (scale > 1) resetZoom();
-          else { scale = 2.5; posX = 0; posY = 0; renderTransform(); }
-        }
-        lastTapTime = now;
       } else if (e.touches.length === 1) {
         isPinching = false;
         if (scale > 1) {
@@ -805,40 +969,45 @@
     }, { passive: false });
   }
 
-  function openViewer(item) {
-    activeViewerItem = item; resetZoom();
-    const isVid = item.kind === 'video';
-    const stage = document.getElementById('vStage');
-    const url = getMediaUrl(item);
+  // Long press on card
+  let longPressTimer = null, touchStartPos = { x: 0, y: 0 }, hasLongPressed = false;
+  function attachCardLongPress(grid) {
+    grid.addEventListener('touchstart', e => {
+      const card = e.target.closest('.media-card');
+      if (!card || e.target.closest('button')) return;
+      hasLongPressed = false;
+      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 
-    document.getElementById('vTitle').textContent = item.name;
-    document.getElementById('vFav').textContent = item.isFavorite ? '★' : '☆';
+      longPressTimer = setTimeout(() => {
+        hasLongPressed = true;
+        const id = card.dataset.id;
+        if (!isSelectMode) isSelectMode = true;
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        if (navigator.vibrate) navigator.vibrate(40);
+        renderGallery();
+      }, 450);
+    }, { passive: true });
 
-    if (isVid) {
-      stage.innerHTML = `<video src="${url}" controls autoplay playsinline style="max-width:100%;max-height:100%;"></video>`;
-    } else {
-      stage.innerHTML = `<img src="${url}" alt="${esc(item.name)}" style="transform: translate3d(0px, 0px, 0) scale(1);">`;
-      initGestureListeners(stage);
-    }
-    document.getElementById('viewerModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    grid.addEventListener('touchmove', e => {
+      if (!longPressTimer) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartPos.x);
+      const dy = Math.abs(e.touches[0].clientY - touchStartPos.y);
+      if (dx > 8 || dy > 8) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }, { passive: true });
+
+    grid.addEventListener('touchend', () => {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    });
   }
 
-  function closeViewer() {
-    const v = document.getElementById('vStage').querySelector('video');
-    if (v) v.pause();
-    document.getElementById('viewerModal').classList.remove('open');
-    document.body.style.overflow = '';
-    document.getElementById('vStage').innerHTML = '';
-    activeViewerItem = null;
-    resetZoom();
-  }
-
+  // Backup & Metadata Edit
   function downloadBackup() {
-    if (!mediaList.length) return alert('गैलरी में कोई डेटा नहीं है।');
+    if (!mediaList.length) return alert('No data to backup.');
     const metaData = mediaList.map(m => ({
       name: m.name, fileName: m.fileName, category: m.category,
-      tags: m.tags, isFavorite: m.isFavorite, createdAt: m.createdAt, kind: m.kind
+      tags: m.tags, isFavorite: m.isFavorite, isPrivate: m.isPrivate,
+      createdAt: m.createdAt, kind: m.kind, size: m.size
     }));
     const blob = new Blob([JSON.stringify(metaData, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -847,57 +1016,29 @@
     a.click();
   }
 
-  /* ============================================================
-     TOUCH HANDLING: IN-APP LONG-PRESS FOR SELECTING CARDS (TICK)
-     ============================================================ */
-  let longPressTimer = null;
-  let touchStartPos = { x: 0, y: 0 };
-  let hasLongPressed = false;
+  function openEditModal(item) {
+    activeEditItem = item;
+    document.getElementById('editName').value = item.name || '';
+    document.getElementById('editCat').value = item.category || 'अन्य';
+    document.getElementById('editPrivate').value = item.isPrivate ? 'true' : 'false';
+    document.getElementById('editDialog').showModal();
+  }
 
-  function attachCardLongPress(grid) {
-    grid.addEventListener('touchstart', e => {
-      const card = e.target.closest('.media-card');
-      if (!card) return;
-      if (e.target.closest('button')) return; // Ignore buttons inside card
-
-      hasLongPressed = false;
-      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-
-      longPressTimer = setTimeout(() => {
-        hasLongPressed = true;
-        const id = card.dataset.id;
-        if (!isSelectMode) isSelectMode = true;
-
-        if (selectedIds.has(id)) selectedIds.delete(id);
-        else selectedIds.add(id);
-
-        if (navigator.vibrate) navigator.vibrate(40); // Haptic feedback tick
-        renderGallery();
-      }, 450); // 450ms hold triggers selection mode & tick!
-    }, { passive: true });
-
-    grid.addEventListener('touchmove', e => {
-      if (!longPressTimer) return;
-      const dx = Math.abs(e.touches[0].clientX - touchStartPos.x);
-      const dy = Math.abs(e.touches[0].clientY - touchStartPos.y);
-      if (dx > 8 || dy > 8) {
-        clearTimeout(longPressTimer); // User is scrolling
-        longPressTimer = null;
-      }
-    }, { passive: true });
-
-    grid.addEventListener('touchend', e => {
-      if (longPressTimer) {
-        clearTimeout(longPressTimer);
-        longPressTimer = null;
-      }
-    });
+  async function saveEditedItem() {
+    if (!activeEditItem) return;
+    activeEditItem.name = document.getElementById('editName').value.trim() || activeEditItem.fileName;
+    activeEditItem.category = document.getElementById('editCat').value;
+    activeEditItem.isPrivate = document.getElementById('editPrivate').value === 'true';
+    await dbPut(activeEditItem);
+    document.getElementById('editDialog').close();
+    renderGallery();
   }
 
   // Initialize
   window.addEventListener('DOMContentLoaded', async () => {
     loadCategories();
     renderCategoryPills();
+    applyLanguage();
 
     try {
       db = await openDatabase();
@@ -907,99 +1048,81 @@
       console.error('Database error:', err);
     }
 
-    // Attach card long-press detection
     attachCardLongPress(document.getElementById('galleryGrid'));
 
-    // Android-friendly separate file pickers for images and videos
+    // Language Toggle
+    document.getElementById('btnLangToggle').onclick = () => {
+      currentLang = currentLang === 'hi' ? 'en' : 'hi';
+      localStorage.setItem('gallery_lang', currentLang);
+      applyLanguage();
+      renderCategoryPills();
+      renderGallery();
+    };
+
+    // File Inputs
     document.getElementById('btnAdd').onclick = () => {
       const input = document.getElementById('photoInput');
-      input.value = '';
-      input.click();
+      input.value = ''; input.click();
     };
     document.getElementById('photoInput').onchange = e => processNewFiles(e.target.files);
 
     document.getElementById('btnAddVideo').onclick = () => {
       const input = document.getElementById('videoInput');
-      input.value = '';
-      input.click();
+      input.value = ''; input.click();
     };
     document.getElementById('videoInput').onchange = e => processNewFiles(e.target.files);
 
-    // AI Auto Group
-    document.getElementById('btnAIGroup').onclick = async () => {
-      if (!mediaList.length) return alert('गैलरी में कोई फ़ोटो नहीं है।');
-      let count = 0;
-      for (const item of mediaList) {
-        if (item.kind === 'image') {
-          const res = await analyzeVisualPixels(item.blob);
-          if (res) {
-            item.category = res.group; item.aiTag = res.tag;
-            await dbPut(item); count++;
-          }
-        }
-      }
-      renderGallery();
-      document.getElementById('aiOutput').textContent = `🎉 AI ने ${count} फ़ोटो को पहचान कर ऑटो-ग्रुप कर दिया।`;
-    };
-
-    // Toggle Multi-Select Mode
-    document.getElementById('btnToggleSelect').onclick = () => {
-      isSelectMode = !isSelectMode;
-      if (!isSelectMode) selectedIds.clear();
+    // Sorting
+    document.getElementById('sortSelect').onchange = e => {
+      currentSort = e.target.value;
       renderGallery();
     };
 
-    document.getElementById('btnCancelSelected').onclick = () => {
-      isSelectMode = false;
-      selectedIds.clear();
-      renderGallery();
-    };
-
-    // Share Selected
-    document.getElementById('btnShareSelected').onclick = () => {
-      if (selectedIds.size === 0) return alert('कृपया पहले शेयर करने के लिए फ़ोटो चुनें।');
-      const toShare = mediaList.filter(item => selectedIds.has(item.id));
-      shareFiles(toShare);
-    };
-
-    // Delete Selected
-    document.getElementById('btnDeleteSelected').onclick = async () => {
-      if (selectedIds.size === 0) return;
-      if (confirm(`क्या आप चुनी गई ${selectedIds.size} फ़ाइलों को हटाना चाहते हैं?`)) {
-        for (const id of selectedIds) {
-          const item = mediaList.find(i => i.id === id);
-          if (item && item._cachedUrl) URL.revokeObjectURL(item._cachedUrl);
-          await dbDelete(id);
-        }
-        mediaList = mediaList.filter(i => !selectedIds.has(i.id));
-        selectedIds.clear();
-        isSelectMode = false;
+    // Private PIN Dialog
+    document.getElementById('btnLockFolder').onclick = () => {
+      if (!isPrivateUnlocked) {
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinDialog').showModal();
+      } else {
+        isPrivateUnlocked = false;
+        alert(currentLang === 'hi' ? '🔒 प्राइवेट फ़ोल्डर लॉक कर दिया गया।' : '🔒 Private Vault locked.');
         renderGallery();
       }
     };
-
-    // Single item share in fullscreen viewer
-    document.getElementById('vShare').onclick = () => {
-      if (activeViewerItem) shareFiles([activeViewerItem]);
+    document.getElementById('btnCancelPin').onclick = () => document.getElementById('pinDialog').close();
+    document.getElementById('btnSubmitPin').onclick = () => {
+      const val = document.getElementById('pinInput').value.trim();
+      if (val === userPin) {
+        isPrivateUnlocked = true;
+        document.getElementById('pinDialog').close();
+        alert(langDict[currentLang].unlockSuccess);
+        // Switch to private tab automatically
+        document.querySelectorAll('#typeFilters .filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tabPrivate').classList.add('active');
+        currentFilter = 'private';
+        renderGallery();
+      } else {
+        alert(langDict[currentLang].wrongPin);
+      }
     };
 
-    // Search
-    document.getElementById('searchInput').oninput = renderGallery;
-    document.getElementById('btnClearSearch').onclick = () => {
-      document.getElementById('searchInput').value = '';
-      renderGallery();
-    };
-
-    // Filter pills
+    // Filter Navigation
     document.getElementById('typeFilters').onclick = e => {
       const btn = e.target.closest('[data-filter]');
       if (!btn) return;
+      const f = btn.dataset.filter;
+      if (f === 'private' && !isPrivateUnlocked) {
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinDialog').showModal();
+        return;
+      }
       document.querySelectorAll('#typeFilters .filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
+      currentFilter = f;
       renderGallery();
     };
 
+    // Category Filter
     document.getElementById('catPills').onclick = e => {
       const btn = e.target.closest('[data-cat]');
       if (!btn) return;
@@ -1009,13 +1132,50 @@
       renderGallery();
     };
 
-    // Gallery Click Handling
-    document.getElementById('galleryGrid').onclick = async e => {
-      if (hasLongPressed) {
-        hasLongPressed = false;
-        return; // Prevent triggering click if user just long-pressed
+    // Multi-Select Bar Controls
+    document.getElementById('btnToggleSelect').onclick = () => {
+      isSelectMode = !isSelectMode;
+      if (!isSelectMode) selectedIds.clear();
+      renderGallery();
+    };
+    document.getElementById('btnCancelSelected').onclick = () => {
+      isSelectMode = false; selectedIds.clear(); renderGallery();
+    };
+    document.getElementById('btnShareSelected').onclick = () => {
+      if (selectedIds.size === 0) return;
+      const toShare = mediaList.filter(item => selectedIds.has(item.id));
+      shareFiles(toShare);
+    };
+    // Lock selected
+    document.getElementById('btnLockSelected').onclick = async () => {
+      if (selectedIds.size === 0) return;
+      for (const id of selectedIds) {
+        const item = mediaList.find(i => i.id === id);
+        if (item) { item.isPrivate = true; await dbPut(item); }
       }
+      selectedIds.clear(); isSelectMode = false;
+      alert(currentLang === 'hi' ? 'चुनी गई फ़ाइलें प्राइवेट फ़ोल्डर में डाल दी गईं!' : 'Selected files moved to Private Vault!');
+      renderGallery();
+    };
+    // Soft Delete selected (Move to Trash)
+    document.getElementById('btnDeleteSelected').onclick = async () => {
+      if (selectedIds.size === 0) return;
+      const msg = currentLang === 'hi' 
+        ? `क्या आप चुनी गई ${selectedIds.size} फ़ाइलों को रीसायकल बिन में डालना चाहते हैं?` 
+        : `Move ${selectedIds.size} files to Recycle Bin?`;
+      if (confirm(msg)) {
+        for (const id of selectedIds) {
+          const item = mediaList.find(i => i.id === id);
+          if (item) { item.isDeleted = true; await dbPut(item); }
+        }
+        selectedIds.clear(); isSelectMode = false;
+        renderGallery();
+      }
+    };
 
+    // Gallery Card Clicks
+    document.getElementById('galleryGrid').onclick = async e => {
+      if (hasLongPressed) { hasLongPressed = false; return; }
       const card = e.target.closest('.media-card');
       if (!card) return;
       const id = card.dataset.id;
@@ -1024,7 +1184,7 @@
 
       const act = e.target.dataset.action;
 
-      if (act === 'select-item' || (isSelectMode && !['share-single', 'edit', 'delete', 'toggle-fav'].includes(act))) {
+      if (act === 'select-item' || (isSelectMode && !['share-single', 'edit', 'soft-delete', 'restore', 'perm-delete'].includes(act))) {
         if (!isSelectMode) isSelectMode = true;
         if (selectedIds.has(id)) selectedIds.delete(id);
         else selectedIds.add(id);
@@ -1032,7 +1192,22 @@
         return;
       }
 
-      if (act === 'share-single') {
+      if (act === 'soft-delete') {
+        item.isDeleted = true;
+        await dbPut(item);
+        renderGallery();
+      } else if (act === 'restore') {
+        item.isDeleted = false;
+        await dbPut(item);
+        renderGallery();
+      } else if (act === 'perm-delete') {
+        if (confirm(currentLang === 'hi' ? 'हमेशा के लिए हटाएँ?' : 'Permanently delete this item?')) {
+          if (item._cachedUrl) URL.revokeObjectURL(item._cachedUrl);
+          await dbDelete(id);
+          mediaList = mediaList.filter(i => i.id !== id);
+          renderGallery();
+        }
+      } else if (act === 'share-single') {
         shareFiles([item]);
       } else if (act === 'toggle-fav') {
         item.isFavorite = !item.isFavorite;
@@ -1042,27 +1217,30 @@
         openViewer(item);
       } else if (act === 'edit') {
         openEditModal(item);
-      } else if (act === 'delete') {
-        if (confirm(`क्या आप वाकई "${item.name}" को हटाना चाहते हैं?`)) {
-          if (item._cachedUrl) URL.revokeObjectURL(item._cachedUrl);
-          await dbDelete(id);
-          mediaList = mediaList.filter(i => i.id !== id);
-          renderGallery();
-        }
       }
+    };
+
+    // Viewer In-App Editing Tools (Rotate & Filter)
+    document.getElementById('vRotate').onclick = () => {
+      currentRotation = (currentRotation + 90) % 360;
+      renderTransform();
+    };
+    document.getElementById('vFilter').onclick = () => {
+      currentFilterIndex = (currentFilterIndex + 1) % filtersList.length;
+      renderTransform();
     };
 
     // Viewer Controls
     document.getElementById('vClose').onclick = closeViewer;
-    document.getElementById('vReset').onclick = resetZoom;
-    document.getElementById('vZoomIn').onclick = () => { scale = Math.min(6, scale + 0.5); renderTransform(); };
-    document.getElementById('vZoomOut').onclick = () => { scale = Math.max(1, scale - 0.5); if (scale <= 1) { posX = 0; posY = 0; } renderTransform(); };
     document.getElementById('vFav').onclick = async () => {
       if (!activeViewerItem) return;
       activeViewerItem.isFavorite = !activeViewerItem.isFavorite;
       await dbPut(activeViewerItem);
       document.getElementById('vFav').textContent = activeViewerItem.isFavorite ? '★' : '☆';
       renderGallery();
+    };
+    document.getElementById('vShare').onclick = () => {
+      if (activeViewerItem) shareFiles([activeViewerItem]);
     };
     document.getElementById('vDownload').onclick = () => {
       if (!activeViewerItem) return;
@@ -1072,9 +1250,9 @@
       a.click();
     };
 
+    // Dialog Buttons
     document.getElementById('btnCancelEdit').onclick = () => document.getElementById('editDialog').close();
     document.getElementById('btnSaveEdit').onclick = saveEditedItem;
-
     document.getElementById('btnAddCat').onclick = () => {
       document.getElementById('catInputName').value = '';
       document.getElementById('newCatDialog').showModal();
@@ -1089,6 +1267,7 @@
     };
 
     document.getElementById('btnBackup').onclick = downloadBackup;
+    document.getElementById('searchInput').oninput = renderGallery;
   });
 })();
 </script>
