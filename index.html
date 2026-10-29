@@ -3,16 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <title>Smart AI Gallery</title>
+  <meta name="theme-color" content="#0b0f19">
+  <title>Smart AI Gallery Pro Ultimate</title>
   <style>
     :root {
-      --bg: #000000;
-      --surface: #121212;
-      --card-bg: #1c1c1e;
-      --text: #ffffff;
-      --muted: #8e8e93;
-      --accent: #22c55e;
+      --bg: #070a12;
+      --surface: #101728;
+      --card: #162035;
+      --border: #233152;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #2dd4bf;
+      --accent-glow: rgba(45, 212, 191, 0.25);
+      --danger: #f43f5e;
+      --star: #fbbf24;
+      --lock: #ec4899;
       --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,456 +28,570 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-bottom: calc(70px + env(safe-area-inset-bottom));
-      user-select: none;
-      -webkit-user-select: none;
+      padding-bottom: 85px;
       -webkit-tap-highlight-color: transparent;
     }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px;
+      width: 100%;
+      flex: 1;
+    }
 
-    /* Top Native Bar */
-    .top-bar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(20px);
+    /* Header */
+    header.hero {
+      background: linear-gradient(135deg, #131d33 0%, #0d2331 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.5);
+    }
+    .brand-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 14px;
     }
-    .top-title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .top-actions {
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      padding: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-    .icon-btn.active {
-      color: var(--accent);
-      background: rgba(34, 197, 94, 0.15);
-    }
-    .icon {
-      width: 22px;
-      height: 22px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* Main Container */
-    .content-area {
-      flex: 1;
-      width: 100%;
-    }
-
-    /* Date Header Groups */
-    .date-group {
-      margin-bottom: 8px;
-    }
-    .date-heading {
-      font-size: 14px;
-      font-weight: 600;
-      color: #9ca3af;
-      padding: 14px 12px 8px;
-    }
-
-    /* Native Seamless Edge-to-Edge Grid */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2.5px;
-      width: 100%;
-    }
-    @media (min-width: 600px) {
-      .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
-    }
-    @media (min-width: 900px) {
-      .photo-grid { grid-template-columns: repeat(6, 1fr); gap: 4px; }
-    }
-
-    .photo-item {
-      position: relative;
-      aspect-ratio: 1;
-      background: #18181b;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .photo-item img, .photo-item video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
-    }
-    .video-time {
-      position: absolute;
-      bottom: 5px;
-      left: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #ffffff;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-      pointer-events: none;
-    }
-
-    /* Selection Checkmark Overlay */
-    .item-check {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid #ffffff;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: #ffffff;
-      pointer-events: none;
-      transition: transform 0.15s ease;
-    }
-    .select-mode .item-check { display: flex; }
-    .photo-item.selected .item-check {
-      display: flex;
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #000000;
+    .logo-badge {
+      background: linear-gradient(135deg, #a855f7, #3b82f6, #2dd4bf);
+      color: #050811;
       font-weight: 900;
-      transform: scale(1.05);
-    }
-    .photo-item.selected {
-      filter: brightness(0.82);
-    }
-
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: calc(56px + env(safe-area-inset-bottom));
-      background: rgba(18, 18, 18, 0.96);
-      border-top: 1px solid #27272a;
+      font-size: 22px;
+      padding: 10px 14px;
+      border-radius: 14px;
       display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 200;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      color: #71717a;
-      font-size: 11px;
-      font-weight: 500;
-      cursor: pointer;
-      flex: 1;
-      height: 100%;
-      border: none;
-      background: transparent;
     }
-    .nav-item.active {
+    .hero-titles h1 { font-size: clamp(18px, 4vw, 24px); font-weight: 800; }
+    .hero-titles p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    
+    .lang-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
       color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
       font-weight: 700;
-    }
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Floating Multi-Select Action Bar */
-    .selection-float-bar {
-      position: fixed;
-      bottom: calc(64px + env(safe-area-inset-bottom));
-      left: 14px;
-      right: 14px;
-      background: #18181b;
-      border: 1px solid #3f3f46;
-      border-radius: 30px;
-      padding: 10px 18px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 300;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-    }
-    .selection-float-bar.active { display: flex; }
-    .float-count { font-size: 14px; font-weight: 700; color: #ffffff; }
-    .float-btns { display: flex; gap: 14px; }
-    .float-btn {
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 5px;
     }
-    .float-share { color: var(--accent); }
-    .float-delete { color: #f43f5e; }
+
+    .stats-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+    .stat-pill {
+      background: rgba(7, 10, 18, 0.7);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stat-storage { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* Toolbar Buttons */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      touch-action: manipulation;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    button:active { transform: scale(0.96); }
+    .btn-primary { background: var(--accent); color: #042f2e; border-color: var(--accent); }
+    .btn-ai { background: linear-gradient(135deg, #7c3aed, #2563eb); color: #fff; border-color: #9333ea; }
+    .btn-danger { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: #fda4af; }
+    .btn-share { background: #15803d; color: #fff; border-color: #22c55e; font-weight: 700; }
+    .btn-lock { background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); color: #f472b6; }
+    
+    .icon {
+      width: 16px; height: 16px; fill: none; stroke: currentColor;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+    }
+
+    /* Controls: Search & Sort Bar */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .field {
+      width: 100%; background: #0b1120; border: 1px solid var(--border);
+      color: var(--text); padding: 9px 12px; border-radius: 12px; font: inherit; font-size: 13px; outline: none;
+    }
+    .field:focus { border-color: var(--accent); }
+    .sort-select {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; }
+    .filter-btn { white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 12px; }
+    .filter-btn.active { background: var(--accent); color: #042f2e; border-color: var(--accent); font-weight: 700; }
+    .filter-btn.tab-lock.active { background: var(--lock); color: #fff; border-color: var(--lock); }
+    .filter-btn.tab-trash.active { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 10px; }
+    .section-title h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .section-title span { font-size: 12px; color: var(--muted); }
+
+    /* Gallery Grid */
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
+    @media (min-width: 600px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+    @media (min-width: 900px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+    
+    .media-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; display: flex; flex-direction: column; position: relative;
+      user-select: none; -webkit-user-select: none;
+    }
+    .media-card.selected {
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.25);
+    }
+    .media-thumb {
+      aspect-ratio: 1; background: #050811; position: relative;
+      cursor: pointer; overflow: hidden; display: grid; place-items: center;
+    }
+    .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; display: block; background: #0b1120; }
+    .video-badge {
+      position: absolute; background: rgba(0, 0, 0, 0.75); color: #fff;
+      padding: 3px 6px; border-radius: 6px; font-size: 10px; bottom: 6px; left: 6px;
+    }
+    .private-badge {
+      position: absolute; top: 6px; left: 38px; background: rgba(236, 72, 153, 0.85); color: #fff;
+      padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700;
+    }
+    .select-check {
+      position: absolute; top: 6px; left: 6px; width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(11, 15, 25, 0.8); border: 2px solid #94a3b8; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;
+      cursor: pointer; z-index: 5;
+    }
+    .media-card.selected .select-check {
+      background: var(--accent); border-color: var(--accent); color: #042f2e;
+    }
+    .fav-btn {
+      position: absolute; top: 6px; right: 6px; background: rgba(10, 15, 26, 0.8);
+      border: none; color: var(--star); font-size: 16px; padding: 3px 6px; border-radius: 50%;
+      cursor: pointer; z-index: 5;
+    }
+    .media-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .media-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .media-meta { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+    .media-actions { display: flex; gap: 4px; margin-top: 5px; }
+    .media-actions button { flex: 1; padding: 5px; font-size: 11px; justify-content: center; }
+
+    /* Selection Floating Bar */
+    .selection-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #101728;
+      border-top: 1px solid var(--border); padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      display: none; align-items: center; justify-content: space-between; gap: 10px; z-index: 999;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.6);
+    }
+    .selection-bar.active { display: flex; }
+    .selection-count { font-size: 13px; font-weight: 700; color: var(--accent); }
 
     /* Fullscreen Viewer */
     .viewer {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #000000;
-      z-index: 99999;
-      flex-direction: column;
-      touch-action: none;
+      display: none; position: fixed; inset: 0; background: #000;
+      z-index: 99999; flex-direction: column; touch-action: none; overflow: hidden;
     }
     .viewer.open { display: flex; }
     .viewer-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-      z-index: 10;
+      display: flex; align-items: center; gap: 6px; padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+      background: rgba(16, 23, 40, 0.95); border-bottom: 1px solid var(--border); z-index: 100;
     }
+    .viewer-title { flex: 1; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .viewer-stage {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      flex: 1; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center;
+      justify-content: center; position: relative; touch-action: none; background: #000;
     }
     .viewer-stage img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      transform-origin: center center;
+      max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center center;
+      pointer-events: none; transition: filter 0.2s ease;
     }
-    .viewer-stage video {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
+    .viewer-stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
     .viewer-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
-      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-      z-index: 10;
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: rgba(16, 23, 40, 0.95);
+      border-top: 1px solid var(--border); display: flex; justify-content: space-between;
+      align-items: center; font-size: 11px; color: var(--muted); z-index: 100;
     }
-    .viewer-btn {
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      cursor: pointer;
-    }
+    .edit-tools { display: flex; gap: 6px; align-items: center; }
 
-    /* Albums & AI Views */
-    .albums-view, .ai-view {
-      padding: 16px;
-      display: none;
+    /* Dialogs */
+    dialog {
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 16px; width: min(92vw, 400px); margin: auto; padding: 18px;
     }
-    .album-card {
-      background: #18181b;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
+    dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
+    dialog h3 { font-size: 15px; margin-bottom: 12px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    .empty-state {
+      background: var(--surface); border: 1px dashed var(--border); border-radius: 16px;
+      padding: 32px 18px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6;
     }
-    .album-info h3 { font-size: 15px; font-weight: 600; }
-    .album-info p { font-size: 12px; color: #a1a1aa; margin-top: 2px; }
-    .empty-state { text-align: center; color: #71717a; padding: 60px 20px; font-size: 14px; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- Top App Bar -->
-  <header class="top-bar">
-    <div class="top-title" id="pageTitle">Photos</div>
-    <div class="top-actions">
-      <!-- Add Button (Multi Photos) -->
-      <button class="icon-btn" id="btnTopAdd" title="Add Photos">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-      <!-- Multi-Select Toggle Button -->
-      <button class="icon-btn" id="btnTopSelect" title="Select Multiple">
-        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>
-      </button>
+<div class="container">
+  <header class="hero">
+    <div class="brand-bar">
+      <div class="brand">
+        <div class="logo-badge">
+          <svg class="icon" style="width:24px;height:24px;" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+        </div>
+        <div class="hero-titles">
+          <h1 id="txtAppTitle">Smart AI Gallery Pro</h1>
+          <p id="txtAppSubtitle">Offline, Private & AI-Powered Gallery</p>
+        </div>
+      </div>
+      <button class="lang-btn" id="btnLangToggle">🌐 English / हिन्दी</button>
+    </div>
+
+    <!-- Stats with Storage Counter -->
+    <div class="stats-bar">
+      <span class="stat-pill" id="stTotal">0 Media</span>
+      <span class="stat-pill" id="stPhotos">0 Photos</span>
+      <span class="stat-pill" id="stVideos">0 Videos</span>
+      <span class="stat-pill" id="stFav">0 Favorites</span>
+      <span class="stat-pill stat-storage" id="stStorage">📊 0 MB</span>
     </div>
   </header>
 
-  <!-- Clean Multiple Inputs for Android -->
-  <input hidden id="filePicker" type="file" accept="image/*,video/*" multiple>
-
-  <!-- Main Photos View -->
-  <main class="content-area" id="mainContainer">
-    <div id="photosTimeline"></div>
-    <div id="emptyView" class="empty-state">
-      <p>No photos yet</p>
-      <p style="margin-top:6px; font-size:12px; color:#52525b;">Tap + above to add photos</p>
-    </div>
-  </main>
-
-  <!-- Albums View -->
-  <div class="albums-view" id="albumsView">
-    <div class="album-card" data-album="favorites">
-      <div class="album-info">
-        <h3>⭐ Favorites (पसंदीदा)</h3>
-        <p id="favCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-    <div class="album-card" data-album="videos">
-      <div class="album-info">
-        <h3>🎬 Videos (वीडियो)</h3>
-        <p id="videoCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-    <div class="album-card" data-album="trash">
-      <div class="album-info">
-        <h3>🗑️ Recycle Bin (कचरा-पेटी)</h3>
-        <p id="trashCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-  </div>
-
-  <!-- AI Smart Grouping View -->
-  <div class="ai-view" id="aiView">
-    <div style="background:#18181b; border-radius:16px; padding:16px; margin-bottom:14px;">
-      <h3 style="font-size:16px;">🧠 On-Device AI Vision</h3>
-      <p style="font-size:12px; color:#a1a1aa; margin:6px 0 14px;">Scans photo visual patterns locally without uploading anything to the internet.</p>
-      <button id="btnRunAI" style="width:100%; padding:12px; font-size:14px; background:var(--accent); color:#000; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Auto-Group Photos Now</button>
-    </div>
-  </div>
-
-  <!-- Floating Multi-Select Action Bar -->
-  <div class="selection-float-bar" id="selectionBar">
-    <span class="float-count" id="selectCountText">0 selected</span>
-    <div class="float-btns">
-      <button class="float-btn float-share" id="btnFloatShare">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        WhatsApp
-      </button>
-      <button class="float-btn float-delete" id="btnFloatDelete">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        Delete
-      </button>
-      <button class="float-btn" id="btnFloatCancel" style="color:#a1a1aa;">✕ Cancel</button>
-    </div>
-  </div>
-
-  <!-- Native Bottom Navigation Bar -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="photos">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span>Photos</span>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn-primary" id="btnAdd">
+      <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="txtAddPhoto">फ़ोटो जोड़ें</span>
     </button>
-    <button class="nav-item" data-tab="albums">
-      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      <span>Albums</span>
+    <button id="btnAddVideo">
+      <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      <span id="txtAddVideo">वीडियो जोड़ें</span>
     </button>
-    <button class="nav-item" data-tab="ai">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
-      <span>Smart AI</span>
+    <button id="btnToggleSelect">
+      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span id="txtSelect">चुनें</span>
     </button>
-  </nav>
+    <button class="btn-ai" id="btnAIGroup">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span id="txtAutoGroup">AI ऑटो-ग्रुप</span>
+    </button>
+    <button class="btn-lock" id="btnLockFolder">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span id="txtPrivateFolder">🔒 प्राइवेट फ़ोल्डर</span>
+    </button>
+    <button id="btnBackup">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span id="txtBackup">बैकअप</span>
+    </button>
 
-  <!-- Fullscreen Immersive Viewer -->
-  <div class="viewer" id="viewerModal">
-    <div class="viewer-top">
-      <button class="icon-btn" id="vClose">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      </button>
-      <span style="font-size:13px; color:#a1a1aa;" id="vDate">Today</span>
-      <button class="icon-btn" id="vFav">
-        <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-    </div>
-    <div class="viewer-stage" id="vStage"></div>
-    <div class="viewer-bottom">
-      <button class="viewer-btn" id="vShare">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share
-      </button>
-      <button class="viewer-btn" id="vRotate">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        Rotate
-      </button>
-      <button class="viewer-btn" id="vDelete">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        Delete
-      </button>
-    </div>
+    <input hidden id="photoInput" type="file" accept="image/*" multiple>
+    <input hidden id="videoInput" type="file" accept="video/*" multiple>
   </div>
+
+  <!-- Search & Sorting Controls -->
+  <div class="controls-row">
+    <div class="search-box">
+      <input type="text" class="field" id="searchInput" placeholder="खोजें (Search)...">
+    </div>
+    <select class="sort-select" id="sortSelect">
+      <option value="newest">🕒 नई से पुरानी (Newest)</option>
+      <option value="oldest">⌛ पुरानी से नई (Oldest)</option>
+      <option value="name_asc">🔤 नाम (A to Z)</option>
+      <option value="size_desc">💾 साइज़ (Largest First)</option>
+    </select>
+  </div>
+
+  <!-- Filter Pills -->
+  <div class="filter-pills" id="typeFilters">
+    <button class="filter-btn active" data-filter="all" id="tabAll">🌐 सभी</button>
+    <button class="filter-btn" data-filter="photos" id="tabPhotos">🖼️ फ़ोटो</button>
+    <button class="filter-btn" data-filter="videos" id="tabVideos">🎬 वीडियो</button>
+    <button class="filter-btn" data-filter="favorites" id="tabFavs">⭐ पसंदीदा</button>
+    <button class="filter-btn tab-lock" data-filter="private" id="tabPrivate">🔒 प्राइवेट</button>
+    <button class="filter-btn tab-trash" data-filter="trash" id="tabTrash">🗑️ रीसायकल बिन</button>
+  </div>
+
+  <div class="section-title">
+    <h2>
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span id="txtCategories">श्रेणियाँ (Categories)</span>
+    </h2>
+    <button id="btnAddCat" style="padding: 5px 9px; font-size: 11px;">＋ नई श्रेणी</button>
+  </div>
+  <div class="filter-pills" id="catPills"></div>
+
+  <div class="section-title">
+    <h2 id="galleryHeading">आपकी गैलरी</h2>
+    <span id="itemCount">0 फ़ाइलें</span>
+  </div>
+
+  <div id="emptyView" class="empty-state">
+    <p id="txtEmpty">गैलरी अभी ख़ाली है।</p>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- Floating Multi-Select & Share Bar -->
+<div class="selection-bar" id="selectionBar">
+  <div class="selection-count" id="selectedCountText">0 चुनी गई</div>
+  <div style="display: flex; gap: 6px;">
+    <button class="btn-share" id="btnShareSelected">📤 Share</button>
+    <button class="btn-lock" id="btnLockSelected" title="Move to Private">🔒 Private</button>
+    <button class="btn-danger" id="btnDeleteSelected">🗑️ Delete</button>
+    <button id="btnCancelSelected">✕</button>
+  </div>
+</div>
+
+<!-- Fullscreen Viewer with Edit Tools (Rotate & Filters) -->
+<div class="viewer" id="viewerModal" role="dialog" aria-modal="true">
+  <div class="viewer-top">
+    <button id="vClose">✕</button>
+    <div class="viewer-title" id="vTitle">फ़ाइल</div>
+    <div class="edit-tools" id="vEditTools">
+      <button id="vRotate" title="Rotate 90°">🔄 Rotate</button>
+      <button id="vFilter" title="Apply Filter">🎨 Filter</button>
+    </div>
+    <button class="btn-share" id="vShare" style="padding: 7px 11px;">📤</button>
+    <button id="vFav">☆</button>
+  </div>
+  <div class="viewer-stage" id="vStage"></div>
+  <div class="viewer-bottom">
+    <span id="vHint">दो उँगलियों से ज़ूम करें • Rotate/Filter से संपादित करें</span>
+    <button id="vDownload" style="padding: 4px 10px; font-size: 11px;">डाउनलोड</button>
+  </div>
+</div>
+
+<!-- PIN Security Dialog -->
+<dialog id="pinDialog">
+  <h3 id="txtPinHeading">🔒 प्राइवेट फ़ोल्डर सुरक्षा</h3>
+  <label id="txtPinLabel">4-अंकों का पिन (PIN) दर्ज करें:</label>
+  <input class="field" type="password" id="pinInput" maxlength="4" placeholder="उदा. 1234">
+  <div class="dialog-actions">
+    <button id="btnCancelPin">रद्द करें</button>
+    <button class="btn-primary" id="btnSubmitPin">अनलॉक करें</button>
+  </div>
+</dialog>
+
+<!-- Edit Metadata Dialog -->
+<dialog id="editDialog">
+  <h3>फ़ाइल विवरण</h3>
+  <label>नाम</label>
+  <input class="field" id="editName" maxlength="100">
+  <label>श्रेणी</label>
+  <select class="field" id="editCat"></select>
+  <label>सुरक्षा स्थिति</label>
+  <select class="field" id="editPrivate">
+    <option value="false">सामान्य (Normal)</option>
+    <option value="true">🔒 प्राइवेट / छुपा हुआ (Private)</option>
+  </select>
+  <div class="dialog-actions">
+    <button id="btnCancelEdit">रद्द करें</button>
+    <button class="btn-primary" id="btnSaveEdit">सहेजें</button>
+  </div>
+</dialog>
+
+<!-- Add Category Dialog -->
+<dialog id="newCatDialog">
+  <h3>नई श्रेणी जोड़ें</h3>
+  <label>नाम</label>
+  <input class="field" id="catInputName" maxlength="40">
+  <div class="dialog-actions">
+    <button id="btnCancelCat">रद्द करें</button>
+    <button class="btn-primary" id="btnSaveCat">जोड़ें</button>
+  </div>
+</dialog>
 
 <script>
-(()=>{
+(() => {
   'use strict';
 
-  const DB_NAME = 'SmartAIGallery_Native';
-  const STORE = 'media';
-  let db = null, mediaItems = [];
+  const DB_NAME = 'SmartAIGalleryPro_DB';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'media_items';
+
+  const defaultCategories = [
+    'परिवार', 'रिश्तेदार', 'यात्रा / प्रकृति', 'कढ़ाई / डिज़ाइन', 
+    'काम / व्यापार', 'मशीन / औज़ार', 'जूते / चप्पल', 
+    'पढ़ाई', 'दस्तावेज़ / रसीदें', 'शुभ संदेश', 'कैमरा', 'WhatsApp', 'अन्य'
+  ];
+
+  let db = null;
+  let mediaList = [];
+  let currentFilter = 'all';
+  let activeCategory = '';
+  let activeViewerItem = null;
+  let activeEditItem = null;
+  let categories = [...defaultCategories];
+
   let isSelectMode = false;
-  const selectedIds = new Set();
-  let currentTab = 'photos', activeViewerItem = null;
+  let selectedIds = new Set();
+  let currentSort = 'newest';
+  let isPrivateUnlocked = false;
+  let userPin = localStorage.getItem('gallery_pin') || '1234';
+  let currentLang = localStorage.getItem('gallery_lang') || 'hi';
 
-  function openDB() {
-    return new Promise((res, rej) => {
-      const r = indexedDB.open(DB_NAME, 1);
-      r.onupgradeneeded = () => r.result.createObjectStore(STORE, { keyPath: 'id' });
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
+  // Rotation and Filters state for Viewer
+  let currentRotation = 0;
+  const filtersList = ['none', 'grayscale(100%)', 'sepia(80%)', 'contrast(140%) brightness(110%)'];
+  let currentFilterIndex = 0;
+
+  // Language Dictionary
+  const langDict = {
+    hi: {
+      appTitle: 'Smart AI Gallery Pro',
+      appSubtitle: 'ऑफ़लाइन, प्राइवेट व AI संचालित गैलरी',
+      addPhoto: 'फ़ोटो जोड़ें',
+      addVideo: 'वीडियो जोड़ें',
+      select: 'चुनें',
+      autoGroup: 'AI ऑटो-ग्रुप',
+      privateFolder: '🔒 प्राइवेट फ़ोल्डर',
+      backup: 'बैकअप',
+      categories: 'श्रेणियाँ (Categories)',
+      empty: 'गैलरी अभी ख़ाली है।',
+      all: '🌐 सभी',
+      photos: '🖼️ फ़ोटो',
+      videos: '🎬 वीडियो',
+      favs: '⭐ पसंदीदा',
+      private: '🔒 प्राइवेट',
+      trash: '🗑️ रीसायकल बिन',
+      searchHolder: 'खोजें (Search)...',
+      unlockSuccess: 'प्राइवेट फ़ोल्डर अनलॉक हो गया!',
+      wrongPin: 'गलत पिन! कृपया पुनः प्रयास करें।',
+      restore: 'पुनर्प्राप्त करें (Restore)',
+      permDelete: 'हमेशा के लिए हटाएँ'
+    },
+    en: {
+      appTitle: 'Smart AI Gallery Pro',
+      appSubtitle: 'Offline, Private & AI-Powered Gallery',
+      addPhoto: 'Add Photos',
+      addVideo: 'Add Videos',
+      select: 'Select',
+      autoGroup: 'AI Auto-Group',
+      privateFolder: '🔒 Private Vault',
+      backup: 'Backup',
+      categories: 'Categories',
+      empty: 'Gallery is currently empty.',
+      all: '🌐 All',
+      photos: '🖼️ Photos',
+      videos: '🎬 Videos',
+      favs: '⭐ Favorites',
+      private: '🔒 Private',
+      trash: '🗑️ Recycle Bin',
+      searchHolder: 'Search name, tag...',
+      unlockSuccess: 'Private Vault unlocked!',
+      wrongPin: 'Incorrect PIN! Try again.',
+      restore: 'Restore',
+      permDelete: 'Delete Permanently'
+    }
+  };
+
+  function applyLanguage() {
+    const t = langDict[currentLang];
+    document.getElementById('txtAppTitle').textContent = t.appTitle;
+    document.getElementById('txtAppSubtitle').textContent = t.appSubtitle;
+    document.getElementById('txtAddPhoto').textContent = t.addPhoto;
+    document.getElementById('txtAddVideo').textContent = t.addVideo;
+    document.getElementById('txtSelect').textContent = isSelectMode ? (currentLang === 'hi' ? 'चयन समाप्त' : 'Done') : t.select;
+    document.getElementById('txtAutoGroup').textContent = t.autoGroup;
+    document.getElementById('txtPrivateFolder').textContent = t.privateFolder;
+    document.getElementById('txtBackup').textContent = t.backup;
+    document.getElementById('txtCategories').textContent = t.categories;
+    document.getElementById('txtEmpty').textContent = t.empty;
+    document.getElementById('tabAll').textContent = t.all;
+    document.getElementById('tabPhotos').textContent = t.photos;
+    document.getElementById('tabVideos').textContent = t.videos;
+    document.getElementById('tabFavs').textContent = t.favs;
+    document.getElementById('tabPrivate').textContent = t.private;
+    document.getElementById('tabTrash').textContent = t.trash;
+    document.getElementById('searchInput').placeholder = t.searchHolder;
+    document.getElementById('btnLangToggle').textContent = currentLang === 'hi' ? '🌐 English' : '🌐 हिन्दी';
+  }
+
+  const esc = str => String(str ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+
+  function openDatabase() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = e => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          const store = d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
     });
   }
 
-  function allDB() {
-    return new Promise((res, rej) => {
-      const req = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror = () => rej(req.error);
+  function dbGetAll() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
     });
   }
 
-  function putDB(item) {
-    return new Promise((res, rej) => {
-      const req = db.transaction(STORE, 'readwrite').objectStore(STORE).put(item);
-      req.onsuccess = () => res();
-      req.onerror = () => rej(req.error);
+  function dbPut(item) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const req = tx.objectStore(STORE_NAME).put(item);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function dbDelete(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const req = tx.objectStore(STORE_NAME).delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
     });
   }
 
@@ -480,397 +599,718 @@
     if (!item._cachedUrl && item.blob) {
       item._cachedUrl = URL.createObjectURL(item.blob);
     }
-    return item._cachedUrl || item.thumb || '';
+    return item._cachedUrl || '';
   }
 
-  function makeThumb(file) {
-    return new Promise(res => {
+  // Ultra-reliable Thumbnail Generator for Images & Videos on Android
+  function createThumbnail(file) {
+    return new Promise(resolve => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = e => {
           const img = new Image();
           img.onload = () => {
             try {
-              const c = document.createElement('canvas');
-              const max = 220;
-              let w = img.width, h = img.height;
-              if (w > h) { h = Math.round((h * max) / w); w = max; }
-              else { w = Math.round((w * max) / h); h = max; }
-              c.width = w; c.height = h;
-              c.getContext('2d').drawImage(img, 0, 0, w, h);
-              res(c.toDataURL('image/jpeg', 0.7));
-            } catch (_) { res(e.target.result); }
+              const canvas = document.createElement('canvas');
+              const maxDim = 240;
+              let w = img.width || 200, h = img.height || 200;
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+              canvas.width = Math.max(1, w);
+              canvas.height = Math.max(1, h);
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              const thumbData = canvas.toDataURL('image/jpeg', 0.7);
+              resolve(thumbData);
+            } catch (_) {
+              // If canvas fails (e.g. huge camera photo), use compressed data directly
+              resolve(e.target.result);
+            }
           };
-          img.onerror = () => res(e.target.result);
+          img.onerror = () => resolve(e.target.result);
           img.src = e.target.result;
         };
-        reader.onerror = () => res(null);
+        reader.onerror = () => resolve(null);
         reader.readAsDataURL(file);
       } else if (file.type.startsWith('video/')) {
+        // Generate real preview thumbnail for video
         try {
-          const u = URL.createObjectURL(file);
-          const v = document.createElement('video');
-          v.src = u; v.muted = true; v.currentTime = 0.5;
-          v.onloadeddata = () => {
+          const url = URL.createObjectURL(file);
+          const video = document.createElement('video');
+          video.src = url;
+          video.muted = true;
+          video.playsInline = true;
+          video.currentTime = 0.5;
+          video.onloadeddata = () => {
             try {
-              const c = document.createElement('canvas');
-              c.width = 200;
-              c.height = Math.round((v.videoHeight * 200) / (v.videoWidth || 200)) || 150;
-              c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-              res(c.toDataURL('image/jpeg', 0.6));
-              URL.revokeObjectURL(u);
-            } catch (_) { res(null); }
+              const canvas = document.createElement('canvas');
+              canvas.width = 240;
+              canvas.height = Math.round((video.videoHeight * 240) / (video.videoWidth || 240)) || 180;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const thumb = canvas.toDataURL('image/jpeg', 0.6);
+              URL.revokeObjectURL(url);
+              resolve(thumb);
+            } catch (_) {
+              URL.revokeObjectURL(url);
+              resolve(null);
+            }
           };
-          v.onerror = () => res(null);
-        } catch (_) { res(null); }
-      } else { res(null); }
+          video.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+        } catch (_) {
+          resolve(null);
+        }
+      } else {
+        resolve(null);
+      }
     });
   }
 
-  function formatDateHeader(timestamp) {
-    const d = new Date(timestamp);
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  function loadCategories() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('smart_ai_gallery_cats'));
+      if (Array.isArray(saved) && saved.length > 0) {
+        categories = [...new Set([...defaultCategories, ...saved])];
+      }
+    } catch (_) {}
   }
 
-  function renderTimeline() {
-    const container = document.getElementById('photosTimeline');
-    const empty = document.getElementById('emptyView');
-
-    const active = mediaItems.filter(i => !i.isDeleted);
-    active.sort((a, b) => b.createdAt - a.createdAt);
-
-    if (active.length === 0) {
-      container.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    const groups = new Map();
-    active.forEach(item => {
-      const dateKey = formatDateHeader(item.createdAt);
-      if (!groups.has(dateKey)) groups.set(dateKey, []);
-      groups.get(dateKey).push(item);
-    });
-
-    let html = '';
-    groups.forEach((items, dateKey) => {
-      html += `
-        <section class="date-group">
-          <div class="date-heading">${dateKey}</div>
-          <div class="photo-grid ${isSelectMode ? 'select-mode' : ''}">
-            ${items.map(item => {
-              const isVid = item.kind === 'video';
-              const src = item.thumb || getMediaUrl(item);
-              const isSelected = selectedIds.has(item.id);
-              return `
-                <div class="photo-item ${isSelected ? 'selected' : ''}" data-id="${item.id}">
-                  <div class="item-check">${isSelected ? '✓' : ''}</div>
-                  ${isVid ? `
-                    <video src="${src}" preload="metadata" muted playsinline></video>
-                    <span class="video-time">00:15</span>
-                  ` : `
-                    <img src="${src}" alt="" loading="lazy">
-                  `}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </section>
-      `;
-    });
-
-    container.innerHTML = html;
-    updateSelectionUI();
-    updateAlbumCounts();
+  function saveCategories() {
+    try {
+      localStorage.setItem('smart_ai_gallery_cats', JSON.stringify(categories));
+    } catch (_) {}
   }
 
-  // Smooth DOM Selection update without re-rendering entire timeline
-  function toggleItemSelection(id, itemEl) {
-    if (selectedIds.has(id)) {
-      selectedIds.delete(id);
-      itemEl.classList.remove('selected');
-      const check = itemEl.querySelector('.item-check');
-      if (check) check.textContent = '';
-    } else {
-      selectedIds.add(id);
-      itemEl.classList.add('selected');
-      const check = itemEl.querySelector('.item-check');
-      if (check) check.textContent = '✓';
+  function renderCategoryPills() {
+    const pillsCont = document.getElementById('catPills');
+    const selectEl = document.getElementById('editCat');
+
+    pillsCont.innerHTML = `<button class="filter-btn ${!activeCategory ? 'active' : ''}" data-cat="">${currentLang==='hi'?'सभी श्रेणियाँ':'All Categories'}</button>` +
+      categories.map(c => `<button class="filter-btn ${activeCategory === c ? 'active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+
+    selectEl.innerHTML = categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  }
+
+  function updateStats() {
+    const activeItems = mediaList.filter(i => !i.isDeleted);
+    const total = activeItems.length;
+    const photos = activeItems.filter(i => i.kind === 'image').length;
+    const videos = activeItems.filter(i => i.kind === 'video').length;
+    const favs = activeItems.filter(i => i.isFavorite).length;
+
+    // Calculate Storage Space in Bytes
+    let totalBytes = 0;
+    mediaList.forEach(i => { totalBytes += (i.size || 0); });
+    let storageStr = (totalBytes / (1024 * 1024)).toFixed(1) + ' MB';
+    if (totalBytes > 1024 * 1024 * 1024) {
+      storageStr = (totalBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
     }
 
-    // If all deselected, we can keep select mode or exit
-    updateSelectionUI();
+    document.getElementById('stTotal').textContent = `${total} ${currentLang==='hi'?'कुल':'Items'}`;
+    document.getElementById('stPhotos').textContent = `${photos} ${currentLang==='hi'?'फ़ोटो':'Photos'}`;
+    document.getElementById('stVideos').textContent = `${videos} ${currentLang==='hi'?'वीडियो':'Videos'}`;
+    document.getElementById('stFav').textContent = `${favs} ${currentLang==='hi'?'पसंदीदा':'Favs'}`;
+    document.getElementById('stStorage').textContent = `💾 ${storageStr}`;
   }
 
-  function updateSelectionUI() {
+  function updateSelectionBar() {
     const bar = document.getElementById('selectionBar');
-    const txt = document.getElementById('selectCountText');
-    const selectBtn = document.getElementById('btnTopSelect');
-    const timeline = document.getElementById('photosTimeline');
+    const text = document.getElementById('selectedCountText');
+    const btn = document.getElementById('btnToggleSelect');
 
     if (isSelectMode) {
       bar.classList.add('active');
-      selectBtn.classList.add('active');
-      txt.textContent = `${selectedIds.size} selected`;
-      if (timeline) timeline.querySelectorAll('.photo-grid').forEach(g => g.classList.add('select-mode'));
+      text.textContent = `${selectedIds.size} ${currentLang==='hi'?'चुनी गई':'Selected'}`;
+      btn.textContent = currentLang === 'hi' ? '✕ चयन समाप्त' : '✕ Done';
+      btn.classList.add('btn-primary');
     } else {
       bar.classList.remove('active');
-      selectBtn.classList.remove('active');
-      if (timeline) {
-        timeline.querySelectorAll('.photo-grid').forEach(g => g.classList.remove('select-mode'));
-        timeline.querySelectorAll('.photo-item.selected').forEach(el => {
-          el.classList.remove('selected');
-          const check = el.querySelector('.item-check');
-          if (check) check.textContent = '';
-        });
-      }
+      btn.textContent = currentLang === 'hi' ? 'चुनें (Select)' : 'Select';
+      btn.classList.remove('btn-primary');
       selectedIds.clear();
     }
   }
 
-  function updateAlbumCounts() {
-    const favs = mediaItems.filter(i => i.isFavorite && !i.isDeleted).length;
-    const vids = mediaItems.filter(i => i.kind === 'video' && !i.isDeleted).length;
-    const trash = mediaItems.filter(i => i.isDeleted).length;
+  function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    const empty = document.getElementById('emptyView');
+    const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    document.getElementById('favCount').textContent = `${favs} items`;
-    document.getElementById('videoCount').textContent = `${vids} items`;
-    document.getElementById('trashCount').textContent = `${trash} items`;
+    // Filtering
+    let list = mediaList.filter(item => {
+      // Trash handling
+      if (currentFilter === 'trash') {
+        return item.isDeleted === true;
+      }
+      if (item.isDeleted === true) return false;
+
+      // Private folder handling
+      if (currentFilter === 'private') {
+        return item.isPrivate === true;
+      }
+      // If not in private tab, hide private files unless unlocked
+      if (item.isPrivate && !isPrivateUnlocked) return false;
+
+      if (currentFilter === 'photos' && item.kind !== 'image') return false;
+      if (currentFilter === 'videos' && item.kind !== 'video') return false;
+      if (currentFilter === 'favorites' && !item.isFavorite) return false;
+
+      if (activeCategory && item.category !== activeCategory) return false;
+
+      if (searchVal) {
+        const fullTxt = `${item.name} ${item.fileName} ${item.category} ${(item.tags || []).join(' ')}`.toLowerCase();
+        if (!fullTxt.includes(searchVal)) return false;
+      }
+      return true;
+    });
+
+    // Sorting
+    list.sort((a, b) => {
+      if (currentSort === 'newest') return b.createdAt - a.createdAt;
+      if (currentSort === 'oldest') return a.createdAt - b.createdAt;
+      if (currentSort === 'name_asc') return (a.name || '').localeCompare(b.name || '');
+      if (currentSort === 'size_desc') return (b.size || 0) - (a.size || 0);
+      return 0;
+    });
+
+    document.getElementById('itemCount').textContent = `${list.length} ${currentLang==='hi'?'फ़ाइलें':'Files'}`;
+
+    if (list.length === 0) {
+      grid.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    grid.classList.remove('hidden');
+    empty.classList.add('hidden');
+
+    grid.innerHTML = list.map(item => {
+      const isVid = item.kind === 'video';
+      // Use thumbnail data if exists for ultra-fast rendering, otherwise cached URL
+      const displaySrc = item.thumbData || getMediaUrl(item);
+      const isSelected = selectedIds.has(item.id);
+      const isTrashView = currentFilter === 'trash';
+      const dateStr = new Date(item.createdAt).toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-US', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      });
+
+      return `
+        <article class="media-card ${isSelected ? 'selected' : ''}" data-id="${esc(item.id)}">
+          ${!isTrashView ? `<div class="select-check" data-action="select-item">${isSelected ? '✓' : ''}</div>` : ''}
+          ${!isTrashView ? `<button class="fav-btn" data-action="toggle-fav">${item.isFavorite ? '★' : '☆'}</button>` : ''}
+          ${item.isPrivate ? `<span class="private-badge">🔒</span>` : ''}
+          <div class="media-thumb" data-action="${isTrashView ? 'none' : 'view'}">
+            ${isVid ? `
+              <video src="${displaySrc}" preload="metadata" muted></video>
+              <div class="video-badge">▶ Video</div>
+            ` : `
+              <img src="${displaySrc}" alt="" loading="lazy" onerror="if(this.dataset.tried)return;this.dataset.tried=1;const r=new FileReader();r.onload=e=>this.src=e.target.result;if(item&&item.blob)r.readAsDataURL(item.blob);">
+            `}
+          </div>
+          <div class="media-body">
+            <div class="media-name" title="${esc(item.name)}">${esc(item.name)}</div>
+            <div class="media-meta">
+              <span>${esc(item.category || 'Other')}</span>
+              <span>${dateStr}</span>
+            </div>
+            <div class="media-actions">
+              ${isTrashView ? `
+                <button class="btn-primary" data-action="restore" style="font-size:10px;">${currentLang==='hi'?'पुनर्प्राप्त':'Restore'}</button>
+                <button class="btn-danger" data-action="perm-delete" style="font-size:10px;">${currentLang==='hi'?'हटाएँ':'Delete'}</button>
+              ` : `
+                <button class="btn-share" data-action="share-single">📤</button>
+                <button data-action="edit">✎</button>
+                <button class="btn-danger" data-action="soft-delete" title="Move to Trash">🗑️</button>
+              `}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    updateStats();
+    updateSelectionBar();
   }
 
-  async function handleAddFiles(files) {
-    if (!files || !files.length) return;
-    for (const f of files) {
-      const isVid = f.type.startsWith('video/');
-      const thumb = await makeThumb(f);
-      
-      // Store persistent bytes in Blob
+  // Process and Compress
+  async function processNewFiles(fileArray) {
+    const validFiles = [...fileArray].filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+    if (!validFiles.length) {
+      alert(currentLang === 'hi' ? 'कृपया वैध फ़ाइलें चुनें।' : 'Please select valid files.');
+      return;
+    }
+
+    let addedCount = 0;
+    for (const file of validFiles) {
+      const isVid = file.type.startsWith('video/');
+      const cleanedName = file.name.replace(/\.[^.]+$/, '');
+      const thumb = await createThumbnail(file);
+
+      // Convert to persistent Blob so Android WebView never loses the file bytes
       let persistentBlob;
       try {
-        const buffer = await f.arrayBuffer();
-        persistentBlob = new Blob([buffer], { type: f.type || (isVid ? 'video/mp4' : 'image/jpeg') });
-      } catch (_) {
-        persistentBlob = f;
+        const buffer = await file.arrayBuffer();
+        persistentBlob = new Blob([buffer], { type: file.type || (isVid ? 'video/mp4' : 'image/jpeg') });
+      } catch (err) {
+        persistentBlob = file;
       }
 
       const item = {
-        id: 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6),
-        blob: persistentBlob,
-        name: f.name,
-        type: f.type,
+        id: 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6),
+        blob: persistentBlob, fileName: file.name, name: cleanedName,
+        type: file.type || (isVid ? 'video/mp4' : 'image/jpeg'),
         kind: isVid ? 'video' : 'image',
-        thumb: thumb,
-        isFavorite: false,
-        isPrivate: false,
-        isDeleted: false,
-        category: 'Photos',
-        createdAt: f.lastModified || Date.now(),
-        size: f.size
+        category: 'अन्य', tags: [], isFavorite: false, isPrivate: false, isDeleted: false,
+        thumbData: thumb, createdAt: Date.now(), size: file.size
       };
-      await putDB(item);
-      mediaItems.push(item);
+
+      try {
+        await dbPut(item);
+        mediaList.push(item);
+        addedCount++;
+      } catch (err) {
+        console.error('Save error:', err);
+      }
     }
-    renderTimeline();
+
+    renderGallery();
+    alert(`${addedCount} ${currentLang==='hi'?'फ़ाइलें सफलतापूर्वक जोड़ी गईं!':'files added successfully!'}`);
   }
 
-  // Viewer
-  let vScale = 1, vRotate = 0;
+  // Sharing
+  async function shareFiles(itemsToShare) {
+    if (!itemsToShare || itemsToShare.length === 0) return;
+    const filesArray = [];
+    for (const item of itemsToShare) {
+      try {
+        const fileObj = new File([item.blob], item.fileName || `${item.name}.jpg`, {
+          type: item.type || (item.kind === 'video' ? 'video/mp4' : 'image/jpeg')
+        });
+        filesArray.push(fileObj);
+      } catch (e) {}
+    }
+
+    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+      try {
+        await navigator.share({ files: filesArray, title: 'Smart AI Gallery' });
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error(err);
+        return;
+      }
+    }
+
+    // Direct download fallback
+    for (const item of itemsToShare) {
+      const a = document.createElement('a');
+      a.href = getMediaUrl(item);
+      a.download = item.fileName || item.name;
+      a.click();
+    }
+  }
+
+  // Viewer controls
+  let scale = 1, posX = 0, posY = 0, isPinching = false, isPanning = false;
+  let pinchStartDistance = 0, pinchStartScale = 1, panStartX = 0, panStartY = 0, startPosX = 0, startPosY = 0;
+
+  function renderTransform() {
+    const img = document.querySelector('#vStage img');
+    if (!img) return;
+    if (scale <= 1) { scale = 1; posX = 0; posY = 0; }
+    img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale}) rotate(${currentRotation}deg)`;
+    img.style.filter = filtersList[currentFilterIndex];
+  }
+
+  function resetZoom() {
+    scale = 1; posX = 0; posY = 0; currentRotation = 0; currentFilterIndex = 0;
+    renderTransform();
+  }
+
   function openViewer(item) {
     activeViewerItem = item;
-    vScale = 1; vRotate = 0;
+    resetZoom();
     const isVid = item.kind === 'video';
     const stage = document.getElementById('vStage');
     const url = getMediaUrl(item);
 
-    document.getElementById('vDate').textContent = formatDateHeader(item.createdAt);
-    document.getElementById('vFav').style.color = item.isFavorite ? 'var(--accent)' : '#fff';
+    document.getElementById('vTitle').textContent = item.name;
+    document.getElementById('vFav').textContent = item.isFavorite ? '★' : '☆';
+    document.getElementById('vEditTools').style.display = isVid ? 'none' : 'flex';
 
     if (isVid) {
-      stage.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
+      stage.innerHTML = `<video src="${url}" controls autoplay playsinline style="max-width:100%;max-height:100%;"></video>`;
     } else {
-      stage.innerHTML = `<img src="${url}" alt="" style="transform: rotate(0deg) scale(1);">`;
-      initPinchZoom(stage);
+      stage.innerHTML = `<img src="${url}" alt="${esc(item.name)}">`;
+      initGestureListeners(stage);
     }
-
     document.getElementById('viewerModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
   function closeViewer() {
+    const v = document.getElementById('vStage').querySelector('video');
+    if (v) v.pause();
     document.getElementById('viewerModal').classList.remove('open');
+    document.body.style.overflow = '';
     document.getElementById('vStage').innerHTML = '';
     activeViewerItem = null;
+    resetZoom();
   }
 
-  function initPinchZoom(stage) {
-    let distStart = 0, scaleStart = 1, posX = 0, posY = 0, startX = 0, startY = 0;
-    stage.ontouchstart = e => {
-      if (e.touches.length === 2) {
-        distStart = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        scaleStart = vScale;
-      } else if (e.touches.length === 1 && vScale > 1) {
-        startX = e.touches[0].clientX - posX;
-        startY = e.touches[0].clientY - posY;
-      }
-    };
-    stage.ontouchmove = e => {
+  function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function initGestureListeners(stage) {
+    stage.addEventListener('touchstart', e => {
       const img = stage.querySelector('img');
       if (!img) return;
-      if (e.touches.length === 2 && distStart > 0) {
+      if (e.touches.length === 2) {
+        e.preventDefault(); isPinching = true; isPanning = false;
+        pinchStartDistance = getTouchDistance(e.touches); pinchStartScale = scale;
+      } else if (e.touches.length === 1 && scale > 1) {
+        isPanning = true; panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
+        startPosX = posX; startPosY = posY;
+      }
+    }, { passive: false });
+
+    stage.addEventListener('touchmove', e => {
+      const img = stage.querySelector('img');
+      if (!img) return;
+      if (e.touches.length === 2 && isPinching) {
         e.preventDefault();
-        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        vScale = Math.min(Math.max(1, scaleStart * (d / distStart)), 5);
-        img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${vScale}) rotate(${vRotate}deg)`;
-      } else if (e.touches.length === 1 && vScale > 1) {
+        const dist = getTouchDistance(e.touches);
+        if (pinchStartDistance > 0) {
+          scale = Math.min(Math.max(1, pinchStartScale * (dist / pinchStartDistance)), 6);
+          renderTransform();
+        }
+      } else if (e.touches.length === 1 && isPanning && scale > 1) {
         e.preventDefault();
-        posX = e.touches[0].clientX - startX;
-        posY = e.touches[0].clientY - startY;
-        img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${vScale}) rotate(${vRotate}deg)`;
+        posX = startPosX + (e.touches[0].clientX - panStartX);
+        posY = startPosY + (e.touches[0].clientY - panStartY);
+        renderTransform();
+      }
+    }, { passive: false });
+
+    stage.addEventListener('touchend', e => {
+      if (e.touches.length === 0) {
+        isPinching = false; isPanning = false;
+      } else if (e.touches.length === 1) {
+        isPinching = false;
+        if (scale > 1) {
+          isPanning = true; panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
+          startPosX = posX; startPosY = posY;
+        }
+      }
+    }, { passive: false });
+  }
+
+  // Long press on card
+  let longPressTimer = null, touchStartPos = { x: 0, y: 0 }, hasLongPressed = false;
+  function attachCardLongPress(grid) {
+    grid.addEventListener('touchstart', e => {
+      const card = e.target.closest('.media-card');
+      if (!card || e.target.closest('button')) return;
+      hasLongPressed = false;
+      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+
+      longPressTimer = setTimeout(() => {
+        hasLongPressed = true;
+        const id = card.dataset.id;
+        if (!isSelectMode) isSelectMode = true;
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        if (navigator.vibrate) navigator.vibrate(40);
+        renderGallery();
+      }, 450);
+    }, { passive: true });
+
+    grid.addEventListener('touchmove', e => {
+      if (!longPressTimer) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartPos.x);
+      const dy = Math.abs(e.touches[0].clientY - touchStartPos.y);
+      if (dx > 8 || dy > 8) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }, { passive: true });
+
+    grid.addEventListener('touchend', () => {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    });
+  }
+
+  // Backup & Metadata Edit
+  function downloadBackup() {
+    if (!mediaList.length) return alert('No data to backup.');
+    const metaData = mediaList.map(m => ({
+      name: m.name, fileName: m.fileName, category: m.category,
+      tags: m.tags, isFavorite: m.isFavorite, isPrivate: m.isPrivate,
+      createdAt: m.createdAt, kind: m.kind, size: m.size
+    }));
+    const blob = new Blob([JSON.stringify(metaData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `SmartGallery_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+  }
+
+  function openEditModal(item) {
+    activeEditItem = item;
+    document.getElementById('editName').value = item.name || '';
+    document.getElementById('editCat').value = item.category || 'अन्य';
+    document.getElementById('editPrivate').value = item.isPrivate ? 'true' : 'false';
+    document.getElementById('editDialog').showModal();
+  }
+
+  async function saveEditedItem() {
+    if (!activeEditItem) return;
+    activeEditItem.name = document.getElementById('editName').value.trim() || activeEditItem.fileName;
+    activeEditItem.category = document.getElementById('editCat').value;
+    activeEditItem.isPrivate = document.getElementById('editPrivate').value === 'true';
+    await dbPut(activeEditItem);
+    document.getElementById('editDialog').close();
+    renderGallery();
+  }
+
+  // Initialize
+  window.addEventListener('DOMContentLoaded', async () => {
+    loadCategories();
+    renderCategoryPills();
+    applyLanguage();
+
+    try {
+      db = await openDatabase();
+      mediaList = await dbGetAll();
+      renderGallery();
+    } catch (err) {
+      console.error('Database error:', err);
+    }
+
+    attachCardLongPress(document.getElementById('galleryGrid'));
+
+    // Language Toggle
+    document.getElementById('btnLangToggle').onclick = () => {
+      currentLang = currentLang === 'hi' ? 'en' : 'hi';
+      localStorage.setItem('gallery_lang', currentLang);
+      applyLanguage();
+      renderCategoryPills();
+      renderGallery();
+    };
+
+    // File Inputs
+    document.getElementById('btnAdd').onclick = () => {
+      const input = document.getElementById('photoInput');
+      input.value = ''; input.click();
+    };
+    document.getElementById('photoInput').onchange = e => processNewFiles(e.target.files);
+
+    document.getElementById('btnAddVideo').onclick = () => {
+      const input = document.getElementById('videoInput');
+      input.value = ''; input.click();
+    };
+    document.getElementById('videoInput').onchange = e => processNewFiles(e.target.files);
+
+    // Sorting
+    document.getElementById('sortSelect').onchange = e => {
+      currentSort = e.target.value;
+      renderGallery();
+    };
+
+    // Private PIN Dialog
+    document.getElementById('btnLockFolder').onclick = () => {
+      if (!isPrivateUnlocked) {
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinDialog').showModal();
+      } else {
+        isPrivateUnlocked = false;
+        alert(currentLang === 'hi' ? '🔒 प्राइवेट फ़ोल्डर लॉक कर दिया गया।' : '🔒 Private Vault locked.');
+        renderGallery();
       }
     };
-  }
-
-  async function shareSelected() {
-    const list = mediaItems.filter(i => selectedIds.has(i.id));
-    if (!list.length) return;
-    const files = list.map(i => new File([i.blob], i.name, { type: i.type }));
-    if (navigator.canShare && navigator.canShare({ files })) {
-      try { await navigator.share({ files }); } catch (_) {}
-    } else {
-      list.forEach(i => {
-        const a = document.createElement('a'); a.href = getMediaUrl(i); a.download = i.name; a.click();
-      });
-    }
-  }
-
-  // Card Long-Press detection for instant multi-select
-  let pressTimer = null, pressTriggered = false;
-  function setupLongPress(container) {
-    container.addEventListener('touchstart', e => {
-      const itemEl = e.target.closest('.photo-item');
-      if (!itemEl) return;
-      pressTriggered = false;
-
-      pressTimer = setTimeout(() => {
-        pressTriggered = true;
-        if (!isSelectMode) {
-          isSelectMode = true;
-        }
-        const id = itemEl.dataset.id;
-        toggleItemSelection(id, itemEl);
-        if (navigator.vibrate) navigator.vibrate(35);
-      }, 350);
-    }, { passive: true });
-
-    container.addEventListener('touchmove', () => {
-      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-    }, { passive: true });
-
-    container.addEventListener('touchend', () => {
-      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-    });
-  }
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    db = await openDB();
-    mediaItems = await allDB();
-    renderTimeline();
-
-    setupLongPress(document.getElementById('photosTimeline'));
-
-    // Top Add Button
-    document.getElementById('btnTopAdd').onclick = () => {
-      const p = document.getElementById('filePicker');
-      p.value = ''; p.click();
-    };
-    document.getElementById('filePicker').onchange = e => handleAddFiles(e.target.files);
-
-    // Top Select Toggle
-    document.getElementById('btnTopSelect').onclick = () => {
-      isSelectMode = !isSelectMode;
-      updateSelectionUI();
+    document.getElementById('btnCancelPin').onclick = () => document.getElementById('pinDialog').close();
+    document.getElementById('btnSubmitPin').onclick = () => {
+      const val = document.getElementById('pinInput').value.trim();
+      if (val === userPin) {
+        isPrivateUnlocked = true;
+        document.getElementById('pinDialog').close();
+        alert(langDict[currentLang].unlockSuccess);
+        // Switch to private tab automatically
+        document.querySelectorAll('#typeFilters .filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tabPrivate').classList.add('active');
+        currentFilter = 'private';
+        renderGallery();
+      } else {
+        alert(langDict[currentLang].wrongPin);
+      }
     };
 
-    // Cancel Selection Float Bar
-    document.getElementById('btnFloatCancel').onclick = () => {
-      isSelectMode = false;
-      updateSelectionUI();
-    };
-
-    // Bottom Navigation Bar
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab = btn.dataset.tab;
-        currentTab = tab;
-
-        document.getElementById('mainContainer').style.display = tab === 'photos' ? 'block' : 'none';
-        document.getElementById('albumsView').style.display = tab === 'albums' ? 'block' : 'none';
-        document.getElementById('aiView').style.display = tab === 'ai' ? 'block' : 'none';
-        document.getElementById('pageTitle').textContent = tab === 'photos' ? 'Photos' : (tab === 'albums' ? 'Albums' : 'Smart AI');
-      };
-    });
-
-    // Tap Handling (Selection mode preserves multiple ticks without unchecking)
-    document.getElementById('photosTimeline').onclick = e => {
-      if (pressTriggered) {
-        pressTriggered = false;
+    // Filter Navigation
+    document.getElementById('typeFilters').onclick = e => {
+      const btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      const f = btn.dataset.filter;
+      if (f === 'private' && !isPrivateUnlocked) {
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinDialog').showModal();
         return;
       }
-      const itemEl = e.target.closest('.photo-item');
-      if (!itemEl) return;
-      const id = itemEl.dataset.id;
-      const item = mediaItems.find(i => i.id === id);
+      document.querySelectorAll('#typeFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = f;
+      renderGallery();
+    };
 
-      if (isSelectMode) {
-        // Tapping adds tick to this photo WITHOUT removing ticks from others!
-        toggleItemSelection(id, itemEl);
-      } else {
-        openViewer(item);
+    // Category Filter
+    document.getElementById('catPills').onclick = e => {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      document.querySelectorAll('#catPills .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      renderGallery();
+    };
+
+    // Multi-Select Bar Controls
+    document.getElementById('btnToggleSelect').onclick = () => {
+      isSelectMode = !isSelectMode;
+      if (!isSelectMode) selectedIds.clear();
+      renderGallery();
+    };
+    document.getElementById('btnCancelSelected').onclick = () => {
+      isSelectMode = false; selectedIds.clear(); renderGallery();
+    };
+    document.getElementById('btnShareSelected').onclick = () => {
+      if (selectedIds.size === 0) return;
+      const toShare = mediaList.filter(item => selectedIds.has(item.id));
+      shareFiles(toShare);
+    };
+    // Lock selected
+    document.getElementById('btnLockSelected').onclick = async () => {
+      if (selectedIds.size === 0) return;
+      for (const id of selectedIds) {
+        const item = mediaList.find(i => i.id === id);
+        if (item) { item.isPrivate = true; await dbPut(item); }
+      }
+      selectedIds.clear(); isSelectMode = false;
+      alert(currentLang === 'hi' ? 'चुनी गई फ़ाइलें प्राइवेट फ़ोल्डर में डाल दी गईं!' : 'Selected files moved to Private Vault!');
+      renderGallery();
+    };
+    // Soft Delete selected (Move to Trash)
+    document.getElementById('btnDeleteSelected').onclick = async () => {
+      if (selectedIds.size === 0) return;
+      const msg = currentLang === 'hi' 
+        ? `क्या आप चुनी गई ${selectedIds.size} फ़ाइलों को रीसायकल बिन में डालना चाहते हैं?` 
+        : `Move ${selectedIds.size} files to Recycle Bin?`;
+      if (confirm(msg)) {
+        for (const id of selectedIds) {
+          const item = mediaList.find(i => i.id === id);
+          if (item) { item.isDeleted = true; await dbPut(item); }
+        }
+        selectedIds.clear(); isSelectMode = false;
+        renderGallery();
       }
     };
 
-    // Float Bar Buttons
-    document.getElementById('btnFloatShare').onclick = shareSelected;
-    document.getElementById('btnFloatDelete').onclick = async () => {
-      if (!confirm(`Delete ${selectedIds.size} photos?`)) return;
-      for (const id of selectedIds) {
-        const i = mediaItems.find(m => m.id === id);
-        if (i) { i.isDeleted = true; await putDB(i); }
+    // Gallery Card Clicks
+    document.getElementById('galleryGrid').onclick = async e => {
+      if (hasLongPressed) { hasLongPressed = false; return; }
+      const card = e.target.closest('.media-card');
+      if (!card) return;
+      const id = card.dataset.id;
+      const item = mediaList.find(i => i.id === id);
+      if (!item) return;
+
+      const act = e.target.dataset.action;
+
+      if (act === 'select-item' || (isSelectMode && !['share-single', 'edit', 'soft-delete', 'restore', 'perm-delete'].includes(act))) {
+        if (!isSelectMode) isSelectMode = true;
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        renderGallery();
+        return;
       }
-      isSelectMode = false;
-      renderTimeline();
+
+      if (act === 'soft-delete') {
+        item.isDeleted = true;
+        await dbPut(item);
+        renderGallery();
+      } else if (act === 'restore') {
+        item.isDeleted = false;
+        await dbPut(item);
+        renderGallery();
+      } else if (act === 'perm-delete') {
+        if (confirm(currentLang === 'hi' ? 'हमेशा के लिए हटाएँ?' : 'Permanently delete this item?')) {
+          if (item._cachedUrl) URL.revokeObjectURL(item._cachedUrl);
+          await dbDelete(id);
+          mediaList = mediaList.filter(i => i.id !== id);
+          renderGallery();
+        }
+      } else if (act === 'share-single') {
+        shareFiles([item]);
+      } else if (act === 'toggle-fav') {
+        item.isFavorite = !item.isFavorite;
+        await dbPut(item);
+        renderGallery();
+      } else if (act === 'view' || e.target.closest('.media-thumb')) {
+        openViewer(item);
+      } else if (act === 'edit') {
+        openEditModal(item);
+      }
+    };
+
+    // Viewer In-App Editing Tools (Rotate & Filter)
+    document.getElementById('vRotate').onclick = () => {
+      currentRotation = (currentRotation + 90) % 360;
+      renderTransform();
+    };
+    document.getElementById('vFilter').onclick = () => {
+      currentFilterIndex = (currentFilterIndex + 1) % filtersList.length;
+      renderTransform();
     };
 
     // Viewer Controls
     document.getElementById('vClose').onclick = closeViewer;
-    document.getElementById('vRotate').onclick = () => {
-      vRotate = (vRotate + 90) % 360;
-      const img = document.querySelector('#vStage img');
-      if (img) img.style.transform = `rotate(${vRotate}deg) scale(${vScale})`;
-    };
     document.getElementById('vFav').onclick = async () => {
       if (!activeViewerItem) return;
       activeViewerItem.isFavorite = !activeViewerItem.isFavorite;
-      await putDB(activeViewerItem);
-      document.getElementById('vFav').style.color = activeViewerItem.isFavorite ? 'var(--accent)' : '#fff';
-      updateAlbumCounts();
+      await dbPut(activeViewerItem);
+      document.getElementById('vFav').textContent = activeViewerItem.isFavorite ? '★' : '☆';
+      renderGallery();
     };
     document.getElementById('vShare').onclick = () => {
-      if (activeViewerItem) {
-        selectedIds.clear(); selectedIds.add(activeViewerItem.id);
-        shareSelected();
-      }
+      if (activeViewerItem) shareFiles([activeViewerItem]);
     };
-    document.getElementById('vDelete').onclick = async () => {
+    document.getElementById('vDownload').onclick = () => {
       if (!activeViewerItem) return;
-      activeViewerItem.isDeleted = true;
-      await putDB(activeViewerItem);
-      closeViewer();
-      renderTimeline();
+      const a = document.createElement('a');
+      a.href = getMediaUrl(activeViewerItem);
+      a.download = activeViewerItem.fileName || activeViewerItem.name;
+      a.click();
     };
+
+    // Dialog Buttons
+    document.getElementById('btnCancelEdit').onclick = () => document.getElementById('editDialog').close();
+    document.getElementById('btnSaveEdit').onclick = saveEditedItem;
+    document.getElementById('btnAddCat').onclick = () => {
+      document.getElementById('catInputName').value = '';
+      document.getElementById('newCatDialog').showModal();
+    };
+    document.getElementById('btnCancelCat').onclick = () => document.getElementById('newCatDialog').close();
+    document.getElementById('btnSaveCat').onclick = () => {
+      const val = document.getElementById('catInputName').value.trim();
+      if (val && !categories.includes(val)) {
+        categories.push(val); saveCategories(); renderCategoryPills();
+      }
+      document.getElementById('newCatDialog').close();
+    };
+
+    document.getElementById('btnBackup').onclick = downloadBackup;
+    document.getElementById('searchInput').oninput = renderGallery;
   });
 })();
 </script>
