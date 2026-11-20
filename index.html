@@ -24,6 +24,9 @@ canvas{display:block;width:100%;height:100%}
 .ctrl{width:64px;height:64px;border-radius:20px;border:1px solid #ffffff66;background:var(--glass);color:white;font-weight:700;font-size:12px;backdrop-filter:blur(8px);touch-action:none}
 .ctrl:active,.ctrl.active{background:#b17b2c}
 #interact{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;border:1px solid #fff8;background:#f0bd58;color:#2c2618;padding:12px 19px;border-radius:24px;font-weight:800;box-shadow:0 4px 18px #0004}
+#talkPanel{position:fixed;left:50%;bottom:155px;transform:translateX(-50%);width:min(92%,430px);padding:13px;background:rgba(12,29,27,.94);color:#fff;border:1px solid #ffffff55;border-radius:18px;display:none;z-index:4;box-shadow:0 12px 35px #0006}
+.talkHead{display:flex;justify-content:space-between;align-items:center;color:#f5d58e}.talkHead button{border:0;background:#ffffff20;color:white;border-radius:10px;padding:6px 10px}
+#npcLine{font-size:14px;line-height:1.55;padding:12px 2px}.talkActions{display:flex;gap:6px;flex-wrap:wrap}.talkActions input{flex:1;min-width:130px;border:1px solid #ffffff44;border-radius:11px;background:#ffffff12;color:white;padding:11px;font-size:13px}.talkActions button{border:0;border-radius:11px;padding:10px 12px;background:#e9bd67;color:#2c2618;font-weight:800}.talkNote{font-size:10px;color:#c7d7d0;padding-top:8px}
 #message{position:fixed;left:50%;bottom:205px;transform:translateX(-50%);max-width:85%;background:var(--glass);color:white;border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:center;font-size:13px;display:none}
 #start{position:fixed;inset:0;background:linear-gradient(150deg,rgba(13,42,38,.92),rgba(17,45,52,.78)),radial-gradient(circle at 70% 20%,#f1c56b55,transparent 35%);display:flex;align-items:center;justify-content:center;padding:22px;color:white;z-index:5}
 .panel{width:min(440px,100%);border:1px solid #ffffff35;background:rgba(10,25,24,.72);border-radius:26px;padding:25px 22px;box-shadow:0 20px 60px #0006;backdrop-filter:blur(14px)}
@@ -51,14 +54,20 @@ canvas{display:block;width:100%;height:100%}
     <button class="ctrl" id="wave">नमस्ते</button>
   </div>
 </div>
-<button id="interact">बातचीत करें</button>
+<button id="interact">🔊 बातचीत करें</button>
+<div id="talkPanel" aria-live="polite">
+ <div class="talkHead"><strong id="npcName">गाँववाला</strong><button id="closeTalk" aria-label="बंद करें">✕</button></div>
+ <div id="npcLine">नमस्ते! आप गाँव में नए आए हैं?</div>
+ <div class="talkActions"><input id="playerWords" type="text" placeholder="यहाँ अपना सवाल लिखें…"><button id="sendWords">भेजें</button><button id="micBtn">🎙️ बोलें</button></div>
+ <div class="talkNote" id="voiceNote">आवाज़ सुनने और बोलने के लिए अनुमति दें।</div>
+</div>
 <div id="message"></div>
-<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.1</div>
+<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.3 · विविध भारतीय गाँव</div>
 <div id="start">
  <div class="panel">
-  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · PROTOTYPE 01</div>
+  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 03</div>
   <p>आप एक नए गाँव में पहुँचे हैं। यह आपकी नई जिंदगी की शुरुआत है। चारों ओर देखिए, रास्तों पर चलिए और इस छोटी-सी दुनिया को महसूस कीजिए।</p>
-  <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और गाँव के लोगों से मिलें</li></ul>
+  <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और अलग-अलग पेशों के गाँववालों से मिलें</li><li>शिक्षक, किसान, मजदूर, दुकानदार और कारीगरों से बातचीत करें</li></ul>
   <button id="startBtn">दुनिया में प्रवेश करें</button>
   <p class="small">बेहतर अनुभव के लिए मोबाइल को लैंडस्केप मोड में घुमाएँ। इंटरनेट चालू रखें ताकि 3D इंजन लोड हो सके।</p>
  </div>
@@ -124,18 +133,60 @@ function tree(x,z,s=1){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22
 for(const p of [[-20,-4,1.1],[19,-18,1.2],[-28,14,1.25],[30,7,1.1],[13,27,1.35],[-4,25,1],[-34,-34,1.2],[35,-31,1.4],[3,-39,1.1],[-17,34,1.1]])tree(...p);
 // distant low hills
 for(let i=0;i<16;i++){const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*8,10+Math.random()*12,7),mat(i%2?0x688a67:0x78946e));h.position.set(-75+i*10,-1,-78-Math.random()*15);scene.add(h)}
-// village people, simple but visible figures
-function person(x,z,topColor=0x9b553b){
+// Village people: a mixed Indian rural community with distinct ages, clothes and occupations.
+const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
+function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
- const torso=new THREE.Mesh(new THREE.CylinderGeometry(.24,.32,.85,9),mat(topColor));torso.position.y=1.05;torso.castShadow=true;g.add(torso);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),skin);head.position.y=1.68;g.add(head);
- const legsMat=mat(0x514c42);
- for(let sx of [-.13,.13]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.75,7),legsMat);leg.position.set(sx,.38,0);g.add(leg)}
- const a=new THREE.Mesh(new THREE.CylinderGeometry(.07,.08,.7,7),skin);a.position.set(.32,1.08,0);a.rotation.z=-.25;g.add(a);
- return g;
+ const female=!!profile.female, older=!!profile.older, child=!!profile.child;
+ const skinMat=mat(profile.skin||[0x9b6748,0xb77d5a,0x81553e,0xc18b68][variant%4]);
+ const cloth=mat(topColor), lower=mat(profile.lower|| (female?0x72534a:variant===1?0x594638:0x3e4541));
+ const bodyScale=child?.78:older?.96:1;
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(female?.31:.29, female?.58:.62,5,10),cloth);torso.position.y=1.18*bodyScale;torso.scale.set(1,bodyScale,1);torso.castShadow=true;g.add(torso);
+ const neck=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.2,10),skinMat);neck.position.y=1.65*bodyScale;g.add(neck);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.245,24,18),skinMat);head.scale.set(.88,1.12,.9);head.position.y=1.91*bodyScale;head.castShadow=true;g.add(head);
+ for(const side of [-1,1]){
+  const ear=new THREE.Mesh(new THREE.SphereGeometry(.055,10,8),skinMat);ear.position.set(side*.235,1.91*bodyScale,0);g.add(ear);
+  const eyeWhite=new THREE.Mesh(new THREE.SphereGeometry(.045,10,8),humanMats.white);eyeWhite.scale.set(1,.72,.55);eyeWhite.position.set(side*.09,1.96*bodyScale,.205);g.add(eyeWhite);
+  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.022,8,8),humanMats.eye);pupil.position.set(side*.09,1.96*bodyScale,.231);g.add(pupil);
+  const brow=new THREE.Mesh(new THREE.BoxGeometry(.09,.018,.025),humanMats.hair);brow.position.set(side*.09,2.025*bodyScale,.205);g.add(brow);
+ }
+ const nose=new THREE.Mesh(new THREE.SphereGeometry(.045,8,8),skinMat);nose.scale.set(.7,1.15,.8);nose.position.set(0,1.9*bodyScale,.245);g.add(nose);
+ const mouth=new THREE.Mesh(new THREE.BoxGeometry(.075,.018,.018),mat(0x633a32));mouth.position.set(0,1.82*bodyScale,.218);g.add(mouth);
+ const hair=new THREE.Mesh(new THREE.SphereGeometry(.25,16,10,0,Math.PI*2,0,Math.PI*.56),humanMats.hair);hair.position.set(0,2.055*bodyScale,-.015);hair.scale.set(1.02,.8,1);g.add(hair);
+ if(older){const beard=new THREE.Mesh(new THREE.SphereGeometry(.15,12,10),mat(0xaaa49a));beard.scale.set(1,.8,.65);beard.position.set(0,1.72*bodyScale,.19);g.add(beard)}
+ if(profile.turban){const turban=new THREE.Mesh(new THREE.SphereGeometry(.28,16,10),mat(profile.turban));turban.scale.set(1,.52,1);turban.position.set(0,2.19*bodyScale,0);g.add(turban);const band=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,6,16),mat(0xe2c58a));band.position.set(0,2.17*bodyScale,0);g.add(band)}
+ if(female){const dupatta=new THREE.Mesh(new THREE.BoxGeometry(.22,.72,.09),mat(profile.dupatta||0xc58a61));dupatta.position.set(.2,1.38*bodyScale,.22);dupatta.rotation.z=-.18;g.add(dupatta);const bun=new THREE.Mesh(new THREE.SphereGeometry(.105,10,8),humanMats.hair);bun.position.set(0,2.02*bodyScale,-.22);g.add(bun)}
+ // profession-specific visible clothing/accessories
+ if(profile.apron){const apron=new THREE.Mesh(new THREE.BoxGeometry(.43,.55,.055),mat(profile.apron));apron.position.set(0,1.12*bodyScale,.27);g.add(apron)}
+ if(profile.book){const book=new THREE.Mesh(new THREE.BoxGeometry(.28,.36,.07),mat(0x315b83));book.position.set(.42,1.12,.16);book.rotation.z=-.22;g.add(book);const pages=new THREE.Mesh(new THREE.BoxGeometry(.24,.32,.012),mat(0xf0e6c9));pages.position.set(.42,1.12,.2);pages.rotation.z=-.22;g.add(pages)}
+ if(profile.tool){const handle=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.95,8),wood);handle.position.set(.48,.85,.05);handle.rotation.z=-.12;g.add(handle);const blade=new THREE.Mesh(new THREE.BoxGeometry(.28,.16,.07),mat(0x777b78));blade.position.set(.54,1.32,.05);g.add(blade)}
+ const arms=[];for(const side of [-1,1]){
+  const pivot=new THREE.Group();pivot.position.set(side*.34,1.42*bodyScale,0);g.add(pivot);
+  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.095,.34,4,8),cloth);sleeve.position.y=-.22;pivot.add(sleeve);
+  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.075,.27,4,8),skinMat);fore.position.set(0,-.52,.015);pivot.add(fore);
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.085,10,8),skinMat);hand.position.set(0,-.68,.02);pivot.add(hand);arms.push(pivot);
+ }
+ const legs=[];for(const side of [-1,1]){
+  const pivot=new THREE.Group();pivot.position.set(side*.14,.78*bodyScale,0);g.add(pivot);
+  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.48*bodyScale,4,8),lower);leg.position.y=-.28*bodyScale;pivot.add(leg);
+  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.19,.12,.31),humanMats.shoe);shoe.position.set(0,-.56*bodyScale,.065);pivot.add(shoe);legs.push(pivot);
+ }
+ g.userData={arms,legs,mouth,phase:Math.random()*6,variant,profile};return g;
 }
-const villager1=person(-3,-18,0x3d7180),villager2=person(5,3,0x9b633b),villager3=person(-17,16,0x6a7850);
-villager1.rotation.y=-.4;villager2.rotation.y=2.4;villager3.rotation.y=.8;
+const villagers=[
+ person(-3,-18,0x3d7180,0,{name:'रामू',role:'किसान',job:'खेत में गेहूँ और सब्जियाँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
+ person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं निर्माण और खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
+ person(-17,16,0x6a7850,2,{name:'मोहन',role:'कारीगर',job:'मैं लकड़ी का काम और औजारों की मरम्मत करता हूँ।',skin:0x81553e}),
+ person(8,-27,0x425f83,0,{name:'शर्मा जी',role:'शिक्षक',job:'मैं गाँव के बच्चों को पढ़ाता हूँ।',older:true,skin:0xb77d5a,book:true}),
+ person(-8,-29,0x9a704b,1,{name:'गीता',role:'दुकानदार',job:'मेरी छोटी दुकान पर रोजमर्रा का सामान मिलता है।',female:true,skin:0x9b6748,dupatta:0xc58a61,apron:0x72513c}),
+ person(17,12,0x8a4d48,2,{name:'कमला',role:'किसान',job:'मैं खेत और घर दोनों संभालती हूँ।',female:true,older:true,skin:0x9b6748,dupatta:0x9a5b55}),
+ person(-22,-12,0x456f70,0,{name:'अमन',role:'विद्यार्थी',job:'मैं स्कूल में पढ़ता हूँ और बड़ा होकर डॉक्टर बनना चाहता हूँ।',child:true,skin:0xb77d5a,book:true}),
+ person(24,-19,0x8c6247,1,{name:'बाबा हरनाम',role:'बुजुर्ग',job:'मैंने इस गाँव को कई पीढ़ियों से बदलते देखा है।',older:true,skin:0x81553e,turban:0xd0c6b1}),
+ person(21,22,0x7b5269,0,{name:'प्रीति',role:'स्वास्थ्यकर्मी',job:'मैं गाँव के लोगों की सेहत का ध्यान रखती हूँ।',female:true,skin:0xb77d5a,dupatta:0xe0b77e}),
+ person(-27,24,0x6c7650,2,{name:'बलदेव',role:'पशुपालक',job:'मैं गाय-भैंसों की देखभाल करता हूँ।',skin:0x9b6748,turban:0x597d68})
+];
+const [villager1,villager2,villager3]=villagers;
+villagers.forEach((v,i)=>v.rotation.y=[-.4,2.4,.8,1.8,-1.2,.4,2.8,-.8,1.1,-2][i]);
 // small bench and hand pump
 box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
 const pump= new THREE.Group();pump.position.set(13,0,1);scene.add(pump);
@@ -159,11 +210,34 @@ const clock=new THREE.Clock();
 let started=false,joy={x:0,y:0},run=false,jumpQueued=false,lookPointer=null,lastTap=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function say(t){const el=document.getElementById('message');el.textContent=t;el.style.display='block';clearTimeout(say.timer);say.timer=setTimeout(()=>el.style.display='none',2600)}
-function nearestPerson(){let best=null,dist=3.1;for(const p of [villager1,villager2,villager3]){const d=Math.hypot(p.position.x-player.pos.x,p.position.z-player.pos.z);if(d<dist){dist=d;best=p}}return best}
+function nearestPerson(){let best=null,dist=3.1;for(const p of villagers){const d=Math.hypot(p.position.x-player.pos.x,p.position.z-player.pos.z);if(d<dist){dist=d;best=p}}return best}
+let activeNPC=null, speaking=false;
+const talkPanel=document.getElementById('talkPanel'),npcLine=document.getElementById('npcLine'),voiceNote=document.getElementById('voiceNote');
+function speakHindi(text,who='hi-IN'){
+ if(!('speechSynthesis' in window)){voiceNote.textContent='इस ब्राउज़र में आवाज़ सुनाने की सुविधा उपलब्ध नहीं है।';return}
+ speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=who;u.rate=.94;u.pitch=1.0;
+ const voices=speechSynthesis.getVoices();const hindi=voices.find(v=>/^hi(-|_)/i.test(v.lang));if(hindi)u.voice=hindi;
+ u.onstart=()=>{speaking=true;if(activeNPC)activeNPC.userData.mouth.scale.y=2.8};u.onend=()=>{speaking=false;if(activeNPC)activeNPC.userData.mouth.scale.y=1};speechSynthesis.speak(u);
+}
 function updateInteract(){const p=nearestPerson();document.getElementById('interact').style.display=p?'block':'none'}
-function interact(){const p=nearestPerson();if(!p){say('यहाँ अभी कोई पास नहीं है। गाँव में थोड़ा आगे चलिए।');return}say('गाँववाला: नमस्ते यात्री! गाँव में नए आए हो? आराम से रहना, कोई मदद चाहिए तो बताना।');}
-document.getElementById('interact').onclick=interact;
-document.getElementById('wave').onclick=()=>say('आपने हाथ उठाकर नमस्ते किया। गाँववाले ने आपको देखा।');
+function openTalk(){const p=nearestPerson();if(!p){say('यहाँ अभी कोई पास नहीं है। गाँव में थोड़ा आगे चलिए।');return}activeNPC=p;talkPanel.style.display='block';p.rotation.y=Math.atan2(player.pos.x-p.position.x,player.pos.z-p.position.z);const prof=p.userData.profile;const greeting='नमस्ते जी! मेरा नाम '+(prof.name||'गाँववासी')+' है। मैं '+(prof.role||'गाँव का निवासी')+' हूँ। '+(prof.job||'आपका स्वागत है।')+' बताइए, मैं आपकी क्या मदद कर सकता हूँ?';npcLine.textContent=greeting;voiceNote.textContent='गाँववाला आपसे बोल रहा है…';speakHindi(greeting)}
+function replyToPlayer(raw){const q=raw.trim();if(!q)return;document.getElementById('playerWords').value='';let answer;const prof=activeNPC?.userData.profile||{};const personName=prof.name||'गाँववासी';
+ if(/नाम|कौन हो/i.test(q))answer='मेरा नाम '+personName+' है। मैं '+(prof.role||'गाँव का निवासी')+' हूँ।';
+ else if(/गाँव|जगह|कहाँ/i.test(q))answer='यह हमारा छोटा सा गाँव है। आगे मुख्य रास्ते पर दुकान और कुआँ है।';
+ else if(/मदद|काम|रोजगार|पेशा|क्या करते/i.test(q))answer=(prof.job||'मैं गाँव के कामों में हाथ बँटाता हूँ')+' अगर आप चाहें तो मैं आपको गाँव के दूसरे लोगों से भी मिलवा सकता हूँ।';
+ else if(/नमस्ते|नमस्कार|हैलो/i.test(q))answer='नमस्ते जी! आपका हमारे गाँव में स्वागत है।';
+ else if(/धन्यवाद|शुक्रिया/i.test(q))answer='अरे, इसमें धन्यवाद कैसा! अपने ही गाँव के मेहमान हैं आप।';
+ else answer='मैं आपकी बात सुन रहा हूँ। अभी मैं गाँव के बारे में थोड़ा ही जानता हूँ, लेकिन आप मुझसे गाँव, रास्ते या मेरे बारे में पूछ सकते हैं।';
+ npcLine.textContent='आप: '+q+'\n\n'+personName+': '+answer;voiceNote.textContent='जवाब आवाज़ में सुनाया जा रहा है…';speakHindi(answer);
+}
+document.getElementById('interact').onclick=openTalk;
+document.getElementById('closeTalk').onclick=()=>{talkPanel.style.display='none';speechSynthesis?.cancel();speaking=false;if(activeNPC)activeNPC.userData.mouth.scale.y=1};
+document.getElementById('sendWords').onclick=()=>replyToPlayer(document.getElementById('playerWords').value);
+document.getElementById('playerWords').addEventListener('keydown',e=>{if(e.key==='Enter')replyToPlayer(e.target.value)});
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;let recognition=null;
+if(SpeechRecognition){recognition=new SpeechRecognition();recognition.lang='hi-IN';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onresult=e=>replyToPlayer(e.results[0][0].transcript);recognition.onerror=e=>{voiceNote.textContent='आवाज़ पहचानने में समस्या: '+e.error+'. आप लिखकर भी बात कर सकते हैं।'};recognition.onend=()=>document.getElementById('micBtn').classList.remove('active')}
+document.getElementById('micBtn').onclick=()=>{if(!recognition){voiceNote.textContent='इस ब्राउज़र में बोलकर सवाल पूछने की सुविधा नहीं मिली। Chrome में माइक्रोफोन अनुमति जाँचें।';return}try{voiceNote.textContent='सुन रहा हूँ… अब हिंदी में बोलिए।';document.getElementById('micBtn').classList.add('active');recognition.start()}catch(e){voiceNote.textContent='माइक्रोफोन पहले से चालू है या अनुमति नहीं मिली।'}};
+document.getElementById('wave').onclick=()=>{const p=nearestPerson();if(p){p.rotation.y=Math.atan2(player.pos.x-p.position.x,player.pos.z-p.position.z);p.userData.arms[1].rotation.z=-2.1;say('गाँववाले ने हाथ हिलाकर नमस्ते किया।');setTimeout(()=>p.userData.arms[1].rotation.z=0,900)}else say('आपने हाथ उठाकर नमस्ते किया।')};
 document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jumpQueued=true});
 document.getElementById('run').addEventListener('pointerdown',e=>{run=true;document.getElementById('run').classList.add('active')});
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>document.getElementById('run').addEventListener(ev,()=>{run=false;document.getElementById('run').classList.remove('active')}));
@@ -180,7 +254,8 @@ renderer.domElement.addEventListener('pointerdown',e=>{if(!started)return;lookId
 renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;player.yaw-=dx*.004;player.pitch=clamp(player.pitch-dy*.003,-1.15,1.15)});
 function endLook(e){if(e.pointerId===lookId)lookId=null}
 renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
-document.getElementById('startBtn').onclick=()=>{started=true;document.getElementById('start').style.display='none';document.getElementById('hint').style.opacity='1';setTimeout(()=>document.getElementById('hint').style.opacity='0',5000);say('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है।')};
+if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+document.getElementById('startBtn').onclick=()=>{started=true;document.getElementById('start').style.display='none';document.getElementById('hint').style.opacity='1';setTimeout(()=>document.getElementById('hint').style.opacity='0',5000);say('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है।');speakHindi('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है।')};
 function animate(){
  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(started){
@@ -194,6 +269,8 @@ function animate(){
    player.vy-=13*dt;player.pos.y+=player.vy*dt;if(player.pos.y<1.68){player.pos.y=1.68;player.vy=0;player.onGround=true}
    camera.position.copy(player.pos);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
    const moving=move.lengthSq()>0;bodyRig.position.y=moving?Math.sin(performance.now()*.012)*.018:0;
+   const t=performance.now()*.001;
+   for(const npc of villagers){const movingNow=move.lengthSq()>0&&Math.hypot(npc.position.x-player.pos.x,npc.position.z-player.pos.z)<12;const ph=t*5+npc.userData.phase;const swing=movingNow?Math.sin(ph)*.48:Math.sin(t*1.1+npc.userData.phase)*.025;npc.userData.legs[0].rotation.x=swing;npc.userData.legs[1].rotation.x=-swing;npc.userData.arms[0].rotation.x=-swing*.65;npc.userData.arms[1].rotation.x=swing*.65;if(!speaking)npc.userData.mouth.scale.y=1;}
    updateInteract();
  }
  renderer.render(scene,camera);
