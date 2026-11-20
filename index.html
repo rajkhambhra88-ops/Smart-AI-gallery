@@ -26,7 +26,7 @@ canvas{display:block;width:100%;height:100%}
 #interact{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;border:1px solid #fff8;background:#f0bd58;color:#2c2618;padding:12px 19px;border-radius:24px;font-weight:800;box-shadow:0 4px 18px #0004}
 #talkPanel{position:fixed;left:50%;bottom:155px;transform:translateX(-50%);width:min(92%,430px);padding:13px;background:rgba(12,29,27,.94);color:#fff;border:1px solid #ffffff55;border-radius:18px;display:none;z-index:4;box-shadow:0 12px 35px #0006}
 .talkHead{display:flex;justify-content:space-between;align-items:center;color:#f5d58e}.talkHead button{border:0;background:#ffffff20;color:white;border-radius:10px;padding:6px 10px}
-#npcLine{font-size:14px;line-height:1.55;padding:12px 2px}.talkActions{display:flex;gap:6px;flex-wrap:wrap}.talkActions input{flex:1;min-width:130px;border:1px solid #ffffff44;border-radius:11px;background:#ffffff12;color:white;padding:11px;font-size:13px}.talkActions button{border:0;border-radius:11px;padding:10px 12px;background:#e9bd67;color:#2c2618;font-weight:800}.talkNote{font-size:10px;color:#c7d7d0;padding-top:8px}
+#npcLine{font-size:14px;line-height:1.55;padding:12px 2px;white-space:pre-wrap}.talkActions{display:flex;gap:6px;flex-wrap:wrap}.talkActions input{flex:1;min-width:130px;border:1px solid #ffffff44;border-radius:11px;background:#ffffff12;color:white;padding:11px;font-size:13px}.talkActions button{border:0;border-radius:11px;padding:10px 12px;background:#e9bd67;color:#2c2618;font-weight:800}.talkNote{font-size:10px;color:#c7d7d0;padding-top:8px}
 #message{position:fixed;left:50%;bottom:205px;transform:translateX(-50%);max-width:85%;background:var(--glass);color:white;border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:center;font-size:13px;display:none}
 #start{position:fixed;inset:0;background:linear-gradient(150deg,rgba(13,42,38,.92),rgba(17,45,52,.78)),radial-gradient(circle at 70% 20%,#f1c56b55,transparent 35%);display:flex;align-items:center;justify-content:center;padding:22px;color:white;z-index:5}
 .panel{width:min(440px,100%);border:1px solid #ffffff35;background:rgba(10,25,24,.72);border-radius:26px;padding:25px 22px;box-shadow:0 20px 60px #0006;backdrop-filter:blur(14px)}
@@ -133,7 +133,8 @@ function tree(x,z,s=1){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22
 for(const p of [[-20,-4,1.1],[19,-18,1.2],[-28,14,1.25],[30,7,1.1],[13,27,1.35],[-4,25,1],[-34,-34,1.2],[35,-31,1.4],[3,-39,1.1],[-17,34,1.1]])tree(...p);
 // distant low hills
 for(let i=0;i<16;i++){const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*8,10+Math.random()*12,7),mat(i%2?0x688a67:0x78946e));h.position.set(-75+i*10,-1,-78-Math.random()*15);scene.add(h)}
-// Village people: a mixed Indian rural community with distinct ages, clothes and occupations.
+
+// ————— ENHANCED VILLAGERS (more realistic) —————
 const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
 function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
@@ -141,38 +142,99 @@ function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const skinMat=mat(profile.skin||[0x9b6748,0xb77d5a,0x81553e,0xc18b68][variant%4]);
  const cloth=mat(topColor), lower=mat(profile.lower|| (female?0x72534a:variant===1?0x594638:0x3e4541));
  const bodyScale=child?.78:older?.96:1;
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(female?.31:.29, female?.58:.62,5,10),cloth);torso.position.y=1.18*bodyScale;torso.scale.set(1,bodyScale,1);torso.castShadow=true;g.add(torso);
- const neck=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.2,10),skinMat);neck.position.y=1.65*bodyScale;g.add(neck);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.245,24,18),skinMat);head.scale.set(.88,1.12,.9);head.position.y=1.91*bodyScale;head.castShadow=true;g.add(head);
+ // torso with more subtle shaping
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(female?.32:.30, female?.60:.64,6,12),cloth);
+ torso.position.y=1.18*bodyScale;torso.scale.set(1,bodyScale,1.02);torso.castShadow=true;g.add(torso);
+ // neck
+ const neck=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.22,10),skinMat);neck.position.y=1.66*bodyScale;g.add(neck);
+ // head – slightly more realistic proportions
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.255,28,20),skinMat);
+ head.scale.set(.88,1.12,.9);head.position.y=1.92*bodyScale;head.castShadow=true;g.add(head);
+ // ears
  for(const side of [-1,1]){
-  const ear=new THREE.Mesh(new THREE.SphereGeometry(.055,10,8),skinMat);ear.position.set(side*.235,1.91*bodyScale,0);g.add(ear);
-  const eyeWhite=new THREE.Mesh(new THREE.SphereGeometry(.045,10,8),humanMats.white);eyeWhite.scale.set(1,.72,.55);eyeWhite.position.set(side*.09,1.96*bodyScale,.205);g.add(eyeWhite);
-  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.022,8,8),humanMats.eye);pupil.position.set(side*.09,1.96*bodyScale,.231);g.add(pupil);
-  const brow=new THREE.Mesh(new THREE.BoxGeometry(.09,.018,.025),humanMats.hair);brow.position.set(side*.09,2.025*bodyScale,.205);g.add(brow);
+  const ear=new THREE.Mesh(new THREE.SphereGeometry(.06,12,10),skinMat);
+  ear.position.set(side*.235,1.92*bodyScale,0);g.add(ear);
+  // eyes (slightly larger, with iris)
+  const eyeWhite=new THREE.Mesh(new THREE.SphereGeometry(.048,12,10),humanMats.white);
+  eyeWhite.scale.set(1,.72,.55);eyeWhite.position.set(side*.09,1.97*bodyScale,.21);g.add(eyeWhite);
+  const iris=new THREE.Mesh(new THREE.SphereGeometry(.025,8,8),mat(0x4a3a2a));
+  iris.position.set(side*.09,1.97*bodyScale,.235);g.add(iris);
+  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.014,8,8),humanMats.eye);
+  pupil.position.set(side*.09,1.97*bodyScale,.245);g.add(pupil);
+  // brows
+  const brow=new THREE.Mesh(new THREE.BoxGeometry(.09,.018,.025),humanMats.hair);
+  brow.position.set(side*.09,2.035*bodyScale,.205);g.add(brow);
  }
- const nose=new THREE.Mesh(new THREE.SphereGeometry(.045,8,8),skinMat);nose.scale.set(.7,1.15,.8);nose.position.set(0,1.9*bodyScale,.245);g.add(nose);
- const mouth=new THREE.Mesh(new THREE.BoxGeometry(.075,.018,.018),mat(0x633a32));mouth.position.set(0,1.82*bodyScale,.218);g.add(mouth);
- const hair=new THREE.Mesh(new THREE.SphereGeometry(.25,16,10,0,Math.PI*2,0,Math.PI*.56),humanMats.hair);hair.position.set(0,2.055*bodyScale,-.015);hair.scale.set(1.02,.8,1);g.add(hair);
- if(older){const beard=new THREE.Mesh(new THREE.SphereGeometry(.15,12,10),mat(0xaaa49a));beard.scale.set(1,.8,.65);beard.position.set(0,1.72*bodyScale,.19);g.add(beard)}
- if(profile.turban){const turban=new THREE.Mesh(new THREE.SphereGeometry(.28,16,10),mat(profile.turban));turban.scale.set(1,.52,1);turban.position.set(0,2.19*bodyScale,0);g.add(turban);const band=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,6,16),mat(0xe2c58a));band.position.set(0,2.17*bodyScale,0);g.add(band)}
- if(female){const dupatta=new THREE.Mesh(new THREE.BoxGeometry(.22,.72,.09),mat(profile.dupatta||0xc58a61));dupatta.position.set(.2,1.38*bodyScale,.22);dupatta.rotation.z=-.18;g.add(dupatta);const bun=new THREE.Mesh(new THREE.SphereGeometry(.105,10,8),humanMats.hair);bun.position.set(0,2.02*bodyScale,-.22);g.add(bun)}
- // profession-specific visible clothing/accessories
- if(profile.apron){const apron=new THREE.Mesh(new THREE.BoxGeometry(.43,.55,.055),mat(profile.apron));apron.position.set(0,1.12*bodyScale,.27);g.add(apron)}
- if(profile.book){const book=new THREE.Mesh(new THREE.BoxGeometry(.28,.36,.07),mat(0x315b83));book.position.set(.42,1.12,.16);book.rotation.z=-.22;g.add(book);const pages=new THREE.Mesh(new THREE.BoxGeometry(.24,.32,.012),mat(0xf0e6c9));pages.position.set(.42,1.12,.2);pages.rotation.z=-.22;g.add(pages)}
- if(profile.tool){const handle=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.95,8),wood);handle.position.set(.48,.85,.05);handle.rotation.z=-.12;g.add(handle);const blade=new THREE.Mesh(new THREE.BoxGeometry(.28,.16,.07),mat(0x777b78));blade.position.set(.54,1.32,.05);g.add(blade)}
+ // nose
+ const nose=new THREE.Mesh(new THREE.SphereGeometry(.048,10,10),skinMat);
+ nose.scale.set(.7,1.2,.8);nose.position.set(0,1.91*bodyScale,.25);g.add(nose);
+ // mouth (slightly curved)
+ const mouth=new THREE.Mesh(new THREE.BoxGeometry(.085,.018,.018),mat(0x633a32));
+ mouth.position.set(0,1.83*bodyScale,.222);g.add(mouth);
+ // hair – more volume and shape
+ const hair=new THREE.Mesh(new THREE.SphereGeometry(.265,18,12,0,Math.PI*2,0,Math.PI*.55),humanMats.hair);
+ hair.position.set(0,2.06*bodyScale,-.02);hair.scale.set(1.02,.82,1.02);g.add(hair);
+ if(older){
+  const beard=new THREE.Mesh(new THREE.SphereGeometry(.16,14,12),mat(0xaaa49a));
+  beard.scale.set(1,.8,.65);beard.position.set(0,1.73*bodyScale,.19);g.add(beard);
+ }
+ if(profile.turban){
+  const turban=new THREE.Mesh(new THREE.SphereGeometry(.29,18,12),mat(profile.turban));
+  turban.scale.set(1,.52,1);turban.position.set(0,2.20*bodyScale,0);g.add(turban);
+  const band=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,8,20),mat(0xe2c58a));
+  band.position.set(0,2.18*bodyScale,0);g.add(band);
+ }
+ if(female){
+  const dupatta=new THREE.Mesh(new THREE.BoxGeometry(.24,.76,.09),mat(profile.dupatta||0xc58a61));
+  dupatta.position.set(.21,1.39*bodyScale,.23);dupatta.rotation.z=-.18;g.add(dupatta);
+  const bun=new THREE.Mesh(new THREE.SphereGeometry(.11,12,10),humanMats.hair);
+  bun.position.set(0,2.03*bodyScale,-.23);g.add(bun);
+ }
+ // profession accessories
+ if(profile.apron){
+  const apron=new THREE.Mesh(new THREE.BoxGeometry(.45,.58,.055),mat(profile.apron));
+  apron.position.set(0,1.13*bodyScale,.28);g.add(apron);
+ }
+ if(profile.book){
+  const book=new THREE.Mesh(new THREE.BoxGeometry(.30,.38,.07),mat(0x315b83));
+  book.position.set(.43,1.13,.17);book.rotation.z=-.22;g.add(book);
+  const pages=new THREE.Mesh(new THREE.BoxGeometry(.26,.34,.012),mat(0xf0e6c9));
+  pages.position.set(.43,1.13,.21);pages.rotation.z=-.22;g.add(pages);
+ }
+ if(profile.tool){
+  const handle=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.0,8),wood);
+  handle.position.set(.50,.87,.05);handle.rotation.z=-.12;g.add(handle);
+  const blade=new THREE.Mesh(new THREE.BoxGeometry(.30,.17,.07),mat(0x777b78));
+  blade.position.set(.56,1.35,.05);g.add(blade);
+ }
+ // arms – more natural shape
  const arms=[];for(const side of [-1,1]){
-  const pivot=new THREE.Group();pivot.position.set(side*.34,1.42*bodyScale,0);g.add(pivot);
-  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.095,.34,4,8),cloth);sleeve.position.y=-.22;pivot.add(sleeve);
-  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.075,.27,4,8),skinMat);fore.position.set(0,-.52,.015);pivot.add(fore);
-  const hand=new THREE.Mesh(new THREE.SphereGeometry(.085,10,8),skinMat);hand.position.set(0,-.68,.02);pivot.add(hand);arms.push(pivot);
+  const pivot=new THREE.Group();pivot.position.set(side*.35,1.43*bodyScale,0);g.add(pivot);
+  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.10,.36,5,10),cloth);
+  sleeve.position.y=-.23;pivot.add(sleeve);
+  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.08,.28,5,10),skinMat);
+  fore.position.set(0,-.54,.015);pivot.add(fore);
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),skinMat);
+  hand.position.set(0,-.70,.02);pivot.add(hand);
+  // fingers (simple)
+  for(let f=0;f<3;f++){
+   const finger=new THREE.Mesh(new THREE.CapsuleGeometry(.018,.08,3,5),skinMat);
+   finger.position.set((f-1)*.04,-.78,.05);pivot.add(finger);
+  }
+  arms.push(pivot);
  }
+ // legs – more realistic
  const legs=[];for(const side of [-1,1]){
-  const pivot=new THREE.Group();pivot.position.set(side*.14,.78*bodyScale,0);g.add(pivot);
-  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.48*bodyScale,4,8),lower);leg.position.y=-.28*bodyScale;pivot.add(leg);
-  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.19,.12,.31),humanMats.shoe);shoe.position.set(0,-.56*bodyScale,.065);pivot.add(shoe);legs.push(pivot);
+  const pivot=new THREE.Group();pivot.position.set(side*.15,.79*bodyScale,0);g.add(pivot);
+  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.11,.50*bodyScale,5,10),lower);
+  leg.position.y=-.30*bodyScale;pivot.add(leg);
+  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.20,.12,.33),humanMats.shoe);
+  shoe.position.set(0,-.59*bodyScale,.07);pivot.add(shoe);
+  legs.push(pivot);
  }
  g.userData={arms,legs,mouth,phase:Math.random()*6,variant,profile};return g;
 }
+
 const villagers=[
  person(-3,-18,0x3d7180,0,{name:'रामू',role:'किसान',job:'खेत में गेहूँ और सब्जियाँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
  person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं निर्माण और खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
@@ -185,7 +247,6 @@ const villagers=[
  person(21,22,0x7b5269,0,{name:'प्रीति',role:'स्वास्थ्यकर्मी',job:'मैं गाँव के लोगों की सेहत का ध्यान रखती हूँ।',female:true,skin:0xb77d5a,dupatta:0xe0b77e}),
  person(-27,24,0x6c7650,2,{name:'बलदेव',role:'पशुपालक',job:'मैं गाय-भैंसों की देखभाल करता हूँ।',skin:0x9b6748,turban:0x597d68})
 ];
-const [villager1,villager2,villager3]=villagers;
 villagers.forEach((v,i)=>v.rotation.y=[-.4,2.4,.8,1.8,-1.2,.4,2.8,-.8,1.1,-2][i]);
 // small bench and hand pump
 box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
@@ -202,7 +263,6 @@ for(const s of [-1,1]){
  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.58,4,8),mat(0x344a53));leg.position.set(s*.18,-1.12,-.15);bodyRig.add(leg);
  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.2,.11,.34),dark);shoe.position.set(s*.18,-1.48,-.28);bodyRig.add(shoe);
 }
-// body is intentionally below view; it appears when looking down.
 bodyRig.position.set(0,0,0);
 const player={pos:new THREE.Vector3(0,1.68,8),yaw:0,pitch:0,vy:0,onGround:true};
 camera.position.copy(player.pos);
