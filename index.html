@@ -1,635 +1,205 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <title>Smart AI Gallery</title>
-  <style>
-    :root {
-      --bg: #000000;
-      --surface: #121212;
-      --card-bg: #1c1c1e;
-      --text: #ffffff;
-      --muted: #8e8e93;
-      --accent: #22c55e;
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: calc(70px + env(safe-area-inset-bottom));
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .top-bar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(20px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .top-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-    .top-actions { display: flex; align-items: center; gap: 12px; }
-    .icon-btn {
-      background: transparent; border: none; color: var(--text); cursor: pointer;
-      padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 50%;
-    }
-    .icon-btn.active { color: var(--accent); background: rgba(34, 197, 94, 0.15); }
-    .icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .content-area { flex: 1; width: 100%; }
-    .date-group { margin-bottom: 8px; }
-    .date-heading { font-size: 14px; font-weight: 600; color: #9ca3af; padding: 14px 12px 8px; }
-    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5px; width: 100%; }
-    @media (min-width: 600px) { .photo-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; } }
-    @media (min-width: 900px) { .photo-grid { grid-template-columns: repeat(6, 1fr); gap: 4px; } }
-    .photo-item { position: relative; aspect-ratio: 1; background: #18181b; overflow: hidden; cursor: pointer; }
-    .photo-item img, .photo-item video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-    .video-time { position: absolute; bottom: 5px; left: 6px; font-size: 11px; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); pointer-events: none; }
-    .item-check {
-      position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%;
-      background: rgba(0, 0, 0, 0.5); border: 2px solid #ffffff; display: none;
-      align-items: center; justify-content: center; font-size: 13px; color: #ffffff; pointer-events: none;
-    }
-    .select-mode .item-check { display: flex; }
-    .photo-item.selected .item-check { display: flex; background: var(--accent); border-color: var(--accent); color: #000000; font-weight: 900; }
-    .photo-item.selected { filter: brightness(0.82); }
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: calc(56px + env(safe-area-inset-bottom));
-      background: rgba(18, 18, 18, 0.96); border-top: 1px solid #27272a; display: flex;
-      align-items: center; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); z-index: 200;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-      color: #71717a; font-size: 11px; font-weight: 500; cursor: pointer; flex: 1; height: 100%; border: none; background: transparent;
-    }
-    .nav-item.active { color: var(--accent); font-weight: 700; }
-    .nav-item svg { width: 20px; height: 20px; }
-    .selection-float-bar {
-      position: fixed; bottom: calc(64px + env(safe-area-inset-bottom)); left: 14px; right: 14px;
-      background: #18181b; border: 1px solid #3f3f46; border-radius: 30px; padding: 10px 18px;
-      display: none; align-items: center; justify-content: space-between; z-index: 300; box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-    }
-    .selection-float-bar.active { display: flex; }
-    .float-count { font-size: 14px; font-weight: 700; color: #ffffff; }
-    .float-btns { display: flex; gap: 14px; }
-    .float-btn { background: transparent; border: none; color: #ffffff; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .float-share { color: var(--accent); }
-    .float-delete { color: #f43f5e; }
-    .viewer { display: none; position: fixed; inset: 0; background: #000000; z-index: 99999; flex-direction: column; touch-action: none; }
-    .viewer.open { display: flex; }
-    .viewer-top { display: flex; align-items: center; justify-content: space-between; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index: 10; }
-    .viewer-stage { flex: 1; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
-    .viewer-stage img, .viewer-stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .viewer-bottom { display: flex; align-items: center; justify-content: space-around; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 10; }
-    .viewer-btn { background: transparent; border: none; color: #ffffff; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; }
-    .albums-view, .ai-view { padding: 16px; display: none; }
-    .album-card { background: #18181b; border-radius: 14px; padding: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-    .album-info h3 { font-size: 15px; font-weight: 600; }
-    .album-info p { font-size: 12px; color: #a1a1aa; margin-top: 2px; }
-    .empty-state { text-align: center; color: #71717a; padding: 60px 20px; font-size: 14px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#183d35">
+<title>जम्बूद्वीप — पहला जीवंत गाँव</title>
+<style>
+:root{--glass:rgba(13,29,27,.72);--line:rgba(255,255,255,.2);--gold:#f3c66b}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#91c7dc;font-family:system-ui,"Noto Sans Devanagari",sans-serif;touch-action:none}
+#game{position:fixed;inset:0}
+canvas{display:block;width:100%;height:100%}
+#topbar{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;color:#fff;text-shadow:0 2px 8px #172b27}
+.brand{font-weight:800;font-size:18px;letter-spacing:.3px}
+.sub{font-size:11px;opacity:.85}
+#status{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:8px 11px;font-size:12px;backdrop-filter:blur(8px)}
+#hint{position:fixed;left:50%;top:17%;transform:translateX(-50%);padding:8px 13px;border-radius:20px;background:rgba(10,24,23,.58);color:white;font-size:12px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+#crosshair{position:fixed;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #17342c66;transform:translate(-50%,-50%);pointer-events:none}
+#controls{position:fixed;inset:auto 0 0 0;height:190px;pointer-events:none}
+#stickArea{position:absolute;left:18px;bottom:22px;width:132px;height:132px;border-radius:50%;background:rgba(12,28,26,.25);border:1px solid #ffffff55;pointer-events:auto;touch-action:none}
+#stick{position:absolute;width:54px;height:54px;left:39px;top:39px;border-radius:50%;background:rgba(255,255,255,.72);border:2px solid #ffffffaa;box-shadow:0 4px 14px #0004}
+.actions{position:absolute;right:17px;bottom:23px;display:grid;grid-template-columns:repeat(2,64px);gap:10px;pointer-events:auto}
+.ctrl{width:64px;height:64px;border-radius:20px;border:1px solid #ffffff66;background:var(--glass);color:white;font-weight:700;font-size:12px;backdrop-filter:blur(8px);touch-action:none}
+.ctrl:active,.ctrl.active{background:#b17b2c}
+#interact{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;border:1px solid #fff8;background:#f0bd58;color:#2c2618;padding:12px 19px;border-radius:24px;font-weight:800;box-shadow:0 4px 18px #0004}
+#message{position:fixed;left:50%;bottom:205px;transform:translateX(-50%);max-width:85%;background:var(--glass);color:white;border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:center;font-size:13px;display:none}
+#start{position:fixed;inset:0;background:linear-gradient(150deg,rgba(13,42,38,.92),rgba(17,45,52,.78)),radial-gradient(circle at 70% 20%,#f1c56b55,transparent 35%);display:flex;align-items:center;justify-content:center;padding:22px;color:white;z-index:5}
+.panel{width:min(440px,100%);border:1px solid #ffffff35;background:rgba(10,25,24,.72);border-radius:26px;padding:25px 22px;box-shadow:0 20px 60px #0006;backdrop-filter:blur(14px)}
+.panel h1{font-size:29px;margin:0 0 4px;color:#f5d18b}
+.panel .tag{font-size:12px;letter-spacing:2px;color:#d6e7df;margin-bottom:18px}
+.panel p{line-height:1.65;font-size:14px;color:#edf5ef}
+.panel ul{padding-left:20px;line-height:1.8;font-size:13px;color:#e3eee8}
+#startBtn{width:100%;padding:15px;border:0;border-radius:16px;background:linear-gradient(100deg,#f5d58e,#dca84d);color:#2d291e;font-weight:900;font-size:16px;margin-top:10px}
+.small{font-size:11px!important;color:#bdcec5!important;text-align:center}
+#footer{position:fixed;bottom:7px;left:50%;transform:translateX(-50%);font-size:10px;color:#fff9;text-shadow:0 1px 4px #000;pointer-events:none;white-space:nowrap}
+@media(min-width:800px){#controls{height:170px}#stickArea{left:35px} .actions{right:35px}}
+</style>
 </head>
 <body>
-  <header class="top-bar">
-    <div class="top-title" id="pageTitle">Photos</div>
-    <div class="top-actions">
-      <button class="icon-btn" id="btnTopAdd" title="Add Photos">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-      <button class="icon-btn" id="btnTopSelect" title="Select Multiple">
-        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <input hidden id="filePicker" type="file" accept="image/*,video/*" multiple>
-
-  <main class="content-area" id="mainContainer">
-    <div id="photosTimeline"></div>
-    <div id="emptyView" class="empty-state">
-      <p>No photos yet</p>
-      <p style="margin-top:6px; font-size:12px; color:#52525b;">Tap + above to add photos</p>
-    </div>
-  </main>
-
-  <div class="albums-view" id="albumsView">
-    <div class="album-card" data-album="favorites">
-      <div class="album-info">
-        <h3>⭐ Favorites (पसंदीदा)</h3>
-        <p id="favCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-    <div class="album-card" data-album="videos">
-      <div class="album-info">
-        <h3>🎬 Videos (वीडियो)</h3>
-        <p id="videoCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-    <div class="album-card" data-album="trash">
-      <div class="album-info">
-        <h3>🗑️ Recycle Bin (कचरा-पेटी)</h3>
-        <p id="trashCount">0 items</p>
-      </div>
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+<div id="game"></div>
+<div id="topbar"><div><div class="brand">जम्बूद्वीप</div><div class="sub">एक जीवंत दुनिया की पहली झलक</div></div><div id="status">दिन 1 · सुबह 8:00<br>गाँव के बाहर</div></div>
+<div id="hint">चारों ओर देखने के लिए स्क्रीन पर उँगली घुमाएँ</div>
+<div id="crosshair"></div>
+<div id="controls">
+  <div id="stickArea"><div id="stick"></div></div>
+  <div class="actions">
+    <button class="ctrl" id="jump">कूदें</button>
+    <button class="ctrl" id="run">दौड़ें</button>
+    <button class="ctrl" id="look">देखें</button>
+    <button class="ctrl" id="wave">नमस्ते</button>
   </div>
+</div>
+<button id="interact">बातचीत करें</button>
+<div id="message"></div>
+<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.1</div>
+<div id="start">
+ <div class="panel">
+  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · PROTOTYPE 01</div>
+  <p>आप एक नए गाँव में पहुँचे हैं। यह आपकी नई जिंदगी की शुरुआत है। चारों ओर देखिए, रास्तों पर चलिए और इस छोटी-सी दुनिया को महसूस कीजिए।</p>
+  <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और गाँव के लोगों से मिलें</li></ul>
+  <button id="startBtn">दुनिया में प्रवेश करें</button>
+  <p class="small">बेहतर अनुभव के लिए मोबाइल को लैंडस्केप मोड में घुमाएँ। इंटरनेट चालू रखें ताकि 3D इंजन लोड हो सके।</p>
+ </div>
+</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-  <div class="ai-view" id="aiView">
-    <div style="background:#18181b; border-radius:16px; padding:16px; margin-bottom:14px;">
-      <h3 style="font-size:16px;">🧠 On-Device AI Vision</h3>
-      <p style="font-size:12px; color:#a1a1aa; margin:6px 0 14px;">Scans photo visual patterns locally without uploading anything to the internet.</p>
-      <button id="btnRunAI" style="width:100%; padding:12px; font-size:14px; background:var(--accent); color:#000; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Auto-Group Photos Now</button>
-    </div>
-  </div>
+const root=document.getElementById('game');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9bd0e3);
+scene.fog=new THREE.Fog(0x9bd0e3,42,125);
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.08,180);
+camera.position.set(0,1.68,8);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
+root.appendChild(renderer.domElement);
 
-  <div class="selection-float-bar" id="selectionBar">
-    <span class="float-count" id="selectCountText">0 selected</span>
-    <div class="float-btns">
-      <button class="float-btn float-share" id="btnFloatShare">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        WhatsApp
-      </button>
-      <button class="float-btn float-delete" id="btnFloatDelete">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        Delete
-      </button>
-      <button class="float-btn" id="btnFloatCancel" style="color:#a1a1aa;">✕ Cancel</button>
-    </div>
-  </div>
+scene.add(new THREE.HemisphereLight(0xe4f6ff,0x65704c,2.0));
+const sun=new THREE.DirectionalLight(0xffe0a6,2.1);
+sun.position.set(-18,28,14);sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
+scene.add(sun);
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="photos">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <span>Photos</span>
-    </button>
-    <button class="nav-item" data-tab="albums">
-      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      <span>Albums</span>
-    </button>
-    <button class="nav-item" data-tab="ai">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
-      <span>Smart AI</span>
-    </button>
-  </nav>
+const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
+const grass=mat(0x638b4b),pathMat=mat(0xb99b70),wall=mat(0xd7bd91),white=mat(0xe6dfc9),brick=mat(0xb76e4b),roof=mat(0x8d4936),dark=mat(0x493b30),wood=mat(0x795438),leaf=mat(0x39764a),leaf2=mat(0x588b45),water= new THREE.MeshStandardMaterial({color:0x4d9eae,roughness:.25,metalness:.08}),shirt=mat(0x315f72),skin=mat(0xb97950);
+function box(w,h,d,material,x,y,z,cast=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;scene.add(m);return m}
+function ground(w,d,material,x=0,z=0){return box(w,.18,d,material,x,-.1,z,false)}
+ground(150,150,grass);
+const road=box(7,.06,110,pathMat,0,.01,-15,false);
+const road2=box(100,.06,5,pathMat,0,.015,-13,false);
+for(let i=0;i<18;i++){const x=(i%2?1:-1)*(5.2+(i%4)*1.3),z=-48+i*5.3;box(1.1,.045,.22,mat(0xd0b58b),x,.05,z,false)}
+// fields and crop rows
+for(let side of [-1,1]){
+ box(19,.08,23,mat(side<0?0x78964c:0x849d50),side*23,-.01,-23,false);
+ for(let r=0;r<8;r++)for(let c=0;c<11;c++){const x=side*23-8+c*1.5,z=-32+r*2.5;const crop=box(.12,.55,.12,mat(0x47743d),x,.27,z,false);crop.rotation.z=(c%2)*.12}
+}
+// pond
+const pond=new THREE.Mesh(new THREE.CylinderGeometry(5.3,5.3,.22,48),water);pond.position.set(19,.02,9);pond.receiveShadow=true;scene.add(pond);
+const bank=new THREE.Mesh(new THREE.TorusGeometry(5.3,.35,8,48),mat(0x9a9b61));bank.rotation.x=Math.PI/2;bank.position.set(19,.12,9);scene.add(bank);
+// house helper
+function house(x,z,paint=wall,roofColor=roof,scale=1){
+ const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
+ const body=new THREE.Mesh(new THREE.BoxGeometry(5,3.1,4.4),paint);body.position.y=1.55;body.castShadow=true;body.receiveShadow=true;g.add(body);
+ const r=new THREE.Mesh(new THREE.ConeGeometry(3.65,2.2,4),mat(roofColor));r.position.set(0,4.05,0);r.rotation.y=Math.PI/4;r.castShadow=true;g.add(r);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(.95,1.9,.12),wood);door.position.set(0,.95,2.25);g.add(door);
+ const winmat=mat(0x5b8b9a);for(const sx of [-1.55,1.55]){const win=new THREE.Mesh(new THREE.BoxGeometry(.75,.75,.1),winmat);win.position.set(sx,1.95,2.25);g.add(win)}
+ const step=new THREE.Mesh(new THREE.BoxGeometry(1.5,.25,.65),mat(0xb2a28a));step.position.set(0,.13,2.55);g.add(step);
+ return g;
+}
+house(-11,-8,wall,0x954d39,1.1);house(11,-11,white,0x9b563b,1);house(-13,8,mat(0xd8c5a0),0x7d4636,.95);house(7,17,mat(0xd5b98b),0x8d4a36,1.05);house(-24,-25,mat(0xc8b18a),0x99573c,1.15);house(27,-8,white,0x8b5140,1.15);
+// shop
+const shop=house(0,-22,mat(0xe4d0a2),0x477b77,1.15);
+const sign=box(3.4,.65,.16,mat(0x315c51),0,2.7,-19.38); 
+// trees
+function tree(x,z,s=1){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.32*s,2.4*s,8),wood);trunk.position.set(x,1.2*s,z);trunk.castShadow=true;scene.add(trunk);for(let i=0;i<3;i++){const crown=new THREE.Mesh(new THREE.SphereGeometry((1.35-i*.12)*s,10,8),i===1?leaf2:leaf);crown.position.set(x+(i-1)*.35*s,2.7*s+i*.48*s,z);crown.castShadow=true;scene.add(crown)}}
+for(const p of [[-20,-4,1.1],[19,-18,1.2],[-28,14,1.25],[30,7,1.1],[13,27,1.35],[-4,25,1],[-34,-34,1.2],[35,-31,1.4],[3,-39,1.1],[-17,34,1.1]])tree(...p);
+// distant low hills
+for(let i=0;i<16;i++){const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*8,10+Math.random()*12,7),mat(i%2?0x688a67:0x78946e));h.position.set(-75+i*10,-1,-78-Math.random()*15);scene.add(h)}
+// village people, simple but visible figures
+function person(x,z,topColor=0x9b553b){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const torso=new THREE.Mesh(new THREE.CylinderGeometry(.24,.32,.85,9),mat(topColor));torso.position.y=1.05;torso.castShadow=true;g.add(torso);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),skin);head.position.y=1.68;g.add(head);
+ const legsMat=mat(0x514c42);
+ for(let sx of [-.13,.13]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.75,7),legsMat);leg.position.set(sx,.38,0);g.add(leg)}
+ const a=new THREE.Mesh(new THREE.CylinderGeometry(.07,.08,.7,7),skin);a.position.set(.32,1.08,0);a.rotation.z=-.25;g.add(a);
+ return g;
+}
+const villager1=person(-3,-18,0x3d7180),villager2=person(5,3,0x9b633b),villager3=person(-17,16,0x6a7850);
+villager1.rotation.y=-.4;villager2.rotation.y=2.4;villager3.rotation.y=.8;
+// small bench and hand pump
+box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
+const pump= new THREE.Group();pump.position.set(13,0,1);scene.add(pump);
+const post=new THREE.Mesh(new THREE.CylinderGeometry(.12,.15,1.7,8),mat(0x58676a));post.position.y=.85;pump.add(post);
+const handle=new THREE.Mesh(new THREE.BoxGeometry(1.1,.12,.13),dark);handle.position.set(.35,1.55,0);pump.add(handle);
 
-  <div class="viewer" id="viewerModal">
-    <div class="viewer-top">
-      <button class="icon-btn" id="vClose">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      </button>
-      <span style="font-size:13px; color:#a1a1aa;" id="vDate">Today</span>
-      <button class="icon-btn" id="vFav">
-        <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-    </div>
-    <div class="viewer-stage" id="vStage"></div>
-    <div class="viewer-bottom">
-      <button class="viewer-btn" id="vShare">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share
-      </button>
-      <button class="viewer-btn" id="vRotate">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        Rotate
-      </button>
-      <button class="viewer-btn" id="vDelete">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        Delete
-      </button>
-    </div>
-  </div>
-
-<script>
-(()=>{
-  'use strict';
-
-  const DB_NAME = 'SmartAIGallery_Native';
-  const STORE = 'media';
-  let db = null, mediaItems = [];
-  let isSelectMode = false;
-  const selectedIds = new Set();
-  let currentTab = 'photos', activeViewerItem = null;
-
-  function openDB() {
-    return new Promise((res, rej) => {
-      const r = indexedDB.open(DB_NAME, 1);
-      r.onupgradeneeded = () => r.result.createObjectStore(STORE, { keyPath: 'id' });
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-  }
-
-  function allDB() {
-    return new Promise((res, rej) => {
-      const req = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror = () => rej(req.error);
-    });
-  }
-
-  function putDB(item) {
-    return new Promise((res, rej) => {
-      const req = db.transaction(STORE, 'readwrite').objectStore(STORE).put(item);
-      req.onsuccess = () => res();
-      req.onerror = () => rej(req.error);
-    });
-  }
-
-  function getMediaUrl(item) {
-    if (!item._cachedUrl && item.blob) {
-      item._cachedUrl = URL.createObjectURL(item.blob);
-    }
-    return item._cachedUrl || item.thumb || '';
-  }
-
-  function makeThumb(file) {
-    return new Promise(res => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            try {
-              const c = document.createElement('canvas');
-              const max = 220;
-              let w = img.width, h = img.height;
-              if (w > h) { h = Math.round((h * max) / w); w = max; }
-              else { w = Math.round((w * max) / h); h = max; }
-              c.width = w; c.height = h;
-              c.getContext('2d').drawImage(img, 0, 0, w, h);
-              res(c.toDataURL('image/jpeg', 0.7));
-            } catch (_) { res(e.target.result); }
-          };
-          img.onerror = () => res(e.target.result);
-          img.src = e.target.result;
-        };
-        reader.onerror = () => res(null);
-        reader.readAsDataURL(file);
-      } else if (file.type.startsWith('video/')) {
-        try {
-          const u = URL.createObjectURL(file);
-          const v = document.createElement('video');
-          v.src = u; v.muted = true; v.currentTime = 0.5;
-          v.onloadeddata = () => {
-            try {
-              const c = document.createElement('canvas');
-              c.width = 200;
-              c.height = Math.round((v.videoHeight * 200) / (v.videoWidth || 200)) || 150;
-              c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-              res(c.toDataURL('image/jpeg', 0.6));
-              URL.revokeObjectURL(u);
-            } catch (_) { res(null); }
-          };
-          v.onerror = () => res(null);
-        } catch (_) { res(null); }
-      } else { res(null); }
-    });
-  }
-
-  function formatDateHeader(timestamp) {
-    const d = new Date(timestamp);
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  }
-
-  function renderTimeline() {
-    const container = document.getElementById('photosTimeline');
-    const empty = document.getElementById('emptyView');
-
-    const active = mediaItems.filter(i => !i.isDeleted);
-    active.sort((a, b) => b.createdAt - a.createdAt);
-
-    if (active.length === 0) {
-      container.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    const groups = new Map();
-    active.forEach(item => {
-      const dateKey = formatDateHeader(item.createdAt);
-      if (!groups.has(dateKey)) groups.set(dateKey, []);
-      groups.get(dateKey).push(item);
-    });
-
-    let html = '';
-    groups.forEach((items, dateKey) => {
-      html += `
-        <section class="date-group">
-          <div class="date-heading">${dateKey}</div>
-          <div class="photo-grid ${isSelectMode ? 'select-mode' : ''}">
-            ${items.map(item => {
-              const isVid = item.kind === 'video';
-              const src = item.thumb || getMediaUrl(item);
-              const isSelected = selectedIds.has(item.id);
-              return `
-                <div class="photo-item ${isSelected ? 'selected' : ''}" data-id="${item.id}">
-                  <div class="item-check">${isSelected ? '✓' : ''}</div>
-                  ${isVid ? `
-                    <video src="${src}" preload="metadata" muted playsinline></video>
-                    <span class="video-time">00:15</span>
-                  ` : `
-                    <img src="${src}" alt="" loading="lazy">
-                  `}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </section>
-      `;
-    });
-
-    container.innerHTML = html;
-    updateSelectionUI();
-    updateAlbumCounts();
-  }
-
-  function toggleItemSelection(id, itemEl) {
-    if (selectedIds.has(id)) {
-      selectedIds.delete(id);
-      itemEl.classList.remove('selected');
-      const check = itemEl.querySelector('.item-check');
-      if (check) check.textContent = '';
-    } else {
-      selectedIds.add(id);
-      itemEl.classList.add('selected');
-      const check = itemEl.querySelector('.item-check');
-      if (check) check.textContent = '✓';
-    }
-    updateSelectionUI();
-  }
-
-  function updateSelectionUI() {
-    const bar = document.getElementById('selectionBar');
-    const txt = document.getElementById('selectCountText');
-    const selectBtn = document.getElementById('btnTopSelect');
-    const timeline = document.getElementById('photosTimeline');
-
-    if (isSelectMode) {
-      bar.classList.add('active');
-      selectBtn.classList.add('active');
-      txt.textContent = `${selectedIds.size} selected`;
-      if (timeline) timeline.querySelectorAll('.photo-grid').forEach(g => g.classList.add('select-mode'));
-    } else {
-      bar.classList.remove('active');
-      selectBtn.classList.remove('active');
-      if (timeline) {
-        timeline.querySelectorAll('.photo-grid').forEach(g => g.classList.remove('select-mode'));
-        timeline.querySelectorAll('.photo-item.selected').forEach(el => {
-          el.classList.remove('selected');
-          const check = el.querySelector('.item-check');
-          if (check) check.textContent = '';
-        });
-      }
-      selectedIds.clear();
-    }
-  }
-
-  function updateAlbumCounts() {
-    const favs = mediaItems.filter(i => i.isFavorite && !i.isDeleted).length;
-    const vids = mediaItems.filter(i => i.kind === 'video' && !i.isDeleted).length;
-    const trash = mediaItems.filter(i => i.isDeleted).length;
-
-    document.getElementById('favCount').textContent = `${favs} items`;
-    document.getElementById('videoCount').textContent = `${vids} items`;
-    document.getElementById('trashCount').textContent = `${trash} items`;
-  }
-
-  async function handleAddFiles(files) {
-    if (!files || !files.length) return;
-    for (const f of files) {
-      const isVid = f.type.startsWith('video/');
-      const thumb = await makeThumb(f);
-      
-      let persistentBlob;
-      try {
-        const buffer = await f.arrayBuffer();
-        persistentBlob = new Blob([buffer], { type: f.type || (isVid ? 'video/mp4' : 'image/jpeg') });
-      } catch (_) {
-        persistentBlob = f;
-      }
-
-      const item = {
-        id: 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6),
-        blob: persistentBlob,
-        name: f.name,
-        type: f.type,
-        kind: isVid ? 'video' : 'image',
-        thumb: thumb,
-        isFavorite: false,
-        isPrivate: false,
-        isDeleted: false,
-        category: 'Photos',
-        createdAt: f.lastModified || Date.now(),
-        size: f.size
-      };
-      await putDB(item);
-      mediaItems.push(item);
-    }
-    renderTimeline();
-  }
-
-  let vScale = 1, vRotate = 0;
-  function openViewer(item) {
-    activeViewerItem = item;
-    vScale = 1; vRotate = 0;
-    const isVid = item.kind === 'video';
-    const stage = document.getElementById('vStage');
-    const url = getMediaUrl(item);
-
-    document.getElementById('vDate').textContent = formatDateHeader(item.createdAt);
-    document.getElementById('vFav').style.color = item.isFavorite ? 'var(--accent)' : '#fff';
-
-    if (isVid) {
-      stage.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
-    } else {
-      stage.innerHTML = `<img src="${url}" alt="" style="transform: rotate(0deg) scale(1);">`;
-      initPinchZoom(stage);
-    }
-
-    document.getElementById('viewerModal').classList.add('open');
-  }
-
-  function closeViewer() {
-    document.getElementById('viewerModal').classList.remove('open');
-    document.getElementById('vStage').innerHTML = '';
-    activeViewerItem = null;
-  }
-
-  function initPinchZoom(stage) {
-    let distStart = 0, scaleStart = 1, posX = 0, posY = 0, startX = 0, startY = 0;
-    stage.ontouchstart = e => {
-      if (e.touches.length === 2) {
-        distStart = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        scaleStart = vScale;
-      } else if (e.touches.length === 1 && vScale > 1) {
-        startX = e.touches[0].clientX - posX;
-        startY = e.touches[0].clientY - posY;
-      }
-    };
-    stage.ontouchmove = e => {
-      const img = stage.querySelector('img');
-      if (!img) return;
-      if (e.touches.length === 2 && distStart > 0) {
-        e.preventDefault();
-        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        vScale = Math.min(Math.max(1, scaleStart * (d / distStart)), 5);
-        img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${vScale}) rotate(${vRotate}deg)`;
-      } else if (e.touches.length === 1 && vScale > 1) {
-        e.preventDefault();
-        posX = e.touches[0].clientX - startX;
-        posY = e.touches[0].clientY - startY;
-        img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${vScale}) rotate(${vRotate}deg)`;
-      }
-    };
-  }
-
-  async function shareSelected() {
-    const list = mediaItems.filter(i => selectedIds.has(i.id));
-    if (!list.length) return;
-    const files = list.map(i => new File([i.blob], i.name, { type: i.type }));
-    if (navigator.canShare && navigator.canShare({ files })) {
-      try { await navigator.share({ files }); } catch (_) {}
-    } else {
-      list.forEach(i => {
-        const a = document.createElement('a'); a.href = getMediaUrl(i); a.download = i.name; a.click();
-      });
-    }
-  }
-
-  let pressTimer = null, pressTriggered = false;
-  function setupLongPress(container) {
-    container.addEventListener('touchstart', e => {
-      const itemEl = e.target.closest('.photo-item');
-      if (!itemEl) return;
-      pressTriggered = false;
-
-      pressTimer = setTimeout(() => {
-        pressTriggered = true;
-        if (!isSelectMode) isSelectMode = true;
-        const id = itemEl.dataset.id;
-        toggleItemSelection(id, itemEl);
-        if (navigator.vibrate) navigator.vibrate(35);
-      }, 350);
-    }, { passive: true });
-
-    container.addEventListener('touchmove', () => {
-      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-    }, { passive: true });
-
-    container.addEventListener('touchend', () => {
-      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-    });
-  }
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    db = await openDB();
-    mediaItems = await allDB();
-    renderTimeline();
-
-    setupLongPress(document.getElementById('photosTimeline'));
-
-    document.getElementById('btnTopAdd').onclick = () => {
-      const p = document.getElementById('filePicker');
-      p.value = ''; p.click();
-    };
-    document.getElementById('filePicker').onchange = e => handleAddFiles(e.target.files);
-
-    document.getElementById('btnTopSelect').onclick = () => {
-      isSelectMode = !isSelectMode;
-      updateSelectionUI();
-    };
-
-    document.getElementById('btnFloatCancel').onclick = () => {
-      isSelectMode = false;
-      updateSelectionUI();
-    };
-
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab = btn.dataset.tab;
-        currentTab = tab;
-
-        document.getElementById('mainContainer').style.display = tab === 'photos' ? 'block' : 'none';
-        document.getElementById('albumsView').style.display = tab === 'albums' ? 'block' : 'none';
-        document.getElementById('aiView').style.display = tab === 'ai' ? 'block' : 'none';
-        document.getElementById('pageTitle').textContent = tab === 'photos' ? 'Photos' : (tab === 'albums' ? 'Albums' : 'Smart AI');
-      };
-    });
-
-    document.getElementById('photosTimeline').onclick = e => {
-      if (pressTriggered) {
-        pressTriggered = false;
-        return;
-      }
-      const itemEl = e.target.closest('.photo-item');
-      if (!itemEl) return;
-      const id = itemEl.dataset.id;
-      const item = mediaItems.find(i => i.id === id);
-
-      if (isSelectMode) {
-        toggleItemSelection(id, itemEl);
-      } else {
-        openViewer(item);
-      }
-    };
-
-    document.getElementById('btnFloatShare').onclick = shareSelected;
-    document.getElementById('btnFloatDelete').onclick = async () => {
-      if (!confirm(`Delete ${selectedIds.size} photos?`)) return;
-      for (const id of selectedIds) {
-        const i = mediaItems.find(m => m.id === id);
-        if (i) { i.isDeleted = true; await putDB(i); }
-      }
-      isSelectMode = false;
-      renderTimeline();
-    };
-
-    document.getElementById('vClose').onclick = closeViewer;
-    document.getElementById('vRotate').onclick = () => {
-      vRotate = (vRotate + 90) % 360;
-      const img = document.querySelector('#vStage img');
-      if (img) img.style.transform = `rotate(${vRotate}deg) scale(${vScale})`;
-    };
-    document.getElementById('vFav').onclick = async () => {
-      if (!activeViewerItem) return;
-      activeViewerItem.isFavorite = !activeViewerItem.isFavorite;
-      await putDB(activeViewerItem);
-      document.getElementById('vFav').style.color = activeViewerItem.isFavorite ? 'var(--accent)' : '#fff';
-      updateAlbumCounts();
-    };
-    document.getElementById('vShare').onclick = () => {
-      if (activeViewerItem) {
-        selectedIds.clear(); selectedIds.add(activeViewerItem.id);
-        shareSelected();
-      }
-    };
-    document.getElementById('vDelete').onclick = async () => {
-      if (!activeViewerItem) return;
-      activeViewerItem.isDeleted = true;
-      await putDB(activeViewerItem);
-      closeViewer();
-      renderTimeline();
-    };
-  });
-})();
+// Player camera rig: visible arms, torso edge and legs attached to first-person camera.
+const bodyRig=new THREE.Group();camera.add(bodyRig);scene.add(camera);
+const torso=new THREE.Mesh(new THREE.BoxGeometry(.62,.68,.28),shirt);torso.position.set(0,-.73,-.34);bodyRig.add(torso);
+for(const s of [-1,1]){
+ const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.48,4,8),shirt);arm.position.set(s*.43,-.43,-.48);arm.rotation.z=s*.22;bodyRig.add(arm);
+ const hand=new THREE.Mesh(new THREE.SphereGeometry(.115,10,8),skin);hand.position.set(s*.45,-.78,-.53);bodyRig.add(hand);
+ const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.58,4,8),mat(0x344a53));leg.position.set(s*.18,-1.12,-.15);bodyRig.add(leg);
+ const shoe=new THREE.Mesh(new THREE.BoxGeometry(.2,.11,.34),dark);shoe.position.set(s*.18,-1.48,-.28);bodyRig.add(shoe);
+}
+// body is intentionally below view; it appears when looking down.
+bodyRig.position.set(0,0,0);
+const player={pos:new THREE.Vector3(0,1.68,8),yaw:0,pitch:0,vy:0,onGround:true};
+camera.position.copy(player.pos);
+const clock=new THREE.Clock();
+let started=false,joy={x:0,y:0},run=false,jumpQueued=false,lookPointer=null,lastTap=null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function say(t){const el=document.getElementById('message');el.textContent=t;el.style.display='block';clearTimeout(say.timer);say.timer=setTimeout(()=>el.style.display='none',2600)}
+function nearestPerson(){let best=null,dist=3.1;for(const p of [villager1,villager2,villager3]){const d=Math.hypot(p.position.x-player.pos.x,p.position.z-player.pos.z);if(d<dist){dist=d;best=p}}return best}
+function updateInteract(){const p=nearestPerson();document.getElementById('interact').style.display=p?'block':'none'}
+function interact(){const p=nearestPerson();if(!p){say('यहाँ अभी कोई पास नहीं है। गाँव में थोड़ा आगे चलिए।');return}say('गाँववाला: नमस्ते यात्री! गाँव में नए आए हो? आराम से रहना, कोई मदद चाहिए तो बताना।');}
+document.getElementById('interact').onclick=interact;
+document.getElementById('wave').onclick=()=>say('आपने हाथ उठाकर नमस्ते किया। गाँववाले ने आपको देखा।');
+document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jumpQueued=true});
+document.getElementById('run').addEventListener('pointerdown',e=>{run=true;document.getElementById('run').classList.add('active')});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>document.getElementById('run').addEventListener(ev,()=>{run=false;document.getElementById('run').classList.remove('active')}));
+document.getElementById('look').onclick=()=>say('स्क्रीन के खाली हिस्से पर उँगली घुमाकर चारों ओर देखें।');
+const stickArea=document.getElementById('stickArea'),stick=document.getElementById('stick');let stickId=null;
+function setStick(e){const r=stickArea.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy;const max=43,len=Math.hypot(dx,dy);if(len>max){dx=dx/len*max;dy=dy/len*max}stick.style.transform=`translate(${dx}px,${dy}px)`;joy.x=dx/max;joy.y=dy/max}
+stickArea.addEventListener('pointerdown',e=>{e.preventDefault();stickId=e.pointerId;stickArea.setPointerCapture(stickId);setStick(e)});
+stickArea.addEventListener('pointermove',e=>{if(e.pointerId===stickId)setStick(e)});
+function resetStick(){stickId=null;joy.x=joy.y=0;stick.style.transform='translate(0,0)'}
+stickArea.addEventListener('pointerup',resetStick);stickArea.addEventListener('pointercancel',resetStick);
+// Drag on the world to look around. Ignore control zones.
+let lookId=null,lastX=0,lastY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(!started)return;lookId=e.pointerId;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(lookId)});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;player.yaw-=dx*.004;player.pitch=clamp(player.pitch-dy*.003,-1.15,1.15)});
+function endLook(e){if(e.pointerId===lookId)lookId=null}
+renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
+document.getElementById('startBtn').onclick=()=>{started=true;document.getElementById('start').style.display='none';document.getElementById('hint').style.opacity='1';setTimeout(()=>document.getElementById('hint').style.opacity='0',5000);say('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है।')};
+function animate(){
+ requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
+ if(started){
+   const speed=(run?7.2:3.4)*dt;
+   const forward=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw));
+   const right=new THREE.Vector3(Math.cos(player.yaw),0,-Math.sin(player.yaw));
+   const move=forward.clone().multiplyScalar(-joy.y).add(right.multiplyScalar(joy.x));
+   if(move.lengthSq()>0){move.normalize().multiplyScalar(speed);player.pos.add(move)}
+   player.pos.x=clamp(player.pos.x,-42,42);player.pos.z=clamp(player.pos.z,-48,38);
+   if(jumpQueued&&player.onGround){player.vy=5.2;player.onGround=false}jumpQueued=false;
+   player.vy-=13*dt;player.pos.y+=player.vy*dt;if(player.pos.y<1.68){player.pos.y=1.68;player.vy=0;player.onGround=true}
+   camera.position.copy(player.pos);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
+   const moving=move.lengthSq()>0;bodyRig.position.y=moving?Math.sin(performance.now()*.012)*.018:0;
+   updateInteract();
+ }
+ renderer.render(scene,camera);
+}
+animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6))});
 </script>
 </body>
 </html>
