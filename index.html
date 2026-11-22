@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#183d35">
-<title>जम्बूद्वीप — जीवंत भारतीय गाँव 0.7</title>
+<title>जम्बूद्वीप — जीवंत भारतीय गाँव 0.8</title>
 <style>
 :root{--glass:rgba(13,29,27,.72);--line:rgba(255,255,255,.2);--gold:#f3c66b}
 *{box-sizing:border-box}
@@ -64,12 +64,12 @@ canvas{display:block;width:100%;height:100%}
  <div class="talkNote" id="voiceNote">आवाज़ सुनने और बोलने के लिए अनुमति दें।</div>
 </div>
 <div id="message"></div>
-<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.7 · खेती, फल, बढ़ते पौधे और घरों में परिवार</div>
+<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.8 · फोटोरियलिस्टिक गाँव, धान के खेत, पशु और फल</div>
 <div id="start">
  <div class="panel">
-  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 07</div>
+  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 08</div>
   <p>आप एक नए गाँव में पहुँचे हैं। यह आपकी नई जिंदगी की शुरुआत है। चारों ओर देखिए, रास्तों पर चलिए और इस छोटी-सी दुनिया को महसूस कीजिए।</p>
-  <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और अलग-अलग पेशों के गाँववालों से मिलें</li><li>शिक्षक, किसान, मजदूर, दुकानदार और कारीगरों से बातचीत करें</li><li>घर के खुले दरवाजे से अंदर जाएँ, चारपाई के पास बैठें और रसोई/आँगन देखें</li><li>सब्ज़ी की क्यारियों में टमाटर, बैंगन, भिंडी, मिर्च और पालक देखें</li><li>पेड़ों पर फल लगे हैं और पौधे धीरे-धीरे बढ़ रहे हैं</li><li>किसान बीज बोते हैं, पानी देते हैं और फसल काटते हैं — आप भी खेती में हाथ बँटा सकते हैं</li></ul>
+  <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और अलग-अलग पेशों के गाँववालों से मिलें</li><li>हरे-भरे धान के खेत, पानी और पशुओं को देखें</li><li>घर के खुले दरवाजे से अंदर जाएँ, चारपाई के पास बैठें और रसोई/आँगन देखें</li><li>सब्ज़ी की क्यारियों में टमाटर, बैंगन, भिंडी, मिर्च और पालक देखें</li><li>पेड़ों पर फल लगे हैं और पौधे धीरे-धीरे बढ़ रहे हैं</li><li>किसान बीज बोते हैं, पानी देते हैं और फसल काटते हैं — आप भी खेती में हाथ बँटा सकते हैं</li></ul>
   <button id="startBtn">दुनिया में प्रवेश करें</button>
   <p class="small">बेहतर अनुभव के लिए मोबाइल को लैंडस्केप मोड में घुमाएँ। आवाज़ के लिए मीडिया वॉल्यूम चालू रखें।</p>
  </div>
@@ -79,8 +79,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const root=document.getElementById('game');
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0xa8cbdc);
-scene.fog=new THREE.Fog(0xa8c6c9,58,155);
+// सुनहरी सुबह की रोशनी के लिए आसमान और कोहरा (Fog)
+scene.background=new THREE.Color(0xd9cba5);
+scene.fog=new THREE.Fog(0xd9cba5, 60, 160);
+
 const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.08,180);
 camera.position.set(0,1.68,8);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
@@ -91,16 +93,17 @@ renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate=true;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.0;
-renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMappingExposure=1.15;
 root.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xeaf5ff,0x5a6046,1.35));
-const sun=new THREE.DirectionalLight(0xffe8c5,2.65);
-sun.position.set(-18,28,14);sun.castShadow=true;
+// रोशनी (Lighting) - तस्वीरों जैसा सुनहरा असर
+scene.add(new THREE.HemisphereLight(0xfff0d0, 0x5a6046, 1.5));
+const sun=new THREE.DirectionalLight(0xffdcaa, 2.8);
+sun.position.set(-25,35,15);
+sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);
 sun.shadow.bias=-0.00018;sun.shadow.normalBias=0.025;sun.shadow.radius=4;
-sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
+sun.shadow.camera.left=-45;sun.shadow.camera.right=45;sun.shadow.camera.top=45;sun.shadow.camera.bottom=-45;
 scene.add(sun);
 
 const mat=(color,roughness=.88)=>new THREE.MeshStandardMaterial({color,roughness});
@@ -112,50 +115,119 @@ function surfaceTexture(base,kind='plaster'){
  if(kind==='roof'){x.globalAlpha=.24;for(let y=0;y<256;y+=24){x.strokeStyle='#3c2921';x.beginPath();x.moveTo(0,y);x.lineTo(256,y);x.stroke();for(let xx=(y%48?0:16);xx<256;xx+=32){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+24);x.stroke()}}}
  x.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;
 }
-const grass=mat(0xffffff),pathMat=mat(0xffffff),wall=mat(0xffffff),white=mat(0xffffff),brick=mat(0xb76e4b),roof=mat(0xffffff),dark=mat(0x493b30),wood=mat(0x795438),leaf=mat(0x39764a),leaf2=mat(0x588b45),water=new THREE.MeshStandardMaterial({color:0x4d9eae,roughness:.18,metalness:.04}),shirt=mat(0x315f72),skin=mat(0xb97950);
-grass.map=surfaceTexture('#718b4c','grass');grass.color.set(0xffffff);grass.map.repeat.set(12,12);
-pathMat.map=surfaceTexture('#b6a080','dirt');pathMat.map.repeat.set(3,18);
+
+// टेक्सचर
+const grass=mat(0xffffff),pathMat=mat(0xffffff),wall=mat(0xffffff),white=mat(0xffffff),brick=mat(0xb76e4b),roof=mat(0xffffff),dark=mat(0x493b30),wood=mat(0x795438),leaf=mat(0x2e5c3a),leaf2=mat(0x437c39),water=new THREE.MeshStandardMaterial({color:0x4d9eae,roughness:.1,metalness:.1,transparent:true,opacity:0.85}),shirt=mat(0x315f72),skin=mat(0xb97950);
+grass.map=surfaceTexture('#5a7a3a','grass');grass.color.set(0xffffff);grass.map.repeat.set(12,12);
+pathMat.map=surfaceTexture('#a88c6c','dirt');pathMat.map.repeat.set(3,18);
 wall.map=surfaceTexture('#d0bd99','plaster');white.map=surfaceTexture('#ddd5c1','plaster');roof.map=surfaceTexture('#884c3c','roof');
+
 function box(w,h,d,material,x,y,z,cast=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;scene.add(m);return m}
 function ground(w,d,material,x=0,z=0){return box(w,.18,d,material,x,-.1,z,false)}
 ground(150,150,grass);
 const road=box(7,.06,110,pathMat,0,.01,-15,false);
 const road2=box(100,.06,5,pathMat,0,.015,-13,false);
-for(let i=0;i<18;i++){const x=(i%2?1:-1)*(5.2+(i%4)*1.3),z=-48+i*5.3;box(1.1,.045,.22,mat(0xd0b58b),x,.05,z,false)}
-// fields and crop rows
-for(let side of [-1,1]){
- box(19,.08,23,mat(side<0?0x78964c:0x849d50),side*23,-.01,-23,false);
- for(let r=0;r<8;r++)for(let c=0;c<11;c++){const x=side*23-8+c*1.5,z=-32+r*2.5;const crop=box(.12,.55,.12,mat(0x47743d),x,.27,z,false);crop.rotation.z=(c%2)*.12}
-}
-// pond
-const pond=new THREE.Mesh(new THREE.CylinderGeometry(5.3,5.3,.22,48),water);pond.position.set(19,.02,9);pond.receiveShadow=true;scene.add(pond);
-const bank=new THREE.Mesh(new THREE.TorusGeometry(5.3,.35,8,48),mat(0x9a9b61));bank.rotation.x=Math.PI/2;bank.position.set(19,.12,9);scene.add(bank);
 
-// ————— FARM SYSTEM —————
+// ————— धान के खेत (Paddy Fields) —————
+// तस्वीरों की तरह पानी से भरे हुए खेत
+function paddyField(x,z,w,d){
+ const waterPaddy=new THREE.Mesh(new THREE.BoxGeometry(w,0.05,d),water);
+ waterPaddy.position.set(x,0.05,z);waterPaddy.receiveShadow=true;scene.add(waterPaddy);
+ // मेंड़ (Mud boundaries)
+ const bedMat=mat(0x6b5534);
+ box(w+0.4,0.2,0.4,bedMat,x,0.1,z-d/2);
+ box(w+0.4,0.2,0.4,bedMat,x,0.1,z+d/2);
+ box(0.4,0.2,d,bedMat,x-w/2,0.1,z);
+ box(0.4,0.2,d,bedMat,x+w/2,0.1,z);
+ 
+ // धान के पौधे (Paddy plants)
+ const plantMat=mat(0x7bb33a); // चमकीला हरा
+ for(let r=0;r<10;r++){
+  for(let c=0;c<15;c++){
+   const px=x-w/2+0.5+c*(w-1)/14;
+   const pz=z-d/2+0.5+r*(d-1)/9;
+   // एक झुंड (Cluster) बनाएं
+   for(let i=0;i<3;i++){
+    const blade=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.6,4),plantMat);
+    blade.position.set(px+(Math.random()-0.5)*0.2, 0.3, pz+(Math.random()-0.5)*0.2);
+    blade.rotation.z=(Math.random()-0.5)*0.4;
+    blade.rotation.x=(Math.random()-0.5)*0.4;
+    scene.add(blade);
+   }
+  }
+ }
+}
+paddyField(-25, -20, 22, 26);
+paddyField(25, -22, 20, 24);
+paddyField(-25, 10, 18, 20);
+paddyField(25, 12, 20, 20);
+
+// ————— पशु (Animals - Buffalo/Cow) —————
+function animal(x,z,color=0x3a3a3a){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const bodyMat=mat(color,0.6);
+ const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.45,1.2,8,16),bodyMat);
+ body.rotation.z=Math.PI/2;body.position.y=0.8;body.castShadow=true;g.add(body);
+ const head=new THREE.Mesh(new THREE.CapsuleGeometry(0.25,0.3,6,10),bodyMat);
+ head.position.set(0.9,0.9,0);head.rotation.z=-0.2;head.castShadow=true;g.add(head);
+ // सींग (Horns)
+ const hornMat=mat(0xdddddd);
+ for(const side of [-1,1]){
+  const horn=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.3,6),hornMat);
+  horn.position.set(1.05,1.1,side*0.15);horn.rotation.x=side*0.5;g.add(horn);
+ }
+ // पैर (Legs)
+ const legMat=mat(0x222222);
+ for(const sx of [-0.5, 0.5]){
+  for(const sz of [-0.3, 0.3]){
+   const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.8,6),legMat);
+   leg.position.set(sx,0.4,sz);leg.castShadow=true;g.add(leg);
+  }
+ }
+ // पूंछ (Tail)
+ const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.6,4),legMat);
+ tail.position.set(-0.8,0.6,0);tail.rotation.z=-0.3;g.add(tail);
+ 
+ // धीरे-धीरे सिर हिलाना (Animation के लिए)
+ g.userData={head, phase: Math.random()*10};
+ return g;
+}
+const animals=[
+ animal(-2, 5, 0x2a2a2a), // काली भैंस
+ animal(2, -8, 0x4a3a2a), // भूरी गाय
+ animal(-15, 2, 0x3a3a3a),
+ animal(15, -5, 0x2a2a2a),
+ animal(0, 15, 0x4a3a2a)
+];
+
+// ————— सब्जी की क्यारियां (Kitchen Garden) —————
 const CROP_TYPES={
-  tomato:{name:'टमाटर',seedColor:0xd34a35,fruitColor:0xd34a35,leafColor:0x4a7a3a,maxH:.9},
-  brinjal:{name:'बैंगन',seedColor:0x8c5a9e,fruitColor:0x8c5a9e,leafColor:0x4c783e,maxH:.95},
-  okra:{name:'भिंडी',seedColor:0x6b8f35,fruitColor:0x6b8f35,leafColor:0x3f7139,maxH:.8},
-  chili:{name:'मिर्च',seedColor:0xd34a35,fruitColor:0xcc2e2e,leafColor:0x477b3b,maxH:.7},
-  spinach:{name:'पालक',seedColor:0x477c3d,fruitColor:0x5a8a3a,leafColor:0x3f7139,maxH:.6}
+  tomato:{name:'टमाटर',seedColor:0xd34a35,fruitColor:0xd34a35,leafColor:0x3a6a2a,maxH:.9},
+  brinjal:{name:'बैंगन',seedColor:0x8c5a9e,fruitColor:0x8c5a9e,leafColor:0x3c683e,maxH:.95},
+  okra:{name:'भिंडी',seedColor:0x6b8f35,fruitColor:0x6b8f35,leafColor:0x2f6139,maxH:.8},
+  chili:{name:'मिर्च',seedColor:0xd34a35,fruitColor:0xcc2e2e,leafColor:0x377b2b,maxH:.7},
+  spinach:{name:'पालक',seedColor:0x477c3d,fruitColor:0x5a8a3a,leafColor:0x2f6139,maxH:.6}
 };
 const farmPlots=[];
 function createFarmPlot(x,z,w=5,d=3){
  const plot={x,z,w,d,planted:false,watered:false,growth:0,harvestable:false,crop:'tomato',plants:[],waterLevel:0,daysOld:0};
- // raised soil bed
- const bed=box(w,.16,d,mat(0x705039),x,.09,z);
- // soil border
- box(w+.2,.04,d+.2,mat(0x8a6547),x,.17,z,false);
- // water indicator (a small blue patch that appears when watered)
- const waterPatch=new THREE.Mesh(new THREE.CircleGeometry(w*.4,.1),new THREE.MeshStandardMaterial({color:0x3a6b8a,transparent:true,opacity:0,roughness:.3}));
- waterPatch.rotation.x=-Math.PI/2;waterPatch.position.set(x,.18,z);scene.add(waterPatch);
+ // उठी हुई मिट्टी की क्यारी (Raised soil bed)
+ const bed=box(w,.2,d,mat(0x5a3e28),x,.1,z);
+ // लकड़ी का किनारा (Wooden border)
+ box(w+.2,.08,d+.2,mat(0x4a3020),x,.18,z,false);
+ // पानी का संकेत (Water indicator)
+ const waterPatch=new THREE.Mesh(new THREE.CircleGeometry(w*.4,.1),new THREE.MeshStandardMaterial({color:0x2a5b7a,transparent:true,opacity:0,roughness:.2}));
+ waterPatch.rotation.x=-Math.PI/2;waterPatch.position.set(x,.21,z);scene.add(waterPatch);
  plot.waterPatch=waterPatch;
  plot.bed=bed;
  farmPlots.push(plot);
  return plot;
 }
 // Create farm plots
-createFarmPlot(-19,20,6,4);createFarmPlot(-11,24,5,3);createFarmPlot(20,-26,6,4);createFarmPlot(8,14,4,3);
+createFarmPlot(-12, 20, 5, 3);
+createFarmPlot(-5, 24, 4, 3);
+createFarmPlot(14, 22, 5, 3);
+createFarmPlot(20, 18, 4, 3);
 
 function plantCrop(plot,cropKey){
  if(plot.planted)return;
@@ -165,16 +237,15 @@ function plantCrop(plot,cropKey){
  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
    const px=plot.x-plot.w/2+.5+c*(plot.w-1)/(cols-1||1);
    const pz=plot.z-plot.d/2+.5+r*(plot.d-1)/(rows-1||1);
-   // seedling
-   const stem=new THREE.Mesh(new THREE.CylinderGeometry(.02,.03,.2,6),mat(0x5a8a3a));
+   // अंकुर (Seedling)
+   const stem=new THREE.Mesh(new THREE.CylinderGeometry(.02,.03,.2,6),mat(0x4a8a2a));
    stem.position.set(px,.3,pz);scene.add(stem);
    const leafMesh=new THREE.Mesh(new THREE.SphereGeometry(.1,8,6),mat(crop.leafColor));
    leafMesh.scale.set(1.2,.35,.5);leafMesh.position.set(px,.42,pz);scene.add(leafMesh);
    const plant={stem,leafMesh,fruit:null,x:px,z:pz};
    plot.plants.push(plant);
  }
- // Mark plot as planted
- plot.bed.material=mat(0x6b4f38);
+ plot.bed.material=mat(0x4a3020);
 }
 function waterPlot(plot){
  if(!plot.planted)return;
@@ -185,15 +256,13 @@ function waterPlot(plot){
 function growPlants(plot,dt){
  if(!plot.planted||plot.harvestable)return;
  const growthRate=plot.watered?0.15:0.05;
- plot.growth=Math.min(1,plot.growth+growthRate*dt/60); // Slow growth for realism
+ plot.growth=Math.min(1,plot.growth+growthRate*dt/60);
  const crop=CROP_TYPES[plot.crop];
- const scale=0.2+plot.growth*1.3;
  for(const p of plot.plants){
    p.stem.scale.y=0.5+plot.growth*1.5;
    p.stem.position.y=0.3+plot.growth*0.3;
    p.leafMesh.scale.set(1.2+plot.growth*0.8,0.35+plot.growth*0.5,0.5+plot.growth*0.7);
    p.leafMesh.position.y=0.42+plot.growth*0.4;
-   // add fruit when growth is high
    if(plot.growth>0.6&&!p.fruit){
      const fruit=new THREE.Mesh(new THREE.SphereGeometry(.07,10,8),mat(crop.fruitColor));
      fruit.position.set(p.x,.5+plot.growth*0.3,p.z+.08);
@@ -206,77 +275,94 @@ function growPlants(plot,dt){
 function harvestPlot(plot){
  if(!plot.harvestable)return false;
  plot.harvestable=false;plot.planted=false;plot.growth=0;plot.watered=false;
- // Remove plant meshes
  for(const p of plot.plants){
    scene.remove(p.stem);scene.remove(p.leafMesh);if(p.fruit)scene.remove(p.fruit);
  }
  plot.plants=[];
- // Reset bed
- plot.bed.material=mat(0x705039);
+ plot.bed.material=mat(0x5a3e28);
  return true;
 }
-// ————— END FARM SYSTEM —————
-// ————— TREE FRUITS —————
-function addFruitToTree(treeGroup,count=5){
+
+// ————— पेड़ और फल (Trees & Fruits) —————
+const treeGroups=[];
+function addFruitToTree(treeGroup,count=5,color=0xd4a235){
  const fruits=[];
  for(let i=0;i<count;i++){
    const angle=Math.random()*Math.PI*2;const r=0.8+Math.random()*0.8;
-   const f=new THREE.Mesh(new THREE.SphereGeometry(.08,10,8),mat(0xd4a235));
+   const f=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),mat(color));
    f.position.set(Math.cos(angle)*r,2.7+Math.random()*1.2,Math.sin(angle)*r);
    treeGroup.add(f);fruits.push(f);
  }
  return fruits;
 }
-// Create trees with fruits
-const treeGroups=[];
-function tree(x,z,s=1){
+function tree(x,z,s=1, fruitColor=null){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);treeGroups.push(g);
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.32*s,2.4*s,8),wood);trunk.position.y=1.2*s;trunk.castShadow=true;g.add(trunk);
- for(let i=0;i<3;i++){const crown=new THREE.Mesh(new THREE.SphereGeometry((1.35-i*.12)*s,10,8),i===1?leaf2:leaf);crown.position.set((i-1)*.35*s,2.7*s+i*.48*s,0);crown.castShadow=true;g.add(crown)}
- // Add fruits
- const fruits=addFruitToTree(g,4+Math.floor(Math.random()*4));
- g.userData={fruits};
+ // तना (Trunk)
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.35*s,2.8*s,10),mat(0x4a3626));
+ trunk.position.y=1.4*s;trunk.castShadow=true;g.add(trunk);
+ // पत्ते (Leaves)
+ for(let i=0;i<4;i++){
+  const crown=new THREE.Mesh(new THREE.SphereGeometry((1.5-i*.1)*s,12,10),i%2?leaf2:leaf);
+  crown.position.set((i-1.5)*.4*s,3.0*s+i*.4*s,(i%2?-0.2:0.2)*s);
+  crown.castShadow=true;g.add(crown);
+ }
+ // फल (Fruits)
+ if(fruitColor) {
+  const fruits=addFruitToTree(g,6+Math.floor(Math.random()*5), fruitColor);
+  g.userData={fruits};
+ }
 }
-for(const p of [[-20,-4,1.1],[19,-18,1.2],[-28,14,1.25],[30,7,1.1],[13,27,1.35],[-4,25,1],[-34,-34,1.2],[35,-31,1.4],[3,-39,1.1],[-17,34,1.1]])tree(...p);
-// ————— END TREE FRUITS —————
+// फलों वाले पेड़ (आम और अमरूद)
+tree(-18,-5,1.2, 0xd4a235);
+tree(22,-15,1.3, 0xd4a235);
+tree(-28,15,1.1, 0x8dbb3a); // हरे फल (अमरूद)
+tree(30,8,1.2, 0xd4a235);
+tree(13,30,1.4, 0x8dbb3a);
+tree(-4,28,1.1, 0xd4a235);
+tree(-34,-30,1.2, 0x8dbb3a);
+tree(35,-28,1.5, 0xd4a235);
 
-// ————— HOUSE WITH FAMILY —————
+// ————— घरों का निर्माण (Houses) —————
 const houseList=[];
 function house(x,z,paint=wall,roofColor=roof,scale=1,familyName='परिवार'){
  const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
  const addPart=(geo,material,pos)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.castShadow=true;m.receiveShadow=true;g.add(m);return m};
- const floor=addPart(new THREE.BoxGeometry(4.92,.16,4.28),mat(0x9a8265),[0,.08,0]);
- // rear and side walls
+ const floor=addPart(new THREE.BoxGeometry(4.92,.16,4.28),mat(0x8a7255),[0,.08,0]);
  addPart(new THREE.BoxGeometry(5,3.1,.18),paint,[0,1.55,-2.2]);
  addPart(new THREE.BoxGeometry(.18,3.1,4.4),paint,[-2.5,1.55,0]);
  addPart(new THREE.BoxGeometry(.18,3.1,4.4),paint,[2.5,1.55,0]);
- // front wall split around a walk-through doorway
  addPart(new THREE.BoxGeometry(1.96,3.1,.18),paint,[-1.52,1.55,2.2]);
  addPart(new THREE.BoxGeometry(1.96,3.1,.18),paint,[1.52,1.55,2.2]);
  addPart(new THREE.BoxGeometry(1.08,1.05,.18),paint,[0,2.575,2.2]);
- // roof and visible rafters
+ 
+ // छत (Roof)
  const r=addPart(new THREE.ConeGeometry(3.65,2.2,4),mat(roofColor),[0,4.05,0]);r.rotation.y=Math.PI/4;
+ 
+ // दरवाजा (Door)
  const doorPivot=new THREE.Group();doorPivot.position.set(-.49,0,2.12);g.add(doorPivot);
  const door=addPart(new THREE.BoxGeometry(.94,1.98,.12),wood,[.47,1.0,0]);doorPivot.add(door);door.position.set(.47,1,0);
  const knob=addPart(new THREE.SphereGeometry(.045,12,10),mat(0xb99a53),[.82,1.02,.08]);doorPivot.add(knob);knob.position.set(.82,1.02,.08);
- const winmat=mat(0x426b72);for(const sx of [-1.55,1.55]){const win=addPart(new THREE.BoxGeometry(.72,.78,.06),winmat,[sx,1.95,2.31]);const frame=addPart(new THREE.BoxGeometry(.82,.07,.08),wood,[sx,1.95,2.35]);}
+ 
+ // खिड़कियां (Windows)
+ const winmat=mat(0x2a4b52);for(const sx of [-1.55,1.55]){const win=addPart(new THREE.BoxGeometry(.72,.78,.06),winmat,[sx,1.95,2.31]);const frame=addPart(new THREE.BoxGeometry(.82,.07,.08),wood,[sx,1.95,2.35]);}
  addPart(new THREE.BoxGeometry(1.5,.22,.7),mat(0xb2a28a),[0,.12,2.58]);
- // Lived-in room furniture: charpai, small table, storage trunk and lamp
+ 
+ // चारपाई (Charpai)
  const cotX=-1.25,cotZ=-.45;
  addPart(new THREE.BoxGeometry(1.45,.16,2.35),wood,[cotX,.55,cotZ]);
  for(const sx of [-.58,.58])for(const sz of [-.98,.98])addPart(new THREE.CylinderGeometry(.055,.065,.62,8),wood,[cotX+sx,.29,cotZ+sz]);
  addPart(new THREE.BoxGeometry(1.36,.09,2.18),mat(0xc6b28e),[cotX,.66,cotZ]);
+ 
+ // संदूक (Trunk)
  addPart(new THREE.BoxGeometry(.85,.58,.62),wood,[1.25,.38,-1.15]);
  addPart(new THREE.BoxGeometry(.72,.06,.5),mat(0x9a7654),[1.25,.7,-1.15]);
- addPart(new THREE.CylinderGeometry(.08,.12,.42,10),mat(0x9a744b),[1.65,1.0,-1.2]);
- // Traditional rural kitchen corner: mud chulha, cooking pot and wall shelf
+ 
+ // रसोई (Chulha)
  addPart(new THREE.CylinderGeometry(.38,.43,.42,12),mat(0x8d6044),[1.35,.3,.72]);
  addPart(new THREE.CylinderGeometry(.19,.23,.22,12),mat(0x35312b),[1.35,.56,.72]);
  addPart(new THREE.CylinderGeometry(.18,.22,.28,14),mat(0x777a78),[1.35,.78,.72]);
- addPart(new THREE.BoxGeometry(1.05,.09,.28),wood,[-1.35,2.05,-1.95]);
- addPart(new THREE.BoxGeometry(.28,.28,.24),mat(0xb08b62),[-1.65,2.22,-1.82]);
- addPart(new THREE.BoxGeometry(.24,.2,.22),mat(0x8d9a9d),[-1.22,2.18,-1.82]);
- // Family members inside
+ 
+ // परिवार के सदस्य (Family Members)
  const familyMembers=[];
  const famColors=[0x9b553b,0x3d7180,0x6a7850,0x8a4d48,0x456f70,0x9a704b];
  for(let i=0;i<2+Math.floor(Math.random()*2);i++){
@@ -290,20 +376,42 @@ function house(x,z,paint=wall,roofColor=roof,scale=1,familyName='परिवा
  houseList.push(interior);g.userData.house=interior;
  return g;
 }
-house(-11,-8,wall,0x954d39,1.1,'रामू का परिवार');
-house(11,-11,white,0x9b563b,1,'सुरेश का परिवार');
-house(-13,8,mat(0xd8c5a0),0x7d4636,.95,'मोहन का परिवार');
-house(7,17,mat(0xd5b98b),0x8d4a36,1.05,'शर्मा जी का परिवार');
-house(-24,-25,mat(0xc8b18a),0x99573c,1.15,'बाबा हरनाम का परिवार');
-house(27,-8,white,0x8b5140,1.15,'बलदेव का परिवार');
-// shop
-const shop=house(0,-22,mat(0xe4d0a2),0x477b77,1.15,'गीता का परिवार');
-const sign=box(3.4,.65,.16,mat(0x315c51),0,2.7,-19.38); 
-// ————— END HOUSE WITH FAMILY —————
 
-// distant low hills
-for(let i=0;i<16;i++){const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*8,10+Math.random()*12,7),mat(i%2?0x688a67:0x78946e));h.position.set(-75+i*10,-1,-78-Math.random()*15);scene.add(h)}
-// Village people
+// गाँव के घर
+house(-15,-10,wall,0x7d3c2c,1.1,'रामू का परिवार');
+house(12,-12,white,0x8c4a32,1,'सुरेश का परिवार');
+house(-14,6,mat(0xc8b490),0x6d3626,.95,'मोहन का परिवार');
+house(8,16,mat(0xd5b98b),0x7d3a26,1.05,'शर्मा जी का परिवार');
+house(-28,-25,mat(0xb8a17a),0x893c2c,1.15,'बाबा हरनाम का परिवार');
+house(28,-8,white,0x7b4120,1.15,'बलदेव का परिवार');
+// दुकान (Shop)
+const shop=house(0,-25,mat(0xe4d0a2),0x376b67,1.15,'गीता का परिवार');
+const sign=box(3.4,.65,.16,mat(0x214c41),0,2.7,-22.38); 
+
+// ————— आँगन के बर्तन (Clay Pots) —————
+function clayPot(x,z,scale=1){
+ const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
+ const potMat=mat(0x9e5a3a,0.9);
+ const base=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.2,0.5,12),potMat);
+ base.position.y=0.25;base.castShadow=true;g.add(base);
+ const neck=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.25,0.2,12),potMat);
+ neck.position.y=0.6;neck.castShadow=true;g.add(neck);
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(0.15,0.03,8,16),mat(0x7a4028));
+ rim.rotation.x=Math.PI/2;rim.position.y=0.7;g.add(rim);
+}
+clayPot(-12, 8.5, 1.2);
+clayPot(-10, 9, 0.9);
+clayPot(9, 18, 1);
+clayPot(15, 20, 1.1);
+
+// दूर की पहाड़ियाँ (Distant Hills)
+for(let i=0;i<20;i++){
+ const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*10,12+Math.random()*15,7),mat(i%2?0x5a7a4a:0x6a8a5a));
+ h.position.set(-90+i*10,-2,-90-Math.random()*20);
+ scene.add(h);
+}
+
+// ————— गाँव के लोग (Villagers) —————
 const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
 function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
@@ -315,7 +423,7 @@ function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const hairMat=new THREE.MeshStandardMaterial({color:profile.hair||0x211c19,roughness:.9});
  const shoeMat=mat(0x302820);
  const add=(geo,material,pos,rot=null)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);if(rot)m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;g.add(m);return m};
- // Natural leg length, hips and layered village clothing
+ 
  const hip=add(new THREE.CapsuleGeometry(.22,.22,5,12),lower,[0,.88*scale,0]);hip.scale.set(1,.78,1);
  for(const side of [-1,1]){
   const legPivot=new THREE.Group();legPivot.position.set(side*.145,.83*scale,0);g.add(legPivot);
@@ -324,15 +432,14 @@ function person(x,z,topColor=0x9b553b,variant=0,profile={}){
   const foot=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.15,4,8),shoeMat);foot.rotation.x=Math.PI/2;foot.position.set(0,-.72*scale,.085);foot.castShadow=true;legPivot.add(foot);
   g.userData=g.userData||{};(g.userData.legs||(g.userData.legs=[])).push(legPivot);
  }
- // Torso with shoulder slope and waist, not a single toy-like capsule
+ 
  const torso=add(new THREE.CapsuleGeometry(.285,.58,7,16),cloth,[0,1.34*scale,0]);torso.scale.set(1.05,.92,.76);
  const waist=add(new THREE.CylinderGeometry(.235,.255,.22,16),lower,[0,.99*scale,0]);
  const neck=add(new THREE.CylinderGeometry(.075,.095,.19,14),skinMat,[0,1.78*scale,0]);
- // Collar and subtle shirt placket/buttons
  const collar=add(new THREE.TorusGeometry(.105,.025,6,18),cloth,[0,1.72*scale,.015]);collar.rotation.x=Math.PI/2;
  const placket=add(new THREE.BoxGeometry(.035,.43,.018),mat(0xddd0b8),[0,1.42*scale,.222]);
  for(let i=0;i<3;i++)add(new THREE.SphereGeometry(.014,8,6),mat(0x302b25),[0,1.55*scale-i*.12,.24]);
- // Anatomical head with jaw, cheeks and face plane
+ 
  const head=add(new THREE.SphereGeometry(.235,32,24),skinMat,[0,2.015*scale,.015]);head.scale.set(.88,1.16,.84);
  for(const side of [-1,1]){
   add(new THREE.SphereGeometry(.052,14,10),skinMat,[side*.207,1.99*scale,.01]);
@@ -342,22 +449,24 @@ function person(x,z,topColor=0x9b553b,variant=0,profile={}){
   add(new THREE.SphereGeometry(.009,10,8),mat(0xffffff),[side*.081,2.055*scale,.247]);
   const brow=add(new THREE.CapsuleGeometry(.012,.075,3,8),hairMat,[side*.088,2.115*scale,.205]);brow.rotation.z=side*.08;
  }
- // Nose bridge and nostrils
+ 
  const bridge=add(new THREE.CapsuleGeometry(.025,.085,4,10),skinMat,[0,1.995*scale,.225]);bridge.rotation.x=-.12;
  add(new THREE.SphereGeometry(.038,12,10),skinMat,[0,1.95*scale,.245]).scale.set(.85,.72,.8);
- // Lips, subtle chin and cheeks
+ 
  const mouth=add(new THREE.BoxGeometry(.082,.018,.018),mat(0x75483d),[0,1.865*scale,.218]);
  add(new THREE.SphereGeometry(.045,12,8),skinMat,[0,1.82*scale,.16]).scale.set(1,.55,.55);
  for(const side of [-1,1])add(new THREE.SphereGeometry(.07,12,10),skinMat,[side*.13,1.94*scale,.17]).scale.set(1,.75,.5);
- // Hairline, crown and back hair
+ 
  const cap=add(new THREE.SphereGeometry(.242,24,16,0,Math.PI*2,0,Math.PI*.53),hairMat,[0,2.105*scale,-.015]);cap.scale.set(1,.78,1);
  add(new THREE.SphereGeometry(.19,16,12),hairMat,[0,1.96*scale,-.14]).scale.set(1,1,.62);
+ 
  if(older){const beard=add(new THREE.SphereGeometry(.115,16,12),mat(0xaaa49a),[0,1.82*scale,.19]);beard.scale.set(1,1.15,.72);}
  if(profile.turban){const turbanMat=mat(profile.turban);const turban=add(new THREE.SphereGeometry(.285,24,16),turbanMat,[0,2.235*scale,-.005]);turban.scale.set(1,.48,1);const fold=add(new THREE.TorusGeometry(.235,.027,8,28),mat(0xd7bd8a),[0,2.19*scale,.005]);fold.rotation.x=Math.PI/2;}
  if(female){add(new THREE.SphereGeometry(.095,14,10),hairMat,[0,2.0*scale,-.19]);const dupatta=add(new THREE.CapsuleGeometry(.075,.55,5,10),mat(profile.dupatta||0xc58a61),[.24,1.42*scale,.04]);dupatta.rotation.z=-.24;}
  if(profile.apron){const apron=add(new THREE.BoxGeometry(.39,.55,.035),mat(profile.apron),[0,1.23*scale,.235]);}
  if(profile.book){const book=add(new THREE.BoxGeometry(.25,.32,.055),mat(0x315b83),[.38,1.25,.12]);book.rotation.z=-.2;add(new THREE.BoxGeometry(.22,.29,.012),mat(0xf0e6c9),[.38,1.25,.155]);}
  if(profile.tool){const handle=add(new THREE.CylinderGeometry(.027,.035,.9,12),wood,[.52,.8,.04]);handle.rotation.z=-.12;add(new THREE.BoxGeometry(.25,.14,.08),mat(0x777b78),[.55,1.28,.04]);}
+ 
  const arms=[];for(const side of [-1,1]){
   const pivot=new THREE.Group();pivot.position.set(side*.31,1.59*scale,0);g.add(pivot);
   const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.34,6,12),cloth);sleeve.position.set(side*.015,-.22,0);sleeve.rotation.z=side*.06;sleeve.castShadow=true;pivot.add(sleeve);
@@ -368,46 +477,47 @@ function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  }
  g.userData={...g.userData,arms,legs:g.userData.legs,mouth,phase:Math.random()*6,variant,profile};return g;
 }
+
 const villagers=[
- person(-3,-18,0x3d7180,0,{name:'रामू',role:'किसान',job:'खेत में गेहूँ और सब्जियाँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
- person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं निर्माण और खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
- person(-17,16,0x6a7850,2,{name:'मोहन',role:'कारीगर',job:'मैं लकड़ी का काम और औजारों की मरम्मत करता हूँ।',skin:0x81553e}),
- person(8,-27,0x425f83,0,{name:'शर्मा जी',role:'शिक्षक',job:'मैं गाँव के बच्चों को पढ़ाता हूँ।',older:true,skin:0xb77d5a,book:true}),
- person(-8,-29,0x9a704b,1,{name:'गीता',role:'दुकानदार',job:'मेरी छोटी दुकान पर रोजमर्रा का सामान मिलता है।',female:true,skin:0x9b6748,dupatta:0xc58a61,apron:0x72513c}),
- person(17,12,0x8a4d48,2,{name:'कमला',role:'किसान',job:'मैं खेत और घर दोनों संभालती हूँ।',female:true,older:true,skin:0x9b6748,dupatta:0x9a5b55}),
- person(-22,-12,0x456f70,0,{name:'अमन',role:'विद्यार्थी',job:'मैं स्कूल में पढ़ता हूँ और बड़ा होकर डॉक्टर बनना चाहता हूँ।',child:true,skin:0xb77d5a,book:true}),
- person(24,-19,0x8c6247,1,{name:'बाबा हरनाम',role:'बुजुर्ग',job:'मैंने इस गाँव को कई पीढ़ियों से बदलते देखा है।',older:true,skin:0x81553e,turban:0xd0c6b1}),
- person(21,22,0x7b5269,0,{name:'प्रीति',role:'स्वास्थ्यकर्मी',job:'मैं गाँव के लोगों की सेहत का ध्यान रखती हूँ।',female:true,skin:0xb77d5a,dupatta:0xe0b77e}),
+ person(-4,-20,0x3d7180,0,{name:'रामू',role:'किसान',job:'धान और गेहूँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
+ person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
+ person(-17,16,0x6a7850,2,{name:'मोहन',role:'कारीगर',job:'मैं लकड़ी का काम करता हूँ।',skin:0x81553e}),
+ person(8,-30,0x425f83,0,{name:'शर्मा जी',role:'शिक्षक',job:'मैं बच्चों को पढ़ाता हूँ।',older:true,skin:0xb77d5a,book:true}),
+ person(-8,-32,0x9a704b,1,{name:'गीता',role:'दुकानदार',job:'मेरी दुकान पर सामान मिलता है।',female:true,skin:0x9b6748,dupatta:0xc58a61,apron:0x72513c}),
+ person(17,12,0x8a4d48,2,{name:'कमला',role:'किसान',job:'मैं खेत और घर संभालती हूँ।',female:true,older:true,skin:0x9b6748,dupatta:0x9a5b55}),
+ person(-22,-12,0x456f70,0,{name:'अमन',role:'विद्यार्थी',job:'मैं स्कूल जाता हूँ।',child:true,skin:0xb77d5a,book:true}),
+ person(24,-19,0x8c6247,1,{name:'बाबा हरनाम',role:'बुजुर्ग',job:'मैंने गाँव को बदलते देखा है।',older:true,skin:0x81553e,turban:0xd0c6b1}),
+ person(21,22,0x7b5269,0,{name:'प्रीति',role:'स्वास्थ्यकर्मी',job:'मैं लोगों की सेहत का ध्यान रखती हूँ।',female:true,skin:0xb77d5a,dupatta:0xe0b77e}),
  person(-27,24,0x6c7650,2,{name:'बलदेव',role:'पशुपालक',job:'मैं गाय-भैंसों की देखभाल करता हूँ।',skin:0x9b6748,turban:0x597d68})
 ];
-// गीता को उसकी दुकान के अंदर रखा गया है
 const geetaNPC=villagers.find(v=>v.userData.profile.name==='गीता');
-if(geetaNPC)geetaNPC.position.set(0,-22.75,0);
-// Shared village memory
+if(geetaNPC)geetaNPC.position.set(0,-25.75,0);
+
 const villageFacts = {
-  place: 'जम्बूद्वीप का यह गाँव पंजाब की धरती पर बसा है। यहाँ खेत, छोटी दुकान, स्कूल, कुआँ और घर हैं।',
-  school: 'गाँव के स्कूल में शर्मा जी पढ़ाते हैं। अमन उनका विद्यार्थी है और पढ़ाई में अच्छा है।',
-  market: 'गाँव की छोटी दुकान गीता चलाती हैं। वहाँ अनाज, तेल, दाल, साबुन और रोजमर्रा का सामान मिलता है।',
-  work: 'सुरेश खेतों और मकान बनाने के काम में मजदूरी करता है। मोहन लकड़ी और औजारों की मरम्मत करता है।',
-  health: 'प्रीति गाँव की स्वास्थ्यकर्मी हैं। बुखार या चोट लगने पर लोग पहले उनसे सलाह लेते हैं।',
-  animals: 'बलदेव गाय-भैंस पालता है। सुबह वह पशुओं को चारा-पानी देता है और दूध लेकर बाजार जाता है।',
+  place: 'जम्बूद्वीप का यह गाँव पंजाब की धरती पर बसा है। यहाँ खेत, दुकान, स्कूल और घर हैं।',
+  school: 'गाँव के स्कूल में शर्मा जी पढ़ाते हैं।',
+  market: 'गाँव की दुकान गीता चलाती हैं।',
+  work: 'सुरेश मजदूरी करता है। मोहन लकड़ी का काम करता है।',
+  health: 'प्रीति गाँव की स्वास्थ्यकर्मी हैं।',
+  animals: 'बलदेव गाय-भैंस पालता है।',
   farming: 'गाँव में टमाटर, बैंगन, भिंडी, मिर्च और पालक उगाई जाती हैं। पेड़ों पर फल भी लगते हैं।'
 };
 const social = {
- 'रामू': {family:'मेरी पत्नी कमला हैं। हमारा बेटा अमन स्कूल में पढ़ता है।', friends:'सुरेश मेरे साथ खेत में काम कर चुका है। गीता की दुकान से घर का सामान लेते हैं। बाबा हरनाम गाँव के बुजुर्ग हैं, उनकी सलाह मानता हूँ।',knows:'मैं कमला, अमन, सुरेश, गीता, शर्मा जी, मोहन, प्रीति, बलदेव और बाबा हरनाम को जानता हूँ।'},
- 'सुरेश': {family:'मेरे माता-पिता पास के गाँव में रहते हैं। मेरी पत्नी और एक छोटी बेटी है; वे अभी रिश्तेदारी में गए हैं।',friends:'रामू के खेत में भी काम करता हूँ। मोहन कारीगर है, औजार खराब हों तो उसी के पास जाता हूँ।',knows:'मैं रामू, मोहन, गीता और बाबा हरनाम को अच्छी तरह जानता हूँ।'},
- 'मोहन': {family:'मेरी पत्नी और दो बच्चे हैं। बच्चे स्कूल जाते हैं।',friends:'सुरेश मेरा पुराना साथी है। रामू के हल और बलदेव की गाड़ी की मरम्मत भी मैं करता हूँ।',knows:'गाँव के अधिकतर लोगों को जानता हूँ, खासकर रामू, सुरेश और बलदेव को।'},
- 'शर्मा जी': {family:'मेरी पत्नी हैं और एक बेटी शहर में कॉलेज में पढ़ती है।',friends:'अमन मेरा विद्यार्थी है। रामू और कमला अपने बेटे की पढ़ाई का ध्यान रखते हैं।',knows:'मैं रामू और कमला के परिवार को जानता हूँ। गीता की दुकान से स्कूल का सामान भी लिया जाता है।'},
- 'गीता': {family:'मेरे पति पास के कस्बे में काम करते हैं। मेरी एक बेटी है जो स्कूल जाती है।',friends:'रामू और कमला नियमित ग्राहक हैं। सुरेश भी रोजमर्रा का सामान लेने आता है।',knows:'मैं गाँव के कई परिवारों को जानती हूँ। शर्मा जी स्कूल में पढ़ाते हैं और प्रीति स्वास्थ्यकर्मी हैं।'},
- 'कमला': {family:'मेरे पति रामू हैं और बेटा अमन है। अमन पढ़-लिखकर डॉक्टर बनना चाहता है।',friends:'गीता मेरी अच्छी सहेली हैं। प्रीति से घर की सेहत के बारे में सलाह लेती हूँ।',knows:'मैं गाँव की महिलाओं और परिवारों को अच्छी तरह जानती हूँ।'},
- 'अमन': {family:'मेरे पिताजी रामू किसान हैं और माताजी कमला खेत में मदद करती हैं।',friends:'शर्मा जी मेरे अध्यापक हैं। मैं स्कूल के बाद दोस्तों के साथ खेलता हूँ।',knows:'मैं अपने माता-पिता, शर्मा जी, गीता आंटी और बाबा हरनाम को जानता हूँ।'},
- 'बाबा हरनाम': {family:'मेरे दो बेटे हैं। एक लुधियाना में काम करता है और दूसरा पास के गाँव में रहता है। पोते-पोतियाँ छुट्टियों में मिलने आते हैं।',friends:'रामू के परिवार को बचपन से जानता हूँ। गाँव के पुराने किस्से मुझे याद हैं।',knows:'इस गाँव के पुराने और नए, लगभग सभी परिवारों को जानता हूँ।'},
- 'प्रीति': {family:'मेरे माता-पिता पास के कस्बे में रहते हैं। मैं गाँव के स्वास्थ्य केंद्र में काम करती हूँ।',friends:'कमला से अक्सर मिलती हूँ। अमन को भी साफ-सफाई और सेहत की बातें समझाती हूँ।',knows:'मैं गाँव के परिवारों का स्वास्थ्य रिकॉर्ड रखती हूँ और जरूरत पर मदद करती हूँ।'},
- 'बलदेव': {family:'मेरे माता-पिता और छोटा भाई मेरे साथ रहते हैं। हमारे पास कुछ गायें और भैंसें हैं।',friends:'रामू किसान है, उससे चारे और खेतों की बातें होती हैं। मोहन मेरी बैलगाड़ी ठीक करता है।',knows:'मैं रामू, मोहन, बाबा हरनाम और आसपास के पशुपालकों को जानता हूँ।'}
+ 'रामू': {family:'मेरी पत्नी कमला और बेटा अमन हैं।', friends:'सुरेश मेरे साथ काम करता है।',knows:'मैं सबको जानता हूँ।'},
+ 'सुरेश': {family:'मेरे माता-पिता पास के गाँव में हैं।',friends:'रामू और मोहन मेरे दोस्त हैं।',knows:'मैं रामू, मोहन और गीता को जानता हूँ।'},
+ 'मोहन': {family:'मेरी पत्नी और दो बच्चे हैं।',friends:'सुरेश मेरा साथी है।',knows:'गाँव के अधिकतर लोगों को जानता हूँ।'},
+ 'शर्मा जी': {family:'मेरी पत्नी और बेटी हैं।',friends:'अमन मेरा विद्यार्थी है।',knows:'मैं रामू के परिवार को जानता हूँ।'},
+ 'गीता': {family:'मेरे पति और बेटी हैं।',friends:'रामू और कमला ग्राहक हैं।',knows:'मैं गाँव के कई परिवारों को जानती हूँ।'},
+ 'कमला': {family:'मेरे पति रामू और बेटा अमन हैं।',friends:'गीता मेरी सहेली है।',knows:'मैं सबको जानती हूँ।'},
+ 'अमन': {family:'मेरे पिता रामू और माता कमला हैं।',friends:'शर्मा जी मेरे अध्यापक हैं।',knows:'मैं अपने परिवार और दोस्तों को जानता हूँ।'},
+ 'बाबा हरनाम': {family:'मेरे दो बेटे हैं।',friends:'रामू का परिवार मुझे बचपन से पता है।',knows:'मैं पुराने सभी परिवारों को जानता हूँ।'},
+ 'प्रीति': {family:'मेरे माता-पिता पास के कस्बे में हैं।',friends:'कमला से अक्सर मिलती हूँ।',knows:'मैं सबका स्वास्थ्य रिकॉर्ड रखती हूँ।'},
+ 'बलदेव': {family:'मेरे माता-पिता और भाई हैं।',friends:'रामू से खेती की बातें होती हैं।',knows:'मैं रामू और मोहन को जानता हूँ।'}
 };
 for (const v of villagers) { const n=v.userData.profile.name; v.userData.profile.social=social[n]||{}; }
 villagers.forEach((v,i)=>v.rotation.y=[-.4,2.4,.8,1.8,-1.2,.4,2.8,-.8,1.1,-2][i]);
-// small bench and hand pump
+
+// पत्थर की बेंच (Bench) और हैण्डपंप (Handpump)
 box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
 const pump= new THREE.Group();pump.position.set(13,0,1);scene.add(pump);
 const post=new THREE.Mesh(new THREE.CylinderGeometry(.12,.15,1.7,8),mat(0x58676a));post.position.y=.85;pump.add(post);
@@ -429,6 +539,7 @@ const clock=new THREE.Clock();
 let started=false,joy={x:0,y:0},run=false,jumpQueued=false,lookPointer=null,lastTap=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let seated=false,seatBaseY=1.68,insideHouse=null;
+
 function currentHouse(){
  let found=null,best=Infinity;
  for(const h of houseList){const dx=Math.abs(player.pos.x-h.x),dz=Math.abs(player.pos.z-h.z);const inside=dx<2.28*h.scale&&dz<2.02*h.scale&&player.pos.y<3.4;if(inside){const d=dx+dz;if(d<best){best=d;found=h}}}
@@ -438,26 +549,29 @@ function nearbySeat(){const h=currentHouse();if(!h)return null;let best=null,dis
 function nearbyFarmPlot(){let best=null,dist=3.5;for(const p of farmPlots){const d=Math.hypot(player.pos.x-p.x,player.pos.z-p.z);if(d<dist){dist=d;best=p}}return best;}
 function say(t){const el=document.getElementById('message');el.textContent=t;el.style.display='block';clearTimeout(say.timer);say.timer=setTimeout(()=>el.style.display='none',2600)}
 function nearestPerson(){let best=null,dist=3.1;for(const p of villagers){const d=Math.hypot(p.position.x-player.pos.x,p.position.z-player.pos.z);if(d<dist){dist=d;best=p}}return best}
+
 let activeNPC=null, speaking=false;
 const talkPanel=document.getElementById('talkPanel'),npcLine=document.getElementById('npcLine'),voiceNote=document.getElementById('voiceNote');
+
 function speakHindi(text,who='hi-IN'){
  const clean=String(text||'').replace(/\s+/g,' ').trim();
  if(!clean)return;
- if(!('speechSynthesis' in window)){voiceNote.textContent='इस ब्राउज़र में आवाज़ उपलब्ध नहीं है; बातचीत लिखकर जारी रखें।';return}
+ if(!('speechSynthesis' in window)){voiceNote.textContent='इस ब्राउज़र में आवाज़ उपलब्ध नहीं है।';return}
  speechSynthesis.cancel();
  const u=new SpeechSynthesisUtterance(clean);u.lang=who;u.rate=.88;u.pitch=.96;u.volume=1;
  const voices=speechSynthesis.getVoices();
  const hindi=voices.find(v=>/^hi(-|_)/i.test(v.lang)) || voices.find(v=>/Hindi|हिन्दी/i.test(v.name));
  if(hindi)u.voice=hindi;
  u.onstart=()=>{speaking=true;voiceNote.textContent='🔊 '+(activeNPC?.userData.profile.name||'गाँववाला')+' बोल रहा है…'};
- u.onend=()=>{speaking=false;voiceNote.textContent='बात पूरी हुई। आप अगला सवाल पूछ सकते हैं।';if(activeNPC)activeNPC.userData.mouth.scale.y=1};
- u.onerror=()=>{speaking=false;voiceNote.textContent='आवाज़ चलाने में दिक्कत हुई। नीचे लिखा जवाब पढ़ सकते हैं।'};
+ u.onend=()=>{speaking=false;voiceNote.textContent='बात पूरी हुई।';if(activeNPC)activeNPC.userData.mouth.scale.y=1};
+ u.onerror=()=>{speaking=false;voiceNote.textContent='आवाज़ चलाने में दिक्कत हुई।'};
  speechSynthesis.speak(u);
 }
 function updateInteract(){const p=nearestPerson();document.getElementById('interact').style.display=p?'block':'none'}
+
 let playerKnownName='';
 function openTalk(){
- const p=nearestPerson();if(!p){say('यहाँ अभी कोई पास नहीं है। गाँव में थोड़ा आगे चलिए।');return}
+ const p=nearestPerson();if(!p){say('यहाँ अभी कोई पास नहीं है।');return}
  activeNPC=p;talkPanel.style.display='block';
  p.rotation.y=Math.atan2(player.pos.x-p.position.x,player.pos.z-p.position.z);
  const prof=p.userData.profile;
@@ -469,42 +583,29 @@ function replyToPlayer(raw){
  const q=raw.trim();if(!q)return;
  document.getElementById('playerWords').value='';
  const prof=activeNPC?.userData.profile||{};const name=prof.name||'गाँववासी';const info=prof.social||{};
- let answer='जी, आपकी बात समझ रहा/रही हूँ। आप मेरे परिवार, काम या गाँव के किसी व्यक्ति के बारे में पूछ सकते हैं।';
- if(/मेरा नाम\s+(.+)/i.test(q)){playerKnownName=q.match(/मेरा नाम\s+(.+)/i)[1].replace(/[।.!?]+$/,'').trim();answer='आपसे मिलकर खुशी हुई '+playerKnownName+' जी। अब अगली बार मिलेंगे तो आपका नाम याद रखने की कोशिश करूँगा।';}
+ let answer='जी, आपकी बात समझ रहा/रही हूँ।';
+ if(/मेरा नाम\s+(.+)/i.test(q)){playerKnownName=q.match(/मेरा नाम\s+(.+)/i)[1].replace(/[।.!?]+$/,'').trim();answer='आपसे मिलकर खुशी हुई '+playerKnownName+' जी।';}
  else if(/तुम्हारा नाम|आपका नाम|कौन हो|कौन हैं|अपने बारे में/i.test(q))answer='मेरा नाम '+name+' है। मैं '+(prof.role||'गाँव का निवासी')+' हूँ। '+(prof.job||'')+' '+(info.family||'');
  else if(/परिवार|घर में कौन|बीवी|पत्नी|पति|बच्चे|बेटा|बेटी|माता|पिता|माँ|पापा/i.test(q))answer=info.family||'मेरा परिवार यहीं गाँव में रहता है।';
- else if(/किसे जानते|किस-किस|दूसरे लोग|गाँव वाले|और कौन|कौन-कौन|किसके बारे|किसका नाम/i.test(q))answer=info.knows||'मैं गाँव के कई लोगों को जानता/जानती हूँ।';
- else if(/रामू|किसान/i.test(q))answer=name==='रामू'?'मैं ही रामू हूँ। खेती करता हूँ और मेरा परिवार भी इसी गाँव में रहता है।':(name==='कमला'?'रामू मेरे पति हैं। वे गेहूँ और सब्जियों की खेती करते हैं।':'रामू हमारे गाँव के किसान हैं। उनकी पत्नी कमला हैं और बेटा अमन स्कूल में पढ़ता है।');
- else if(/सुरेश|मजदूर/i.test(q))answer=name==='सुरेश'?'मैं सुरेश हूँ। खेतों और निर्माण के काम में मजदूरी करता हूँ।': 'सुरेश मेहनती मजदूर है। खेत और मकान बनाने के काम में हाथ बँटाता है।';
- else if(/शर्मा|मास्टर|शिक्षक|स्कूल|पढ़ाई/i.test(q))answer=name==='शर्मा जी'?'मैं गाँव के स्कूल में बच्चों को पढ़ाता हूँ। अमन मेरा विद्यार्थी है।':'शर्मा जी हमारे गाँव के शिक्षक हैं। अमन उनके स्कूल में पढ़ता है।';
- else if(/गीता|दुकान|सामान/i.test(q))answer=name==='गीता'?'मेरी दुकान गाँव के मुख्य रास्ते पर है। यहाँ रोजमर्रा का सामान मिलता है।':'गीता की दुकान मुख्य रास्ते पर है। गाँव के अधिकतर लोग वहीं से सामान लेते हैं।';
- else if(/मोहन|कारीगर|मरम्मत|औजार/i.test(q))answer='मोहन गाँव का कारीगर है। वह लकड़ी का काम और खेती के औजारों की मरम्मत करता है।';
- else if(/कमला/i.test(q))answer=name==='कमला'?'मैं कमला हूँ। रामू मेरी पति हैं और अमन हमारा बेटा है।':'कमला रामू की पत्नी हैं। वे खेती और घर दोनों संभालती हैं।';
- else if(/अमन|बच्चा|विद्यार्थी/i.test(q))answer='अमन रामू और कमला का बेटा है। वह शर्मा जी के स्कूल में पढ़ता है और बड़ा होकर डॉक्टर बनना चाहता है।';
- else if(/बाबा|हरनाम|बुजुर्ग/i.test(q))answer='बाबा हरनाम गाँव के बुजुर्ग हैं। उन्हें गाँव के पुराने परिवारों और घटनाओं की बहुत जानकारी है।';
- else if(/प्रीति|दवा|बीमार|स्वास्थ्य|डॉक्टर/i.test(q))answer='प्रीति गाँव की स्वास्थ्यकर्मी हैं। तबीयत खराब हो तो उनसे सलाह ले सकते हैं।';
- else if(/बलदेव|पशु|गाय|भैंस|दूध/i.test(q))answer='बलदेव पशुपालक है। उसके घर में गाय-भैंस हैं और वह दूध गाँव में पहुँचाता है।';
- else if(/खेती|फसल|बीज|टमाटर|बैंगन|भिंडी|मिर्च|पालक|पौध|बगीचा/i.test(q))answer=villageFacts.farming+' आप भी खेती कर सकते हैं — प्लॉट के पास जाकर "खेती करें" बटन दबाएँ।';
- else if(/गाँव|जगह|कहाँ|रास्ता|कुआँ/i.test(q))answer=villageFacts.place+' '+villageFacts.school+' '+villageFacts.market;
- else if(/काम|रोजगार|पेशा|क्या करते|मजदूरी/i.test(q))answer=(prof.job||'मैं गाँव के कामों में हाथ बँटाता/बँटाती हूँ')+' '+(info.friends||'');
- else if(/दोस्त|मित्र|रिश्ता|जान-पहचान/i.test(q))answer=info.friends||info.knows||'गाँव में हम सब एक-दूसरे की मदद करते हैं।';
+ else if(/खेती|फसल|बीज|टमाटर|बैंगन|भिंडी|मिर्च|पालक|पौध|बगीचा/i.test(q))answer=villageFacts.farming+' आप भी खेती कर सकते हैं।';
+ else if(/गाँव|जगह|कहाँ|रास्ता|कुआँ/i.test(q))answer=villageFacts.place+' '+villageFacts.school;
  else if(/नमस्ते|नमस्कार|हैलो|राम-राम/i.test(q))answer='राम-राम जी! आपका हमारे गाँव में स्वागत है।';
- else if(/धन्यवाद|शुक्रिया/i.test(q))answer='अरे, इसमें धन्यवाद कैसा! गाँव में एक-दूसरे के काम आना ही तो अच्छा लगता है।';
- else if(/क्या चल रहा|अभी क्या|कहाँ जा रहे/i.test(q))answer=prof.role==='किसान'?'सुबह का समय है, खेत का काम देखने जा रहा हूँ।':prof.role==='मजदूर'?'आज गाँव में एक मकान की मरम्मत का काम है, वहीं जा रहा हूँ।':prof.role==='शिक्षक'?'स्कूल खुलने वाला है, बच्चों को पढ़ाने की तैयारी कर रहा हूँ।':'अपने रोज के काम निपटा रहा/रही हूँ।';
- else answer='इस बारे में मुझे पूरी जानकारी नहीं है। लेकिन मैं आपको अपने परिवार, अपने काम, रामू, कमला, अमन, शर्मा जी और गाँव के दूसरे लोगों के बारे में बता सकता/सकती हूँ।';
+ else if(/धन्यवाद|शुक्रिया/i.test(q))answer='अरे, इसमें धन्यवाद कैसा!';
+ else answer='इस बारे में मुझे पूरी जानकारी नहीं है।';
  const prefix=playerKnownName?playerKnownName+' जी, ':'जी, ';
  npcLine.textContent='आपने पूछा: '+q+'\n\n'+name+': '+prefix+answer;
  speakHindi(prefix+answer);
 }
+
 document.getElementById('interact').onclick=openTalk;
 document.getElementById('closeTalk').onclick=()=>{talkPanel.style.display='none';speechSynthesis?.cancel();speaking=false;if(activeNPC)activeNPC.userData.mouth.scale.y=1};
 document.getElementById('sendWords').onclick=()=>replyToPlayer(document.getElementById('playerWords').value);
 document.getElementById('playerWords').addEventListener('keydown',e=>{if(e.key==='Enter')replyToPlayer(e.target.value)});
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;let recognition=null;
-if(SpeechRecognition){recognition=new SpeechRecognition();recognition.lang='hi-IN';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onresult=e=>replyToPlayer(e.results[0][0].transcript);recognition.onerror=e=>{voiceNote.textContent='आवाज़ पहचानने में समस्या: '+e.error+'. आप लिखकर भी बात कर सकते हैं।'};recognition.onend=()=>document.getElementById('micBtn').classList.remove('active')}
-document.getElementById('micBtn').onclick=()=>{if(!recognition){voiceNote.textContent='इस ब्राउज़र में बोलकर सवाल पूछने की सुविधा नहीं मिली। Chrome में माइक्रोफोन अनुमति जाँचें।';return}try{voiceNote.textContent='सुन रहा हूँ… अब हिंदी में बोलिए।';document.getElementById('micBtn').classList.add('active');recognition.start()}catch(e){voiceNote.textContent='माइक्रोफोन पहले से चालू है या अनुमति नहीं मिली।'}};
+if(SpeechRecognition){recognition=new SpeechRecognition();recognition.lang='hi-IN';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onresult=e=>replyToPlayer(e.results[0][0].transcript);recognition.onerror=e=>{voiceNote.textContent='आवाज़ पहचानने में समस्या: '+e.error;};recognition.onend=()=>document.getElementById('micBtn').classList.remove('active')}
+document.getElementById('micBtn').onclick=()=>{if(!recognition){voiceNote.textContent='इस ब्राउज़र में बोलकर सवाल पूछने की सुविधा नहीं मिली।';return}try{voiceNote.textContent='सुन रहा हूँ…';document.getElementById('micBtn').classList.add('active');recognition.start()}catch(e){voiceNote.textContent='माइक्रोफोन पहले से चालू है।'}};
 document.getElementById('wave').onclick=()=>{const p=nearestPerson();if(p){p.rotation.y=Math.atan2(player.pos.x-p.position.x,player.pos.z-p.position.z);p.userData.arms[1].rotation.z=-2.1;say('गाँववाले ने हाथ हिलाकर नमस्ते किया।');setTimeout(()=>p.userData.arms[1].rotation.z=0,900)}else say('आपने हाथ उठाकर नमस्ते किया।')};
-document.getElementById('sitBtn').onclick=()=>{if(seated){seated=false;player.pos.y=1.68;camera.position.y=player.pos.y;say('आप खड़े हो गए।')}else{const seat=nearbySeat();if(!seat){say('बैठने के लिए चारपाई या कुर्सी के पास जाएँ।');return}seated=true;player.pos.y=1.05;camera.position.y=player.pos.y;player.yaw=0;say('आप आराम से बैठ गए।')} };
+document.getElementById('sitBtn').onclick=()=>{if(seated){seated=false;player.pos.y=1.68;camera.position.y=player.pos.y;say('आप खड़े हो गए।')}else{const seat=nearbySeat();if(!seat){say('बैठने के लिए चारपाई के पास जाएँ।');return}seated=true;player.pos.y=1.05;camera.position.y=player.pos.y;player.yaw=0;say('आप आराम से बैठ गए।')} };
 document.getElementById('farmBtn').onclick=()=>{
  const plot=nearbyFarmPlot();if(!plot){say('खेती के लिए प्लॉट के पास जाएँ।');return}
  if(plot.harvestable){harvestPlot(plot);say('फसल काट ली गई! अब नई फसल बो सकते हैं।');return}
@@ -522,14 +623,15 @@ stickArea.addEventListener('pointerdown',e=>{e.preventDefault();stickId=e.pointe
 stickArea.addEventListener('pointermove',e=>{if(e.pointerId===stickId)setStick(e)});
 function resetStick(){stickId=null;joy.x=joy.y=0;stick.style.transform='translate(0,0)'}
 stickArea.addEventListener('pointerup',resetStick);stickArea.addEventListener('pointercancel',resetStick);
-// Drag on the world to look around
+
 let lookId=null,lastX=0,lastY=0;
 renderer.domElement.addEventListener('pointerdown',e=>{if(!started)return;lookId=e.pointerId;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(lookId)});
 renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;player.yaw-=dx*.004;player.pitch=clamp(player.pitch-dy*.003,-1.15,1.15)});
 function endLook(e){if(e.pointerId===lookId)lookId=null}
 renderer.domElement.addEventListener('pointerup',endLook);renderer.domElement.addEventListener('pointercancel',endLook);
 if('speechSynthesis' in window) speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
-document.getElementById('startBtn').onclick=()=>{started=true;document.getElementById('start').style.display='none';document.getElementById('hint').style.opacity='1';setTimeout(()=>document.getElementById('hint').style.opacity='0',5000);say('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है। खेतों में जाकर खेती भी कर सकते हैं।');speakHindi('स्वागत है! यह जम्बूद्वीप में आपकी पहली सुबह है। खेतों में जाकर खेती भी कर सकते हैं।')};
+document.getElementById('startBtn').onclick=()=>{started=true;document.getElementById('start').style.display='none';document.getElementById('hint').style.opacity='1';setTimeout(()=>document.getElementById('hint').style.opacity='0',5000);say('स्वागत है! खेतों में जाकर खेती भी कर सकते हैं।');speakHindi('स्वागत है! खेतों में जाकर खेती भी कर सकते हैं।')};
+
 function animate(){
  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(started){
@@ -543,18 +645,34 @@ function animate(){
    if(jumpQueued&&seated){seated=false;player.pos.y=1.68;player.vy=0;}else if(jumpQueued&&player.onGround){player.vy=5.2;player.onGround=false}jumpQueued=false;
    player.vy-=13*dt;player.pos.y+=player.vy*dt;if(player.pos.y<1.68){player.pos.y=1.68;player.vy=0;player.onGround=true}
    camera.position.copy(player.pos);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
+   
    const moving=move.lengthSq()>0;bodyRig.position.y=moving?Math.sin(performance.now()*.012)*.018:0;
    const t=performance.now()*.001;
-   for(const npc of villagers){const movingNow=move.lengthSq()>0&&Math.hypot(npc.position.x-player.pos.x,npc.position.z-player.pos.z)<12;const ph=t*5+npc.userData.phase;const swing=movingNow?Math.sin(ph)*.48:Math.sin(t*1.1+npc.userData.phase)*.025;npc.userData.legs[0].rotation.x=swing;npc.userData.legs[1].rotation.x=-swing;npc.userData.arms[0].rotation.x=-swing*.65;npc.userData.arms[1].rotation.x=swing*.65;if(!speaking||npc!==activeNPC)npc.userData.mouth.scale.y=1; else npc.userData.mouth.scale.y=1+Math.abs(Math.sin(t*13))*.8;}
+   
+   // Villager animation
+   for(const npc of villagers){
+    const movingNow=move.lengthSq()>0&&Math.hypot(npc.position.x-player.pos.x,npc.position.z-player.pos.z)<12;
+    const ph=t*5+npc.userData.phase;const swing=movingNow?Math.sin(ph)*.48:Math.sin(t*1.1+npc.userData.phase)*.025;
+    npc.userData.legs[0].rotation.x=swing;npc.userData.legs[1].rotation.x=-swing;
+    npc.userData.arms[0].rotation.x=-swing*.65;npc.userData.arms[1].rotation.x=swing*.65;
+    if(!speaking||npc!==activeNPC)npc.userData.mouth.scale.y=1; else npc.userData.mouth.scale.y=1+Math.abs(Math.sin(t*13))*.8;
+   }
+   
+   // Animal animation (head bobbing)
+   for(const a of animals){
+     a.userData.head.rotation.x = Math.sin(t*1.5 + a.userData.phase)*0.1;
+   }
+   
    updateInteract();
    insideHouse=currentHouse();
    for(const h of houseList){const dx=player.pos.x-h.x,dz=player.pos.z-h.z;const nearDoor=Math.abs(dx)<2.2*h.scale&&Math.abs(dz-2.7*h.scale)<1.5;const target=nearDoor? -1.18:0;h.doorPivot.rotation.y+=(target-h.doorPivot.rotation.y)*Math.min(1,dt*5);}
+   
    const seat=nearbySeat();const sitBtn=document.getElementById('sitBtn');sitBtn.style.display=(seat||seated)?'block':'none';sitBtn.textContent=seated?'🚶 उठें':'🪑 बैठें';
    const plot=nearbyFarmPlot();const farmBtn=document.getElementById('farmBtn');farmBtn.style.display=plot?'block':'none';
-   // Grow plants slowly
+   
    for(const plot of farmPlots){growPlants(plot,dt);}
-   // Animate tree fruits
    for(const tg of treeGroups){if(tg.userData.fruits){for(const f of tg.userData.fruits){f.rotation.y+=dt*.5;f.position.y+=Math.sin(t*2+f.position.x)*0.001;}}}
+   
    document.getElementById('status').innerHTML='दिन 1 · सुबह 8:00<br>'+(insideHouse?'घर के अंदर':(plot?'खेत के पास':'गाँव के बाहर'));
  }
  renderer.render(scene,camera);
