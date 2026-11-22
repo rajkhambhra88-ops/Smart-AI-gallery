@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#183d35">
-<title>जम्बूद्वीप — जीवंत भारतीय गाँव 0.8</title>
+<title>जम्बूद्वीप — जीवंत भारतीय गाँव 0.9</title>
 <style>
 :root{--glass:rgba(13,29,27,.72);--line:rgba(255,255,255,.2);--gold:#f3c66b}
 *{box-sizing:border-box}
@@ -64,10 +64,10 @@ canvas{display:block;width:100%;height:100%}
  <div class="talkNote" id="voiceNote">आवाज़ सुनने और बोलने के लिए अनुमति दें।</div>
 </div>
 <div id="message"></div>
-<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.8 · फोटोरियलिस्टिक गाँव, धान के खेत, पशु और फल</div>
+<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.9 · सेमी-रियलिस्टिक इंसान और सुधरा हुआ लुक</div>
 <div id="start">
  <div class="panel">
-  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 08</div>
+  <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 09</div>
   <p>आप एक नए गाँव में पहुँचे हैं। यह आपकी नई जिंदगी की शुरुआत है। चारों ओर देखिए, रास्तों पर चलिए और इस छोटी-सी दुनिया को महसूस कीजिए।</p>
   <ul><li>बाईं ओर के गोल कंट्रोल से चलें</li><li>स्क्रीन पर उँगली घुमाकर चारों ओर देखें</li><li>दौड़ें, कूदें और अलग-अलग पेशों के गाँववालों से मिलें</li><li>हरे-भरे धान के खेत, पानी और पशुओं को देखें</li><li>घर के खुले दरवाजे से अंदर जाएँ, चारपाई के पास बैठें और रसोई/आँगन देखें</li><li>सब्ज़ी की क्यारियों में टमाटर, बैंगन, भिंडी, मिर्च और पालक देखें</li><li>पेड़ों पर फल लगे हैं और पौधे धीरे-धीरे बढ़ रहे हैं</li><li>किसान बीज बोते हैं, पानी देते हैं और फसल काटते हैं — आप भी खेती में हाथ बँटा सकते हैं</li></ul>
   <button id="startBtn">दुनिया में प्रवेश करें</button>
@@ -129,24 +129,20 @@ const road=box(7,.06,110,pathMat,0,.01,-15,false);
 const road2=box(100,.06,5,pathMat,0,.015,-13,false);
 
 // ————— धान के खेत (Paddy Fields) —————
-// तस्वीरों की तरह पानी से भरे हुए खेत
 function paddyField(x,z,w,d){
  const waterPaddy=new THREE.Mesh(new THREE.BoxGeometry(w,0.05,d),water);
  waterPaddy.position.set(x,0.05,z);waterPaddy.receiveShadow=true;scene.add(waterPaddy);
- // मेंड़ (Mud boundaries)
  const bedMat=mat(0x6b5534);
  box(w+0.4,0.2,0.4,bedMat,x,0.1,z-d/2);
  box(w+0.4,0.2,0.4,bedMat,x,0.1,z+d/2);
  box(0.4,0.2,d,bedMat,x-w/2,0.1,z);
  box(0.4,0.2,d,bedMat,x+w/2,0.1,z);
  
- // धान के पौधे (Paddy plants)
- const plantMat=mat(0x7bb33a); // चमकीला हरा
+ const plantMat=mat(0x7bb33a);
  for(let r=0;r<10;r++){
   for(let c=0;c<15;c++){
    const px=x-w/2+0.5+c*(w-1)/14;
    const pz=z-d/2+0.5+r*(d-1)/9;
-   // एक झुंड (Cluster) बनाएं
    for(let i=0;i<3;i++){
     const blade=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.6,4),plantMat);
     blade.position.set(px+(Math.random()-0.5)*0.2, 0.3, pz+(Math.random()-0.5)*0.2);
@@ -170,13 +166,11 @@ function animal(x,z,color=0x3a3a3a){
  body.rotation.z=Math.PI/2;body.position.y=0.8;body.castShadow=true;g.add(body);
  const head=new THREE.Mesh(new THREE.CapsuleGeometry(0.25,0.3,6,10),bodyMat);
  head.position.set(0.9,0.9,0);head.rotation.z=-0.2;head.castShadow=true;g.add(head);
- // सींग (Horns)
  const hornMat=mat(0xdddddd);
  for(const side of [-1,1]){
   const horn=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.3,6),hornMat);
   horn.position.set(1.05,1.1,side*0.15);horn.rotation.x=side*0.5;g.add(horn);
  }
- // पैर (Legs)
  const legMat=mat(0x222222);
  for(const sx of [-0.5, 0.5]){
   for(const sz of [-0.3, 0.3]){
@@ -184,17 +178,15 @@ function animal(x,z,color=0x3a3a3a){
    leg.position.set(sx,0.4,sz);leg.castShadow=true;g.add(leg);
   }
  }
- // पूंछ (Tail)
  const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.6,4),legMat);
  tail.position.set(-0.8,0.6,0);tail.rotation.z=-0.3;g.add(tail);
  
- // धीरे-धीरे सिर हिलाना (Animation के लिए)
  g.userData={head, phase: Math.random()*10};
  return g;
 }
 const animals=[
- animal(-2, 5, 0x2a2a2a), // काली भैंस
- animal(2, -8, 0x4a3a2a), // भूरी गाय
+ animal(-2, 5, 0x2a2a2a),
+ animal(2, -8, 0x4a3a2a),
  animal(-15, 2, 0x3a3a3a),
  animal(15, -5, 0x2a2a2a),
  animal(0, 15, 0x4a3a2a)
@@ -211,11 +203,8 @@ const CROP_TYPES={
 const farmPlots=[];
 function createFarmPlot(x,z,w=5,d=3){
  const plot={x,z,w,d,planted:false,watered:false,growth:0,harvestable:false,crop:'tomato',plants:[],waterLevel:0,daysOld:0};
- // उठी हुई मिट्टी की क्यारी (Raised soil bed)
  const bed=box(w,.2,d,mat(0x5a3e28),x,.1,z);
- // लकड़ी का किनारा (Wooden border)
  box(w+.2,.08,d+.2,mat(0x4a3020),x,.18,z,false);
- // पानी का संकेत (Water indicator)
  const waterPatch=new THREE.Mesh(new THREE.CircleGeometry(w*.4,.1),new THREE.MeshStandardMaterial({color:0x2a5b7a,transparent:true,opacity:0,roughness:.2}));
  waterPatch.rotation.x=-Math.PI/2;waterPatch.position.set(x,.21,z);scene.add(waterPatch);
  plot.waterPatch=waterPatch;
@@ -223,7 +212,6 @@ function createFarmPlot(x,z,w=5,d=3){
  farmPlots.push(plot);
  return plot;
 }
-// Create farm plots
 createFarmPlot(-12, 20, 5, 3);
 createFarmPlot(-5, 24, 4, 3);
 createFarmPlot(14, 22, 5, 3);
@@ -237,7 +225,6 @@ function plantCrop(plot,cropKey){
  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
    const px=plot.x-plot.w/2+.5+c*(plot.w-1)/(cols-1||1);
    const pz=plot.z-plot.d/2+.5+r*(plot.d-1)/(rows-1||1);
-   // अंकुर (Seedling)
    const stem=new THREE.Mesh(new THREE.CylinderGeometry(.02,.03,.2,6),mat(0x4a8a2a));
    stem.position.set(px,.3,pz);scene.add(stem);
    const leafMesh=new THREE.Mesh(new THREE.SphereGeometry(.1,8,6),mat(crop.leafColor));
@@ -297,30 +284,148 @@ function addFruitToTree(treeGroup,count=5,color=0xd4a235){
 }
 function tree(x,z,s=1, fruitColor=null){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);treeGroups.push(g);
- // तना (Trunk)
  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.35*s,2.8*s,10),mat(0x4a3626));
  trunk.position.y=1.4*s;trunk.castShadow=true;g.add(trunk);
- // पत्ते (Leaves)
  for(let i=0;i<4;i++){
   const crown=new THREE.Mesh(new THREE.SphereGeometry((1.5-i*.1)*s,12,10),i%2?leaf2:leaf);
   crown.position.set((i-1.5)*.4*s,3.0*s+i*.4*s,(i%2?-0.2:0.2)*s);
   crown.castShadow=true;g.add(crown);
  }
- // फल (Fruits)
  if(fruitColor) {
   const fruits=addFruitToTree(g,6+Math.floor(Math.random()*5), fruitColor);
   g.userData={fruits};
  }
 }
-// फलों वाले पेड़ (आम और अमरूद)
 tree(-18,-5,1.2, 0xd4a235);
 tree(22,-15,1.3, 0xd4a235);
-tree(-28,15,1.1, 0x8dbb3a); // हरे फल (अमरूद)
+tree(-28,15,1.1, 0x8dbb3a);
 tree(30,8,1.2, 0xd4a235);
 tree(13,30,1.4, 0x8dbb3a);
 tree(-4,28,1.1, 0xd4a235);
 tree(-34,-30,1.2, 0x8dbb3a);
 tree(35,-28,1.5, 0xd4a235);
+
+// ————— इंसान (Person) - Improved Semi-Realistic —————
+const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
+function person(x,z,topColor=0x9b553b,variant=0,profile={}){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const female=!!profile.female, older=!!profile.older, child=!!profile.child;
+ const scale=child?.82:older?.98:1;
+ const skinMat=new THREE.MeshStandardMaterial({color:profile.skin||[0x986448,0xb77d5a,0x81553e,0xc18b68][variant%4],roughness:.78});
+ const cloth=new THREE.MeshStandardMaterial({color:topColor,roughness:.92});
+ const lower=new THREE.MeshStandardMaterial({color:profile.lower||(female?0x72534a:variant===1?0x594638:0x3e4541),roughness:.95});
+ const hairMat=new THREE.MeshStandardMaterial({color:profile.hair||0x211c19,roughness:.9});
+ const shoeMat=mat(0x302820);
+ const add=(geo,material,pos,rot=null)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);if(rot)m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;g.add(m);return m};
+ 
+ // शरीर का ढांचा (Body Structure)
+ const hip=add(new THREE.CapsuleGeometry(.22,.22,5,12),lower,[0,.88*scale,0]);hip.scale.set(1,.78,1);
+ for(const side of [-1,1]){
+  const legPivot=new THREE.Group();legPivot.position.set(side*.145,.83*scale,0);g.add(legPivot);
+  const thigh=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.38*scale,6,12),lower);thigh.position.y=-.22*scale;thigh.castShadow=true;legPivot.add(thigh);
+  const calf=new THREE.Mesh(new THREE.CapsuleGeometry(.082,.34*scale,6,12),lower);calf.position.set(0,-.52*scale,.015);calf.castShadow=true;legPivot.add(calf);
+  const foot=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.15,4,8),shoeMat);foot.rotation.x=Math.PI/2;foot.position.set(0,-.72*scale,.085);foot.castShadow=true;legPivot.add(foot);
+  g.userData=g.userData||{};(g.userData.legs||(g.userData.legs=[])).push(legPivot);
+ }
+ 
+ // धड़ (Torso)
+ const torso=add(new THREE.CapsuleGeometry(.285,.58,7,16),cloth,[0,1.34*scale,0]);torso.scale.set(1.05,.92,.76);
+ const waist=add(new THREE.CylinderGeometry(.235,.255,.22,16),lower,[0,.99*scale,0]);
+ const neck=add(new THREE.CylinderGeometry(.075,.095,.19,14),skinMat,[0,1.78*scale,0]);
+ const collar=add(new THREE.TorusGeometry(.105,.025,6,18),cloth,[0,1.72*scale,.015]);collar.rotation.x=Math.PI/2;
+ const placket=add(new THREE.BoxGeometry(.035,.43,.018),mat(0xddd0b8),[0,1.42*scale,.222]);
+ for(let i=0;i<3;i++)add(new THREE.SphereGeometry(.014,8,6),mat(0x302b25),[0,1.55*scale-i*.12,.24]);
+ 
+ // ————— सुधरा हुआ चेहरा (Improved Face) —————
+ // सिर का आकार (Head Shape) - अब ज्यादा असली और अंडाकार
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.23, 32, 24), skinMat);
+ head.scale.set(0.82, 1.05, 0.88); // Width, Height, Depth
+ head.position.set(0, 2.0*scale, 0.015);
+ head.castShadow=true; g.add(head);
+ 
+ // आँखें (Eyes) - छोटी और स्वाभाविक
+ for(const side of [-1,1]){
+  // आँख की सॉकेट (Eye Socket)
+  const socket=add(new THREE.SphereGeometry(.045,16,12), mat(0x5d4032), [side*.082, 2.03*scale, .185]);
+  socket.scale.set(1, 0.6, 0.3); // चपटा
+  
+  // आँख की सफेदी (Sclera)
+  const eyeWhite=add(new THREE.SphereGeometry(.032,16,12), mat(0xf1e9dc), [side*.082, 2.03*scale, .205]);
+  eyeWhite.scale.set(1, 0.6, 0.4);
+  
+  // पुतली (Pupil)
+  add(new THREE.SphereGeometry(.015,12,10), mat(0x1a1a1a), [side*.082, 2.03*scale, .218]);
+  
+  // आँख की लाइट (Catchlight)
+  add(new THREE.SphereGeometry(.005,8,6), mat(0xffffff), [side*.078, 2.035*scale, .225]);
+  
+  // भौंह (Eyebrow) - पतली
+  const brow=add(new THREE.BoxGeometry(.07,.012,.02), hairMat, [side*.082, 2.08*scale, .2]);
+  brow.rotation.z = side * 0.08;
+ }
+ 
+ // नाक (Nose) - सीधी और सपाट
+ const bridge=add(new THREE.CapsuleGeometry(.022,.07,4,10), skinMat, [0, 1.98*scale, .2]);
+ bridge.rotation.x = -0.1;
+ add(new THREE.SphereGeometry(.032,12,10), skinMat, [0, 1.94*scale, .215]).scale.set(0.9, 0.6, 0.8);
+ 
+ // होंठ (Lips) - पतले
+ const mouth=add(new THREE.BoxGeometry(.065,.012,.012), mat(0x7a4b3e), [0, 1.87*scale, .2]);
+ 
+ // ठुड्डी (Chin) - सपाट
+ add(new THREE.SphereGeometry(.06,12,10), skinMat, [0, 1.82*scale, .15]).scale.set(1.2, 0.5, 0.6);
+ 
+ // गाल (Cheeks) - अंदर की तरफ
+ for(const side of [-1,1]) add(new THREE.SphereGeometry(.06,12,10), skinMat, [side*.12, 1.93*scale, .15]).scale.set(1, 0.7, 0.4);
+ 
+ // बाल (Hair) - सिर के ऊपर
+ const cap=add(new THREE.SphereGeometry(.235,24,16,0,Math.PI*2,0,Math.PI*.5), hairMat, [0, 2.05*scale, -0.02]);
+ cap.scale.set(0.85, 0.75, 0.9);
+ add(new THREE.SphereGeometry(.18,16,12), hairMat, [0, 1.97*scale, -0.13]).scale.set(0.9, 0.9, 0.6);
+ 
+ // दाढ़ी (Beard) - अगर बुजुर्ग हैं
+ if(older){
+   const beard=add(new THREE.SphereGeometry(.1,16,12), mat(0xb0b0b0), [0, 1.78*scale, .16]);
+   beard.scale.set(1.1, 1.0, 0.6);
+ }
+ 
+ // पगड़ी (Turban)
+ if(profile.turban){
+   const turbanMat=mat(profile.turban);
+   const turban=add(new THREE.SphereGeometry(.25,24,16), turbanMat, [0, 2.18*scale, -0.01]);
+   turban.scale.set(0.9, 0.5, 0.95);
+   const fold=add(new THREE.TorusGeometry(.21,.025,8,28), mat(0xd7bd8a), [0, 2.15*scale, 0]);
+   fold.rotation.x=Math.PI/2;
+ }
+ 
+ // दुपट्टा / साड़ी (Dupatta)
+ if(female){
+   add(new THREE.SphereGeometry(.09,14,10), hairMat, [0, 2.0*scale, -0.16]).scale.set(1, 0.8, 0.6);
+   const dupatta=add(new THREE.CapsuleGeometry(.06,.5,5,10), mat(profile.dupatta||0xc58a61), [.22, 1.42*scale, .04]);
+   dupatta.rotation.z=-.2;
+ }
+ 
+ // एक्सेसरीज़ (Accessories)
+ if(profile.apron) add(new THREE.BoxGeometry(.39,.55,.035), mat(profile.apron), [0,1.23*scale,.235]);
+ if(profile.book){
+   const book=add(new THREE.BoxGeometry(.22,.3,.05), mat(0x315b83), [.38,1.25,.12]); book.rotation.z=-.2;
+   add(new THREE.BoxGeometry(.2,.28,.01), mat(0xf0e6c9), [.38,1.25,.15]);
+ }
+ if(profile.tool){
+   const handle=add(new THREE.CylinderGeometry(.025,.03,.9,12), wood, [.52,.8,.04]); handle.rotation.z=-.12;
+   add(new THREE.BoxGeometry(.2,.12,.06), mat(0x777b78), [.55,1.28,.04]);
+ }
+ 
+ // हाथ (Arms)
+ const arms=[];for(const side of [-1,1]){
+  const pivot=new THREE.Group();pivot.position.set(side*.31,1.59*scale,0);g.add(pivot);
+  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.1,.34,6,12),cloth);sleeve.position.set(side*.015,-.22,0);sleeve.rotation.z=side*.06;sleeve.castShadow=true;pivot.add(sleeve);
+  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.065,.31,6,12),skinMat);fore.position.set(0,-.52,.012);fore.castShadow=true;pivot.add(fore);
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.07,14,10),skinMat);hand.position.set(0,-.72,.025);hand.castShadow=true;pivot.add(hand);
+  arms.push(pivot);
+ }
+ g.userData={...g.userData,arms,legs:g.userData.legs,mouth,phase:Math.random()*6,variant,profile};return g;
+}
 
 // ————— घरों का निर्माण (Houses) —————
 const houseList=[];
@@ -335,34 +440,27 @@ function house(x,z,paint=wall,roofColor=roof,scale=1,familyName='परिवा
  addPart(new THREE.BoxGeometry(1.96,3.1,.18),paint,[1.52,1.55,2.2]);
  addPart(new THREE.BoxGeometry(1.08,1.05,.18),paint,[0,2.575,2.2]);
  
- // छत (Roof)
  const r=addPart(new THREE.ConeGeometry(3.65,2.2,4),mat(roofColor),[0,4.05,0]);r.rotation.y=Math.PI/4;
  
- // दरवाजा (Door)
  const doorPivot=new THREE.Group();doorPivot.position.set(-.49,0,2.12);g.add(doorPivot);
  const door=addPart(new THREE.BoxGeometry(.94,1.98,.12),wood,[.47,1.0,0]);doorPivot.add(door);door.position.set(.47,1,0);
  const knob=addPart(new THREE.SphereGeometry(.045,12,10),mat(0xb99a53),[.82,1.02,.08]);doorPivot.add(knob);knob.position.set(.82,1.02,.08);
  
- // खिड़कियां (Windows)
  const winmat=mat(0x2a4b52);for(const sx of [-1.55,1.55]){const win=addPart(new THREE.BoxGeometry(.72,.78,.06),winmat,[sx,1.95,2.31]);const frame=addPart(new THREE.BoxGeometry(.82,.07,.08),wood,[sx,1.95,2.35]);}
  addPart(new THREE.BoxGeometry(1.5,.22,.7),mat(0xb2a28a),[0,.12,2.58]);
  
- // चारपाई (Charpai)
  const cotX=-1.25,cotZ=-.45;
  addPart(new THREE.BoxGeometry(1.45,.16,2.35),wood,[cotX,.55,cotZ]);
  for(const sx of [-.58,.58])for(const sz of [-.98,.98])addPart(new THREE.CylinderGeometry(.055,.065,.62,8),wood,[cotX+sx,.29,cotZ+sz]);
  addPart(new THREE.BoxGeometry(1.36,.09,2.18),mat(0xc6b28e),[cotX,.66,cotZ]);
  
- // संदूक (Trunk)
  addPart(new THREE.BoxGeometry(.85,.58,.62),wood,[1.25,.38,-1.15]);
  addPart(new THREE.BoxGeometry(.72,.06,.5),mat(0x9a7654),[1.25,.7,-1.15]);
  
- // रसोई (Chulha)
  addPart(new THREE.CylinderGeometry(.38,.43,.42,12),mat(0x8d6044),[1.35,.3,.72]);
  addPart(new THREE.CylinderGeometry(.19,.23,.22,12),mat(0x35312b),[1.35,.56,.72]);
  addPart(new THREE.CylinderGeometry(.18,.22,.28,14),mat(0x777a78),[1.35,.78,.72]);
  
- // परिवार के सदस्य (Family Members)
  const familyMembers=[];
  const famColors=[0x9b553b,0x3d7180,0x6a7850,0x8a4d48,0x456f70,0x9a704b];
  for(let i=0;i<2+Math.floor(Math.random()*2);i++){
@@ -377,18 +475,16 @@ function house(x,z,paint=wall,roofColor=roof,scale=1,familyName='परिवा
  return g;
 }
 
-// गाँव के घर
 house(-15,-10,wall,0x7d3c2c,1.1,'रामू का परिवार');
 house(12,-12,white,0x8c4a32,1,'सुरेश का परिवार');
 house(-14,6,mat(0xc8b490),0x6d3626,.95,'मोहन का परिवार');
 house(8,16,mat(0xd5b98b),0x7d3a26,1.05,'शर्मा जी का परिवार');
 house(-28,-25,mat(0xb8a17a),0x893c2c,1.15,'बाबा हरनाम का परिवार');
 house(28,-8,white,0x7b4120,1.15,'बलदेव का परिवार');
-// दुकान (Shop)
 const shop=house(0,-25,mat(0xe4d0a2),0x376b67,1.15,'गीता का परिवार');
 const sign=box(3.4,.65,.16,mat(0x214c41),0,2.7,-22.38); 
 
-// ————— आँगन के बर्तन (Clay Pots) —————
+// आँगन के बर्तन (Clay Pots)
 function clayPot(x,z,scale=1){
  const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
  const potMat=mat(0x9e5a3a,0.9);
@@ -404,7 +500,7 @@ clayPot(-10, 9, 0.9);
 clayPot(9, 18, 1);
 clayPot(15, 20, 1.1);
 
-// दूर की पहाड़ियाँ (Distant Hills)
+// दूर की पहाड़ियाँ
 for(let i=0;i<20;i++){
  const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*10,12+Math.random()*15,7),mat(i%2?0x5a7a4a:0x6a8a5a));
  h.position.set(-90+i*10,-2,-90-Math.random()*20);
@@ -412,72 +508,6 @@ for(let i=0;i<20;i++){
 }
 
 // ————— गाँव के लोग (Villagers) —————
-const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
-function person(x,z,topColor=0x9b553b,variant=0,profile={}){
- const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
- const female=!!profile.female, older=!!profile.older, child=!!profile.child;
- const scale=child?.82:older?.98:1;
- const skinMat=new THREE.MeshStandardMaterial({color:profile.skin||[0x986448,0xb77d5a,0x81553e,0xc18b68][variant%4],roughness:.78});
- const cloth=new THREE.MeshStandardMaterial({color:topColor,roughness:.92});
- const lower=new THREE.MeshStandardMaterial({color:profile.lower||(female?0x72534a:variant===1?0x594638:0x3e4541),roughness:.95});
- const hairMat=new THREE.MeshStandardMaterial({color:profile.hair||0x211c19,roughness:.9});
- const shoeMat=mat(0x302820);
- const add=(geo,material,pos,rot=null)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);if(rot)m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;g.add(m);return m};
- 
- const hip=add(new THREE.CapsuleGeometry(.22,.22,5,12),lower,[0,.88*scale,0]);hip.scale.set(1,.78,1);
- for(const side of [-1,1]){
-  const legPivot=new THREE.Group();legPivot.position.set(side*.145,.83*scale,0);g.add(legPivot);
-  const thigh=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.38*scale,6,12),lower);thigh.position.y=-.22*scale;thigh.castShadow=true;legPivot.add(thigh);
-  const calf=new THREE.Mesh(new THREE.CapsuleGeometry(.082,.34*scale,6,12),lower);calf.position.set(0,-.52*scale,.015);calf.castShadow=true;legPivot.add(calf);
-  const foot=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.15,4,8),shoeMat);foot.rotation.x=Math.PI/2;foot.position.set(0,-.72*scale,.085);foot.castShadow=true;legPivot.add(foot);
-  g.userData=g.userData||{};(g.userData.legs||(g.userData.legs=[])).push(legPivot);
- }
- 
- const torso=add(new THREE.CapsuleGeometry(.285,.58,7,16),cloth,[0,1.34*scale,0]);torso.scale.set(1.05,.92,.76);
- const waist=add(new THREE.CylinderGeometry(.235,.255,.22,16),lower,[0,.99*scale,0]);
- const neck=add(new THREE.CylinderGeometry(.075,.095,.19,14),skinMat,[0,1.78*scale,0]);
- const collar=add(new THREE.TorusGeometry(.105,.025,6,18),cloth,[0,1.72*scale,.015]);collar.rotation.x=Math.PI/2;
- const placket=add(new THREE.BoxGeometry(.035,.43,.018),mat(0xddd0b8),[0,1.42*scale,.222]);
- for(let i=0;i<3;i++)add(new THREE.SphereGeometry(.014,8,6),mat(0x302b25),[0,1.55*scale-i*.12,.24]);
- 
- const head=add(new THREE.SphereGeometry(.235,32,24),skinMat,[0,2.015*scale,.015]);head.scale.set(.88,1.16,.84);
- for(const side of [-1,1]){
-  add(new THREE.SphereGeometry(.052,14,10),skinMat,[side*.207,1.99*scale,.01]);
-  const socket=add(new THREE.SphereGeometry(.061,16,12),mat(0x5d4032),[side*.088,2.045*scale,.197]);socket.scale.set(1,.78,.35);
-  const eye=add(new THREE.SphereGeometry(.043,18,12),mat(0xf1e9dc),[side*.088,2.045*scale,.218]);eye.scale.set(1,.72,.48);
-  add(new THREE.SphereGeometry(.021,14,10),mat(0x35251e),[side*.088,2.044*scale,.237]);
-  add(new THREE.SphereGeometry(.009,10,8),mat(0xffffff),[side*.081,2.055*scale,.247]);
-  const brow=add(new THREE.CapsuleGeometry(.012,.075,3,8),hairMat,[side*.088,2.115*scale,.205]);brow.rotation.z=side*.08;
- }
- 
- const bridge=add(new THREE.CapsuleGeometry(.025,.085,4,10),skinMat,[0,1.995*scale,.225]);bridge.rotation.x=-.12;
- add(new THREE.SphereGeometry(.038,12,10),skinMat,[0,1.95*scale,.245]).scale.set(.85,.72,.8);
- 
- const mouth=add(new THREE.BoxGeometry(.082,.018,.018),mat(0x75483d),[0,1.865*scale,.218]);
- add(new THREE.SphereGeometry(.045,12,8),skinMat,[0,1.82*scale,.16]).scale.set(1,.55,.55);
- for(const side of [-1,1])add(new THREE.SphereGeometry(.07,12,10),skinMat,[side*.13,1.94*scale,.17]).scale.set(1,.75,.5);
- 
- const cap=add(new THREE.SphereGeometry(.242,24,16,0,Math.PI*2,0,Math.PI*.53),hairMat,[0,2.105*scale,-.015]);cap.scale.set(1,.78,1);
- add(new THREE.SphereGeometry(.19,16,12),hairMat,[0,1.96*scale,-.14]).scale.set(1,1,.62);
- 
- if(older){const beard=add(new THREE.SphereGeometry(.115,16,12),mat(0xaaa49a),[0,1.82*scale,.19]);beard.scale.set(1,1.15,.72);}
- if(profile.turban){const turbanMat=mat(profile.turban);const turban=add(new THREE.SphereGeometry(.285,24,16),turbanMat,[0,2.235*scale,-.005]);turban.scale.set(1,.48,1);const fold=add(new THREE.TorusGeometry(.235,.027,8,28),mat(0xd7bd8a),[0,2.19*scale,.005]);fold.rotation.x=Math.PI/2;}
- if(female){add(new THREE.SphereGeometry(.095,14,10),hairMat,[0,2.0*scale,-.19]);const dupatta=add(new THREE.CapsuleGeometry(.075,.55,5,10),mat(profile.dupatta||0xc58a61),[.24,1.42*scale,.04]);dupatta.rotation.z=-.24;}
- if(profile.apron){const apron=add(new THREE.BoxGeometry(.39,.55,.035),mat(profile.apron),[0,1.23*scale,.235]);}
- if(profile.book){const book=add(new THREE.BoxGeometry(.25,.32,.055),mat(0x315b83),[.38,1.25,.12]);book.rotation.z=-.2;add(new THREE.BoxGeometry(.22,.29,.012),mat(0xf0e6c9),[.38,1.25,.155]);}
- if(profile.tool){const handle=add(new THREE.CylinderGeometry(.027,.035,.9,12),wood,[.52,.8,.04]);handle.rotation.z=-.12;add(new THREE.BoxGeometry(.25,.14,.08),mat(0x777b78),[.55,1.28,.04]);}
- 
- const arms=[];for(const side of [-1,1]){
-  const pivot=new THREE.Group();pivot.position.set(side*.31,1.59*scale,0);g.add(pivot);
-  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.34,6,12),cloth);sleeve.position.set(side*.015,-.22,0);sleeve.rotation.z=side*.06;sleeve.castShadow=true;pivot.add(sleeve);
-  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.067,.31,6,12),skinMat);fore.position.set(0,-.52,.012);fore.castShadow=true;pivot.add(fore);
-  const hand=new THREE.Mesh(new THREE.SphereGeometry(.073,14,10),skinMat);hand.position.set(0,-.72,.025);hand.castShadow=true;pivot.add(hand);
-  for(let f=0;f<4;f++){const finger=new THREE.Mesh(new THREE.CapsuleGeometry(.012,.075,3,6),skinMat);finger.position.set((f-1.5)*.025,-.79,.04);finger.castShadow=true;pivot.add(finger)}
-  arms.push(pivot);
- }
- g.userData={...g.userData,arms,legs:g.userData.legs,mouth,phase:Math.random()*6,variant,profile};return g;
-}
-
 const villagers=[
  person(-4,-20,0x3d7180,0,{name:'रामू',role:'किसान',job:'धान और गेहूँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
  person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
@@ -517,7 +547,6 @@ const social = {
 for (const v of villagers) { const n=v.userData.profile.name; v.userData.profile.social=social[n]||{}; }
 villagers.forEach((v,i)=>v.rotation.y=[-.4,2.4,.8,1.8,-1.2,.4,2.8,-.8,1.1,-2][i]);
 
-// पत्थर की बेंच (Bench) और हैण्डपंप (Handpump)
 box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
 const pump= new THREE.Group();pump.position.set(13,0,1);scene.add(pump);
 const post=new THREE.Mesh(new THREE.CylinderGeometry(.12,.15,1.7,8),mat(0x58676a));post.position.y=.85;pump.add(post);
@@ -649,7 +678,6 @@ function animate(){
    const moving=move.lengthSq()>0;bodyRig.position.y=moving?Math.sin(performance.now()*.012)*.018:0;
    const t=performance.now()*.001;
    
-   // Villager animation
    for(const npc of villagers){
     const movingNow=move.lengthSq()>0&&Math.hypot(npc.position.x-player.pos.x,npc.position.z-player.pos.z)<12;
     const ph=t*5+npc.userData.phase;const swing=movingNow?Math.sin(ph)*.48:Math.sin(t*1.1+npc.userData.phase)*.025;
@@ -658,7 +686,6 @@ function animate(){
     if(!speaking||npc!==activeNPC)npc.userData.mouth.scale.y=1; else npc.userData.mouth.scale.y=1+Math.abs(Math.sin(t*13))*.8;
    }
    
-   // Animal animation (head bobbing)
    for(const a of animals){
      a.userData.head.rotation.x = Math.sin(t*1.5 + a.userData.phase)*0.1;
    }
