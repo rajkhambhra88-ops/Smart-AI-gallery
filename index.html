@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#183d35">
-<title>जम्बूद्वीप — पहला जीवंत गाँव</title>
+<title>जम्बूद्वीप — जीवंत भारतीय गाँव 0.4</title>
 <style>
 :root{--glass:rgba(13,29,27,.72);--line:rgba(255,255,255,.2);--gold:#f3c66b}
 *{box-sizing:border-box}
@@ -26,7 +26,7 @@ canvas{display:block;width:100%;height:100%}
 #interact{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:none;border:1px solid #fff8;background:#f0bd58;color:#2c2618;padding:12px 19px;border-radius:24px;font-weight:800;box-shadow:0 4px 18px #0004}
 #talkPanel{position:fixed;left:50%;bottom:155px;transform:translateX(-50%);width:min(92%,430px);padding:13px;background:rgba(12,29,27,.94);color:#fff;border:1px solid #ffffff55;border-radius:18px;display:none;z-index:4;box-shadow:0 12px 35px #0006}
 .talkHead{display:flex;justify-content:space-between;align-items:center;color:#f5d58e}.talkHead button{border:0;background:#ffffff20;color:white;border-radius:10px;padding:6px 10px}
-#npcLine{font-size:14px;line-height:1.55;padding:12px 2px;white-space:pre-wrap}.talkActions{display:flex;gap:6px;flex-wrap:wrap}.talkActions input{flex:1;min-width:130px;border:1px solid #ffffff44;border-radius:11px;background:#ffffff12;color:white;padding:11px;font-size:13px}.talkActions button{border:0;border-radius:11px;padding:10px 12px;background:#e9bd67;color:#2c2618;font-weight:800}.talkNote{font-size:10px;color:#c7d7d0;padding-top:8px}
+#npcLine{font-size:14px;line-height:1.55;padding:12px 2px}.talkActions{display:flex;gap:6px;flex-wrap:wrap}.talkActions input{flex:1;min-width:130px;border:1px solid #ffffff44;border-radius:11px;background:#ffffff12;color:white;padding:11px;font-size:13px}.talkActions button{border:0;border-radius:11px;padding:10px 12px;background:#e9bd67;color:#2c2618;font-weight:800}.talkNote{font-size:10px;color:#c7d7d0;padding-top:8px}
 #message{position:fixed;left:50%;bottom:205px;transform:translateX(-50%);max-width:85%;background:var(--glass);color:white;border:1px solid var(--line);border-radius:14px;padding:10px 14px;text-align:center;font-size:13px;display:none}
 #start{position:fixed;inset:0;background:linear-gradient(150deg,rgba(13,42,38,.92),rgba(17,45,52,.78)),radial-gradient(circle at 70% 20%,#f1c56b55,transparent 35%);display:flex;align-items:center;justify-content:center;padding:22px;color:white;z-index:5}
 .panel{width:min(440px,100%);border:1px solid #ffffff35;background:rgba(10,25,24,.72);border-radius:26px;padding:25px 22px;box-shadow:0 20px 60px #0006;backdrop-filter:blur(14px)}
@@ -62,7 +62,7 @@ canvas{display:block;width:100%;height:100%}
  <div class="talkNote" id="voiceNote">आवाज़ सुनने और बोलने के लिए अनुमति दें।</div>
 </div>
 <div id="message"></div>
-<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.3 · विविध भारतीय गाँव</div>
+<div id="footer">मोबाइल परीक्षण प्रोटोटाइप · संस्करण 0.4 · प्राकृतिक 3D दुनिया</div>
 <div id="start">
  <div class="panel">
   <h1>जम्बूद्वीप</h1><div class="tag">PROJECT JAMBOODWEEP · LIVING VILLAGE 03</div>
@@ -77,8 +77,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const root=document.getElementById('game');
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x9bd0e3);
-scene.fog=new THREE.Fog(0x9bd0e3,42,125);
+scene.background=new THREE.Color(0xa8cbdc);
+scene.fog=new THREE.Fog(0xa8c6c9,58,155);
 const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.08,180);
 camera.position.set(0,1.68,8);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
@@ -86,20 +86,34 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
 renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate=true;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.12;
+renderer.toneMappingExposure=1.0;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
 root.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xe4f6ff,0x65704c,2.0));
-const sun=new THREE.DirectionalLight(0xffe0a6,2.1);
+scene.add(new THREE.HemisphereLight(0xeaf5ff,0x5a6046,1.35));
+const sun=new THREE.DirectionalLight(0xffe8c5,2.65);
 sun.position.set(-18,28,14);sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.bias=-0.00018;sun.shadow.normalBias=0.025;sun.shadow.radius=4;
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 scene.add(sun);
 
-const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
-const grass=mat(0x638b4b),pathMat=mat(0xb99b70),wall=mat(0xd7bd91),white=mat(0xe6dfc9),brick=mat(0xb76e4b),roof=mat(0x8d4936),dark=mat(0x493b30),wood=mat(0x795438),leaf=mat(0x39764a),leaf2=mat(0x588b45),water= new THREE.MeshStandardMaterial({color:0x4d9eae,roughness:.25,metalness:.08}),shirt=mat(0x315f72),skin=mat(0xb97950);
+const mat=(color,roughness=.88)=>new THREE.MeshStandardMaterial({color,roughness});
+function surfaceTexture(base,kind='plaster'){
+ const c=document.createElement('canvas');c.width=256;c.height=256;const x=c.getContext('2d');x.fillStyle=base;x.fillRect(0,0,256,256);
+ let seed=kind.length*137+31;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ for(let i=0;i<5200;i++){const a=rnd(),b=rnd(),r=kind==='grass'?1+rnd()*2:1+rnd()*1.4;x.globalAlpha=.025+rnd()*.09;x.fillStyle=rnd()>.5?'#ffffff':'#30291f';x.beginPath();x.arc(a*256,b*256,r,0,Math.PI*2);x.fill()}
+ if(kind==='plaster'){x.globalAlpha=.12;x.strokeStyle='#6f5e49';for(let i=0;i<45;i++){let a=rnd()*256,b=rnd()*256;x.beginPath();x.moveTo(a,b);x.lineTo(a+3+rnd()*15,b+1+rnd()*5);x.stroke()}}
+ if(kind==='roof'){x.globalAlpha=.24;for(let y=0;y<256;y+=24){x.strokeStyle='#3c2921';x.beginPath();x.moveTo(0,y);x.lineTo(256,y);x.stroke();for(let xx=(y%48?0:16);xx<256;xx+=32){x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+24);x.stroke()}}}
+ x.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;
+}
+const grass=mat(0xffffff),pathMat=mat(0xffffff),wall=mat(0xffffff),white=mat(0xffffff),brick=mat(0xb76e4b),roof=mat(0xffffff),dark=mat(0x493b30),wood=mat(0x795438),leaf=mat(0x39764a),leaf2=mat(0x588b45),water=new THREE.MeshStandardMaterial({color:0x4d9eae,roughness:.18,metalness:.04}),shirt=mat(0x315f72),skin=mat(0xb97950);
+grass.map=surfaceTexture('#718b4c','grass');grass.color.set(0xffffff);grass.map.repeat.set(12,12);
+pathMat.map=surfaceTexture('#b6a080','dirt');pathMat.map.repeat.set(3,18);
+wall.map=surfaceTexture('#d0bd99','plaster');white.map=surfaceTexture('#ddd5c1','plaster');roof.map=surfaceTexture('#884c3c','roof');
 function box(w,h,d,material,x,y,z,cast=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;scene.add(m);return m}
 function ground(w,d,material,x=0,z=0){return box(w,.18,d,material,x,-.1,z,false)}
 ground(150,150,grass);
@@ -133,108 +147,71 @@ function tree(x,z,s=1){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22
 for(const p of [[-20,-4,1.1],[19,-18,1.2],[-28,14,1.25],[30,7,1.1],[13,27,1.35],[-4,25,1],[-34,-34,1.2],[35,-31,1.4],[3,-39,1.1],[-17,34,1.1]])tree(...p);
 // distant low hills
 for(let i=0;i<16;i++){const h= new THREE.Mesh(new THREE.ConeGeometry(8+Math.random()*8,10+Math.random()*12,7),mat(i%2?0x688a67:0x78946e));h.position.set(-75+i*10,-1,-78-Math.random()*15);scene.add(h)}
-
-// ————— ENHANCED VILLAGERS (more realistic) —————
+// Village people: a mixed Indian rural community with distinct ages, clothes and occupations.
 const humanMats={skin:mat(0x9b6748),skin2:mat(0xb77d5a),hair:mat(0x29231f),darkHair:mat(0x171716),eye:mat(0x211b18),white:mat(0xf0e9dc),trouser:mat(0x3e4541),shoe:mat(0x302820)};
 function person(x,z,topColor=0x9b553b,variant=0,profile={}){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
  const female=!!profile.female, older=!!profile.older, child=!!profile.child;
- const skinMat=mat(profile.skin||[0x9b6748,0xb77d5a,0x81553e,0xc18b68][variant%4]);
- const cloth=mat(topColor), lower=mat(profile.lower|| (female?0x72534a:variant===1?0x594638:0x3e4541));
- const bodyScale=child?.78:older?.96:1;
- // torso with more subtle shaping
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(female?.32:.30, female?.60:.64,6,12),cloth);
- torso.position.y=1.18*bodyScale;torso.scale.set(1,bodyScale,1.02);torso.castShadow=true;g.add(torso);
- // neck
- const neck=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.22,10),skinMat);neck.position.y=1.66*bodyScale;g.add(neck);
- // head – slightly more realistic proportions
- const head=new THREE.Mesh(new THREE.SphereGeometry(.255,28,20),skinMat);
- head.scale.set(.88,1.12,.9);head.position.y=1.92*bodyScale;head.castShadow=true;g.add(head);
- // ears
+ const scale=child?.82:older?.98:1;
+ const skinMat=new THREE.MeshStandardMaterial({color:profile.skin||[0x986448,0xb77d5a,0x81553e,0xc18b68][variant%4],roughness:.78});
+ const cloth=new THREE.MeshStandardMaterial({color:topColor,roughness:.92});
+ const lower=new THREE.MeshStandardMaterial({color:profile.lower||(female?0x72534a:variant===1?0x594638:0x3e4541),roughness:.95});
+ const hairMat=new THREE.MeshStandardMaterial({color:profile.hair||0x211c19,roughness:.9});
+ const shoeMat=mat(0x302820);
+ const add=(geo,material,pos,rot=null)=>{const m=new THREE.Mesh(geo,material);m.position.set(...pos);if(rot)m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;g.add(m);return m};
+ // Natural leg length, hips and layered village clothing
+ const hip=add(new THREE.CapsuleGeometry(.22,.22,5,12),lower,[0,.88*scale,0]);hip.scale.set(1,.78,1);
  for(const side of [-1,1]){
-  const ear=new THREE.Mesh(new THREE.SphereGeometry(.06,12,10),skinMat);
-  ear.position.set(side*.235,1.92*bodyScale,0);g.add(ear);
-  // eyes (slightly larger, with iris)
-  const eyeWhite=new THREE.Mesh(new THREE.SphereGeometry(.048,12,10),humanMats.white);
-  eyeWhite.scale.set(1,.72,.55);eyeWhite.position.set(side*.09,1.97*bodyScale,.21);g.add(eyeWhite);
-  const iris=new THREE.Mesh(new THREE.SphereGeometry(.025,8,8),mat(0x4a3a2a));
-  iris.position.set(side*.09,1.97*bodyScale,.235);g.add(iris);
-  const pupil=new THREE.Mesh(new THREE.SphereGeometry(.014,8,8),humanMats.eye);
-  pupil.position.set(side*.09,1.97*bodyScale,.245);g.add(pupil);
-  // brows
-  const brow=new THREE.Mesh(new THREE.BoxGeometry(.09,.018,.025),humanMats.hair);
-  brow.position.set(side*.09,2.035*bodyScale,.205);g.add(brow);
+  const legPivot=new THREE.Group();legPivot.position.set(side*.145,.83*scale,0);g.add(legPivot);
+  const thigh=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.38*scale,6,12),lower);thigh.position.y=-.22*scale;thigh.castShadow=true;legPivot.add(thigh);
+  const calf=new THREE.Mesh(new THREE.CapsuleGeometry(.082,.34*scale,6,12),lower);calf.position.set(0,-.52*scale,.015);calf.castShadow=true;legPivot.add(calf);
+  const foot=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.15,4,8),shoeMat);foot.rotation.x=Math.PI/2;foot.position.set(0,-.72*scale,.085);foot.castShadow=true;legPivot.add(foot);
+  g.userData=g.userData||{};(g.userData.legs||(g.userData.legs=[])).push(legPivot);
  }
- // nose
- const nose=new THREE.Mesh(new THREE.SphereGeometry(.048,10,10),skinMat);
- nose.scale.set(.7,1.2,.8);nose.position.set(0,1.91*bodyScale,.25);g.add(nose);
- // mouth (slightly curved)
- const mouth=new THREE.Mesh(new THREE.BoxGeometry(.085,.018,.018),mat(0x633a32));
- mouth.position.set(0,1.83*bodyScale,.222);g.add(mouth);
- // hair – more volume and shape
- const hair=new THREE.Mesh(new THREE.SphereGeometry(.265,18,12,0,Math.PI*2,0,Math.PI*.55),humanMats.hair);
- hair.position.set(0,2.06*bodyScale,-.02);hair.scale.set(1.02,.82,1.02);g.add(hair);
- if(older){
-  const beard=new THREE.Mesh(new THREE.SphereGeometry(.16,14,12),mat(0xaaa49a));
-  beard.scale.set(1,.8,.65);beard.position.set(0,1.73*bodyScale,.19);g.add(beard);
+ // Torso with shoulder slope and waist, not a single toy-like capsule
+ const torso=add(new THREE.CapsuleGeometry(.285,.58,7,16),cloth,[0,1.34*scale,0]);torso.scale.set(1.05,.92,.76);
+ const waist=add(new THREE.CylinderGeometry(.235,.255,.22,16),lower,[0,.99*scale,0]);
+ const neck=add(new THREE.CylinderGeometry(.075,.095,.19,14),skinMat,[0,1.78*scale,0]);
+ // Collar and subtle shirt placket/buttons
+ const collar=add(new THREE.TorusGeometry(.105,.025,6,18),cloth,[0,1.72*scale,.015]);collar.rotation.x=Math.PI/2;
+ const placket=add(new THREE.BoxGeometry(.035,.43,.018),mat(0xddd0b8),[0,1.42*scale,.222]);
+ for(let i=0;i<3;i++)add(new THREE.SphereGeometry(.014,8,6),mat(0x302b25),[0,1.55*scale-i*.12,.24]);
+ // Anatomical head with jaw, cheeks and face plane
+ const head=add(new THREE.SphereGeometry(.235,32,24),skinMat,[0,2.015*scale,.015]);head.scale.set(.88,1.16,.84);
+ for(const side of [-1,1]){
+  add(new THREE.SphereGeometry(.052,14,10),skinMat,[side*.207,1.99*scale,.01]);
+  const socket=add(new THREE.SphereGeometry(.061,16,12),mat(0x5d4032),[side*.088,2.045*scale,.197]);socket.scale.set(1,.78,.35);
+  const eye=add(new THREE.SphereGeometry(.043,18,12),mat(0xf1e9dc),[side*.088,2.045*scale,.218]);eye.scale.set(1,.72,.48);
+  add(new THREE.SphereGeometry(.021,14,10),mat(0x35251e),[side*.088,2.044*scale,.237]);
+  add(new THREE.SphereGeometry(.009,10,8),mat(0xffffff),[side*.081,2.055*scale,.247]);
+  const brow=add(new THREE.CapsuleGeometry(.012,.075,3,8),hairMat,[side*.088,2.115*scale,.205]);brow.rotation.z=side*.08;
  }
- if(profile.turban){
-  const turban=new THREE.Mesh(new THREE.SphereGeometry(.29,18,12),mat(profile.turban));
-  turban.scale.set(1,.52,1);turban.position.set(0,2.20*bodyScale,0);g.add(turban);
-  const band=new THREE.Mesh(new THREE.TorusGeometry(.22,.045,8,20),mat(0xe2c58a));
-  band.position.set(0,2.18*bodyScale,0);g.add(band);
- }
- if(female){
-  const dupatta=new THREE.Mesh(new THREE.BoxGeometry(.24,.76,.09),mat(profile.dupatta||0xc58a61));
-  dupatta.position.set(.21,1.39*bodyScale,.23);dupatta.rotation.z=-.18;g.add(dupatta);
-  const bun=new THREE.Mesh(new THREE.SphereGeometry(.11,12,10),humanMats.hair);
-  bun.position.set(0,2.03*bodyScale,-.23);g.add(bun);
- }
- // profession accessories
- if(profile.apron){
-  const apron=new THREE.Mesh(new THREE.BoxGeometry(.45,.58,.055),mat(profile.apron));
-  apron.position.set(0,1.13*bodyScale,.28);g.add(apron);
- }
- if(profile.book){
-  const book=new THREE.Mesh(new THREE.BoxGeometry(.30,.38,.07),mat(0x315b83));
-  book.position.set(.43,1.13,.17);book.rotation.z=-.22;g.add(book);
-  const pages=new THREE.Mesh(new THREE.BoxGeometry(.26,.34,.012),mat(0xf0e6c9));
-  pages.position.set(.43,1.13,.21);pages.rotation.z=-.22;g.add(pages);
- }
- if(profile.tool){
-  const handle=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.0,8),wood);
-  handle.position.set(.50,.87,.05);handle.rotation.z=-.12;g.add(handle);
-  const blade=new THREE.Mesh(new THREE.BoxGeometry(.30,.17,.07),mat(0x777b78));
-  blade.position.set(.56,1.35,.05);g.add(blade);
- }
- // arms – more natural shape
+ // Nose bridge and nostrils
+ const bridge=add(new THREE.CapsuleGeometry(.025,.085,4,10),skinMat,[0,1.995*scale,.225]);bridge.rotation.x=-.12;
+ add(new THREE.SphereGeometry(.038,12,10),skinMat,[0,1.95*scale,.245]).scale.set(.85,.72,.8);
+ // Lips, subtle chin and cheeks
+ const mouth=add(new THREE.BoxGeometry(.082,.018,.018),mat(0x75483d),[0,1.865*scale,.218]);
+ add(new THREE.SphereGeometry(.045,12,8),skinMat,[0,1.82*scale,.16]).scale.set(1,.55,.55);
+ for(const side of [-1,1])add(new THREE.SphereGeometry(.07,12,10),skinMat,[side*.13,1.94*scale,.17]).scale.set(1,.75,.5);
+ // Hairline, crown and back hair
+ const cap=add(new THREE.SphereGeometry(.242,24,16,0,Math.PI*2,0,Math.PI*.53),hairMat,[0,2.105*scale,-.015]);cap.scale.set(1,.78,1);
+ add(new THREE.SphereGeometry(.19,16,12),hairMat,[0,1.96*scale,-.14]).scale.set(1,1,.62);
+ if(older){const beard=add(new THREE.SphereGeometry(.115,16,12),mat(0xaaa49a),[0,1.82*scale,.19]);beard.scale.set(1,1.15,.72);}
+ if(profile.turban){const turbanMat=mat(profile.turban);const turban=add(new THREE.SphereGeometry(.285,24,16),turbanMat,[0,2.235*scale,-.005]);turban.scale.set(1,.48,1);const fold=add(new THREE.TorusGeometry(.235,.027,8,28),mat(0xd7bd8a),[0,2.19*scale,.005]);fold.rotation.x=Math.PI/2;}
+ if(female){add(new THREE.SphereGeometry(.095,14,10),hairMat,[0,2.0*scale,-.19]);const dupatta=add(new THREE.CapsuleGeometry(.075,.55,5,10),mat(profile.dupatta||0xc58a61),[.24,1.42*scale,.04]);dupatta.rotation.z=-.24;}
+ if(profile.apron){const apron=add(new THREE.BoxGeometry(.39,.55,.035),mat(profile.apron),[0,1.23*scale,.235]);}
+ if(profile.book){const book=add(new THREE.BoxGeometry(.25,.32,.055),mat(0x315b83),[.38,1.25,.12]);book.rotation.z=-.2;add(new THREE.BoxGeometry(.22,.29,.012),mat(0xf0e6c9),[.38,1.25,.155]);}
+ if(profile.tool){const handle=add(new THREE.CylinderGeometry(.027,.035,.9,12),wood,[.52,.8,.04]);handle.rotation.z=-.12;add(new THREE.BoxGeometry(.25,.14,.08),mat(0x777b78),[.55,1.28,.04]);}
  const arms=[];for(const side of [-1,1]){
-  const pivot=new THREE.Group();pivot.position.set(side*.35,1.43*bodyScale,0);g.add(pivot);
-  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.10,.36,5,10),cloth);
-  sleeve.position.y=-.23;pivot.add(sleeve);
-  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.08,.28,5,10),skinMat);
-  fore.position.set(0,-.54,.015);pivot.add(fore);
-  const hand=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),skinMat);
-  hand.position.set(0,-.70,.02);pivot.add(hand);
-  // fingers (simple)
-  for(let f=0;f<3;f++){
-   const finger=new THREE.Mesh(new THREE.CapsuleGeometry(.018,.08,3,5),skinMat);
-   finger.position.set((f-1)*.04,-.78,.05);pivot.add(finger);
-  }
+  const pivot=new THREE.Group();pivot.position.set(side*.31,1.59*scale,0);g.add(pivot);
+  const sleeve=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.34,6,12),cloth);sleeve.position.set(side*.015,-.22,0);sleeve.rotation.z=side*.06;sleeve.castShadow=true;pivot.add(sleeve);
+  const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.067,.31,6,12),skinMat);fore.position.set(0,-.52,.012);fore.castShadow=true;pivot.add(fore);
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.073,14,10),skinMat);hand.position.set(0,-.72,.025);hand.castShadow=true;pivot.add(hand);
+  for(let f=0;f<4;f++){const finger=new THREE.Mesh(new THREE.CapsuleGeometry(.012,.075,3,6),skinMat);finger.position.set((f-1.5)*.025,-.79,.04);finger.castShadow=true;pivot.add(finger)}
   arms.push(pivot);
  }
- // legs – more realistic
- const legs=[];for(const side of [-1,1]){
-  const pivot=new THREE.Group();pivot.position.set(side*.15,.79*bodyScale,0);g.add(pivot);
-  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.11,.50*bodyScale,5,10),lower);
-  leg.position.y=-.30*bodyScale;pivot.add(leg);
-  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.20,.12,.33),humanMats.shoe);
-  shoe.position.set(0,-.59*bodyScale,.07);pivot.add(shoe);
-  legs.push(pivot);
- }
- g.userData={arms,legs,mouth,phase:Math.random()*6,variant,profile};return g;
+ g.userData={...g.userData,arms,legs:g.userData.legs,mouth,phase:Math.random()*6,variant,profile};return g;
 }
-
 const villagers=[
  person(-3,-18,0x3d7180,0,{name:'रामू',role:'किसान',job:'खेत में गेहूँ और सब्जियाँ उगाता हूँ।',skin:0x9b6748,turban:0x9b563b,tool:true}),
  person(5,3,0x9b633b,1,{name:'सुरेश',role:'मजदूर',job:'मैं निर्माण और खेतों में मेहनत-मजदूरी करता हूँ।',skin:0xb77d5a}),
@@ -247,6 +224,7 @@ const villagers=[
  person(21,22,0x7b5269,0,{name:'प्रीति',role:'स्वास्थ्यकर्मी',job:'मैं गाँव के लोगों की सेहत का ध्यान रखती हूँ।',female:true,skin:0xb77d5a,dupatta:0xe0b77e}),
  person(-27,24,0x6c7650,2,{name:'बलदेव',role:'पशुपालक',job:'मैं गाय-भैंसों की देखभाल करता हूँ।',skin:0x9b6748,turban:0x597d68})
 ];
+const [villager1,villager2,villager3]=villagers;
 villagers.forEach((v,i)=>v.rotation.y=[-.4,2.4,.8,1.8,-1.2,.4,2.8,-.8,1.1,-2][i]);
 // small bench and hand pump
 box(2.1,.18,.55,wood,-5,.65,5);for(let x of [-5.8,-4.2])box(.16,.65,.16,dark,x,.32,5);
@@ -263,6 +241,7 @@ for(const s of [-1,1]){
  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.13,.58,4,8),mat(0x344a53));leg.position.set(s*.18,-1.12,-.15);bodyRig.add(leg);
  const shoe=new THREE.Mesh(new THREE.BoxGeometry(.2,.11,.34),dark);shoe.position.set(s*.18,-1.48,-.28);bodyRig.add(shoe);
 }
+// body is intentionally below view; it appears when looking down.
 bodyRig.position.set(0,0,0);
 const player={pos:new THREE.Vector3(0,1.68,8),yaw:0,pitch:0,vy:0,onGround:true};
 camera.position.copy(player.pos);
